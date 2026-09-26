@@ -183,70 +183,70 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
       </div>
 
       {/* Status Counters Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'AVAILABLE' ? 'all' : 'AVAILABLE')}
-          className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'AVAILABLE' ? 'ring-2 ring-emerald-600 bg-emerald-50/70 border-emerald-300' : 'bg-white border-slate-200 hover:border-slate-300'
+          className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all duration-200 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover ${
+            selectedStatus === 'AVAILABLE' ? 'ring-2 ring-emerald-600 bg-emerald-50/70 border-emerald-300' : 'bg-white border-slate-200/80 hover:border-slate-300'
           }`}
         >
           <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase">Available</p>
-            <p className="text-xl font-black text-emerald-700">{availableCount}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Available</p>
+            <p className="text-2xl font-black text-emerald-800">{availableCount}</p>
           </div>
-          <span className="w-3 h-3 rounded-full bg-emerald-500" />
+          <span className="w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
         </button>
 
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'OCCUPIED' ? 'all' : 'OCCUPIED')}
-          className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'OCCUPIED' ? 'ring-2 ring-blue-600 bg-blue-50/70 border-blue-300' : 'bg-white border-slate-200 hover:border-slate-300'
+          className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all duration-200 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover ${
+            selectedStatus === 'OCCUPIED' ? 'ring-2 ring-blue-600 bg-blue-50/70 border-blue-300' : 'bg-white border-slate-200/80 hover:border-slate-300'
           }`}
         >
           <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase">Occupied</p>
-            <p className="text-xl font-black text-blue-700">{occupiedCount}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Occupied</p>
+            <p className="text-2xl font-black text-blue-800">{occupiedCount}</p>
           </div>
-          <span className="w-3 h-3 rounded-full bg-blue-500" />
+          <span className="w-3 h-3 rounded-full bg-blue-500 ring-4 ring-blue-500/20" />
         </button>
 
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'RESERVED' ? 'all' : 'RESERVED')}
-          className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'RESERVED' ? 'ring-2 ring-amber-600 bg-amber-50/70 border-amber-300' : 'bg-white border-slate-200 hover:border-slate-300'
+          className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all duration-200 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover ${
+            selectedStatus === 'RESERVED' ? 'ring-2 ring-amber-600 bg-amber-50/70 border-amber-300' : 'bg-white border-slate-200/80 hover:border-slate-300'
           }`}
         >
           <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase">Reserved</p>
-            <p className="text-xl font-black text-amber-700">{reservedCount}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reserved</p>
+            <p className="text-2xl font-black text-amber-800">{reservedCount}</p>
           </div>
-          <span className="w-3 h-3 rounded-full bg-amber-500" />
+          <span className="w-3 h-3 rounded-full bg-amber-500 ring-4 ring-amber-500/20" />
         </button>
 
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'CLEANING' ? 'all' : 'CLEANING')}
-          className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'CLEANING' ? 'ring-2 ring-orange-600 bg-orange-50/70 border-orange-300' : 'bg-white border-slate-200 hover:border-slate-300'
+          className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all duration-200 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover ${
+            selectedStatus === 'CLEANING' ? 'ring-2 ring-orange-600 bg-orange-50/70 border-orange-300' : 'bg-white border-slate-200/80 hover:border-slate-300'
           }`}
         >
           <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase">Cleaning</p>
-            <p className="text-xl font-black text-orange-600">{cleaningCount}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Cleaning</p>
+            <p className="text-2xl font-black text-orange-600">{cleaningCount}</p>
           </div>
-          <span className="w-3 h-3 rounded-full bg-orange-500" />
+          <span className="w-3 h-3 rounded-full bg-orange-500 ring-4 ring-orange-500/20" />
         </button>
 
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'MAINTENANCE' ? 'all' : 'MAINTENANCE')}
-          className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'MAINTENANCE' ? 'ring-2 ring-rose-600 bg-rose-50/70 border-rose-300' : 'bg-white border-slate-200 hover:border-slate-300'
+          className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all duration-200 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover ${
+            selectedStatus === 'MAINTENANCE' ? 'ring-2 ring-rose-600 bg-rose-50/70 border-rose-300' : 'bg-white border-slate-200/80 hover:border-slate-300'
           }`}
         >
           <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase">Maintenance</p>
-            <p className="text-xl font-black text-rose-600">{maintenanceCount}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Maintenance</p>
+            <p className="text-2xl font-black text-rose-600">{maintenanceCount}</p>
           </div>
-          <span className="w-3 h-3 rounded-full bg-rose-500" />
+          <span className="w-3 h-3 rounded-full bg-rose-500 ring-4 ring-rose-500/20" />
         </button>
       </div>
 
@@ -373,12 +373,12 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                   const genderProfile = getRoomGenderProfile(r.id);
 
                   // Card border color based on status
-                  const statusStyles: Record<RoomStatus, { border: string; bg: string; text: string }> = {
-                    AVAILABLE: { border: 'border-emerald-200 hover:border-emerald-400', bg: 'bg-emerald-50/30', text: 'text-emerald-700' },
-                    OCCUPIED: { border: 'border-blue-200 hover:border-blue-400', bg: 'bg-blue-50/30', text: 'text-blue-700' },
-                    RESERVED: { border: 'border-amber-200 hover:border-amber-400', bg: 'bg-amber-50/30', text: 'text-amber-700' },
-                    CLEANING: { border: 'border-orange-200 hover:border-orange-400', bg: 'bg-orange-50/30', text: 'text-orange-700' },
-                    MAINTENANCE: { border: 'border-rose-200 hover:border-rose-400', bg: 'bg-rose-50/30', text: 'text-rose-700' },
+                  const statusStyles: Record<RoomStatus, { border: string; bg: string; text: string; topAccent: string }> = {
+                    AVAILABLE: { border: 'border-slate-200/80 hover:border-emerald-400', bg: 'bg-white hover:bg-emerald-50/20', text: 'text-emerald-700', topAccent: 'bg-emerald-500' },
+                    OCCUPIED: { border: 'border-slate-200/80 hover:border-blue-400', bg: 'bg-white hover:bg-blue-50/20', text: 'text-blue-700', topAccent: 'bg-blue-600' },
+                    RESERVED: { border: 'border-slate-200/80 hover:border-amber-400', bg: 'bg-white hover:bg-amber-50/20', text: 'text-amber-700', topAccent: 'bg-amber-500' },
+                    CLEANING: { border: 'border-slate-200/80 hover:border-orange-400', bg: 'bg-white hover:bg-orange-50/20', text: 'text-orange-700', topAccent: 'bg-orange-500' },
+                    MAINTENANCE: { border: 'border-slate-200/80 hover:border-rose-400', bg: 'bg-white hover:bg-rose-50/20', text: 'text-rose-700', topAccent: 'bg-rose-500' },
                   };
 
                   const currentStyle = statusStyles[r.status];
@@ -387,8 +387,10 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                     <div
                       key={r.id}
                       onClick={() => handleOpenRoomModal(r)}
-                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all duration-150 hover:shadow-md flex flex-col justify-between ${currentStyle.border} ${currentStyle.bg} group relative overflow-hidden`}
+                      className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 shadow-2xs hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between ${currentStyle.border} ${currentStyle.bg} group relative overflow-hidden`}
                     >
+                      {/* Top Accent Line */}
+                      <div className={`absolute top-0 left-0 right-0 h-1 ${currentStyle.topAccent}`} />
                       <div>
                         {/* Header: Room Number and Status */}
                         <div className="flex items-center justify-between mb-1">

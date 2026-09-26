@@ -57,13 +57,13 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* 7-Days Trend Area Chart */}
-      <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-xs">
+      <div className="rounded-3xl bg-white p-6 border border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover transition-all duration-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="text-sm font-bold text-slate-800">Tren Okupansi Tempat Tidur (7 Hari Terakhir)</h4>
+            <h4 className="text-sm font-bold text-slate-900">Tren Okupansi Tempat Tidur (7 Hari Terakhir)</h4>
             <p className="text-xs text-slate-500">Persentase tingkat hunian asrama haji Jayapura</p>
           </div>
-          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/80 shadow-2xs">
             Rata-rata 62.1%
           </span>
         </div>
@@ -72,7 +72,7 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
             <AreaChart data={sevenDaysData}>
               <defs>
                 <linearGradient id="colorOcc" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0F5132" stopOpacity={0.4} />
+                  <stop offset="5%" stopColor="#0F5132" stopOpacity={0.35} />
                   <stop offset="95%" stopColor="#0F5132" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
@@ -81,7 +81,7 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
               <YAxis unit="%" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} domain={[0, 100]} />
               <Tooltip 
                 formatter={(val: number) => [`${val}%`, 'Tingkat Okupansi']} 
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '12px' }}
               />
               <Area type="monotone" dataKey="occupancy" stroke="#0F5132" strokeWidth={3} fillOpacity={1} fill="url(#colorOcc)" />
             </AreaChart>
@@ -90,10 +90,10 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
       </div>
 
       {/* Room Status Composition Donut Chart */}
-      <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-xs">
+      <div className="rounded-3xl bg-white p-6 border border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover transition-all duration-200">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h4 className="text-sm font-bold text-slate-800">Komposisi Status Kamar Real-time</h4>
+            <h4 className="text-sm font-bold text-slate-900">Komposisi Status Kamar Real-time</h4>
             <p className="text-xs text-slate-500">Total {rooms.length} kamar terdistribusi di 3 gedung</p>
           </div>
         </div>
@@ -115,7 +115,7 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
               </Pie>
               <Tooltip 
                 formatter={(val: number, name: string) => [`${val} Kamar`, name]}
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '12px' }}
               />
               <Legend 
                 layout="horizontal" 
@@ -130,10 +130,10 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
       </div>
 
       {/* Monthly Tamu & Okupansi Bar Chart */}
-      <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-xs">
+      <div className="rounded-3xl bg-white p-6 border border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover transition-all duration-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="text-sm font-bold text-slate-800">Okupansi Bulanan & Jumlah Tamu (Tahun 2026)</h4>
+            <h4 className="text-sm font-bold text-slate-900">Okupansi Bulanan & Jumlah Tamu (Tahun 2026)</h4>
             <p className="text-xs text-slate-500">Histori okupansi per bulan di Asrama Haji Papua</p>
           </div>
         </div>
@@ -145,19 +145,19 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
               <YAxis unit="%" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} domain={[0, 100]} />
               <Tooltip 
                 formatter={(val: number, name: string) => [name === 'okupansi' ? `${val}%` : `${val} Orang`, name === 'okupansi' ? 'Okupansi' : 'Total Tamu']}
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '12px' }}
               />
-              <Bar dataKey="okupansi" fill="#C59B27" radius={[6, 6, 0, 0]} name="Okupansi (%)" />
+              <Bar dataKey="okupansi" fill="#C59B27" radius={[8, 8, 0, 0]} name="Okupansi (%)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Activity Breakdown Chart */}
-      <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-xs">
+      <div className="rounded-3xl bg-white p-6 border border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover transition-all duration-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="text-sm font-bold text-slate-800">Distribusi Tamu Berdasarkan Jenis Kegiatan</h4>
+            <h4 className="text-sm font-bold text-slate-900">Distribusi Tamu Berdasarkan Jenis Kegiatan</h4>
             <p className="text-xs text-slate-500">Kategori penerima manfaat fasilitas asrama haji</p>
           </div>
         </div>
@@ -169,9 +169,9 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
               <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} width={90} />
               <Tooltip 
                 formatter={(val: number) => [`${val} Tamu`, 'Jumlah']}
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '12px' }}
               />
-              <Bar dataKey="count" radius={[0, 6, 6, 0]}>
+              <Bar dataKey="count" radius={[0, 8, 8, 0]}>
                 {guestTypeData.map((entry, index) => (
                   <Cell key={`bar-${index}`} fill={entry.fill} />
                 ))}

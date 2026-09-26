@@ -235,17 +235,17 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center gap-3">
+      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] flex flex-wrap items-center gap-3.5">
         {/* Search */}
         <div className="flex-1 min-w-[240px]">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
             <input
               type="text"
               placeholder="Cari nomor reservasi, nama pemesan, rombongan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-10 pr-3.5 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
             />
           </div>
         </div>
@@ -255,7 +255,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
           >
             <option value="all">Semua Status</option>
             <option value="PENDING">PENDING</option>
@@ -272,7 +272,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
           >
             <option value="all">Semua Jenis Reservasi</option>
             <option value="INDIVIDUAL">Individu</option>
@@ -284,18 +284,18 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
       </div>
 
       {/* Table Data */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200">
+            <thead className="bg-slate-50/70 text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-100">
               <tr>
-                <th className="py-3.5 px-4">No. Reservasi</th>
-                <th className="py-3.5 px-4">Tamu / Rombongan</th>
-                <th className="py-3.5 px-4">Instansi & Kegiatan</th>
-                <th className="py-3.5 px-4">Periode Menginap</th>
-                <th className="py-3.5 px-4 text-center">Tamu / Kamar</th>
-                <th className="py-3.5 px-4">Status & Pembayaran</th>
-                <th className="py-3.5 px-4 text-right">Aksi</th>
+                <th className="py-4 px-4">No. Reservasi</th>
+                <th className="py-4 px-4">Tamu / Rombongan</th>
+                <th className="py-4 px-4">Instansi & Kegiatan</th>
+                <th className="py-4 px-4">Periode Menginap</th>
+                <th className="py-4 px-4 text-center">Tamu / Kamar</th>
+                <th className="py-4 px-4">Status & Pembayaran</th>
+                <th className="py-4 px-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -307,7 +307,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                 </tr>
               ) : (
                 paginatedData.map((rsv) => (
-                  <tr key={rsv.id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={rsv.id} className="hover:bg-slate-50/70 transition-colors">
                     {/* No Reservasi */}
                     <td className="py-3 px-4 font-bold text-slate-900">
                       <span className="font-mono text-emerald-900">{rsv.reservation_no}</span>

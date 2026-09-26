@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur-md sm:px-6 shadow-sm">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 backdrop-blur-xl sm:px-6 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
       {/* Left Area: Mobile Toggle & Global Search */}
       <div className="flex items-center gap-3">
         <button
@@ -107,11 +107,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Global Search Bar */}
         <div 
           onClick={onOpenGlobalSearch}
-          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/80 hover:bg-slate-100 border border-slate-200/80 text-xs text-slate-500 cursor-pointer transition-all w-36 md:w-48 lg:w-56 xl:w-64 group shrink"
+          className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-100/70 hover:bg-slate-100 border border-slate-200/70 text-xs text-slate-500 cursor-pointer transition-all duration-200 w-36 md:w-52 lg:w-60 xl:w-64 group shrink ring-1 ring-transparent hover:ring-emerald-700/20"
         >
           <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700 transition-colors shrink-0" />
           <span className="truncate">Cari data sistem...</span>
-          <kbd className="ml-auto text-[9px] font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-400 shrink-0">
+          <kbd className="ml-auto text-[9px] font-mono bg-white px-1.5 py-0.5 rounded-md border border-slate-200 text-slate-400 shrink-0 shadow-2xs">
             ⌘K
           </kbd>
         </div>
@@ -127,20 +127,23 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Area: Time, Reseed Button, Notifications, User Menu */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        {/* WIT Clock */}
-        <div className="hidden xl:flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200/60 font-medium whitespace-nowrap shrink-0">
-          <Clock className="w-3.5 h-3.5 text-emerald-800 shrink-0" />
+        {/* WIT Clock with Live Pulse */}
+        <div className="hidden xl:flex items-center gap-2 text-xs text-slate-600 bg-slate-100/70 px-3 py-1.5 rounded-xl border border-slate-200/60 font-medium whitespace-nowrap shrink-0">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+          </span>
           <span>{currentTime}</span>
         </div>
 
-        {/* Kasir Resepsionis POS Quick Button (Only for Receptionist & Admins) */}
+        {/* Kasir Resepsionis POS Quick Button (Primary Accent) */}
         {['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'RESEPSIONIS'].includes(currentRole) && (
           <button
             onClick={() => onNavigate('frontdesk-pos')}
             title="Buka Kasir & Transaksi Resepsionis 1-Klik (Front Desk POS)"
-            className="flex items-center gap-1.5 text-[11px] font-black text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500/50 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all shadow-xs group whitespace-nowrap shrink-0 cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-semibold text-white bg-gradient-to-r from-emerald-800 to-emerald-900 hover:from-emerald-700 hover:to-emerald-800 border border-emerald-700/80 px-3 py-1.5 rounded-xl transition-all shadow-xs hover:shadow-sm group whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <Receipt className="w-3.5 h-3.5 text-slate-900 group-hover:scale-110 transition-transform shrink-0" />
+            <Receipt className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-6 transition-transform shrink-0" />
             <span className="hidden sm:inline">Kasir POS</span>
           </button>
         )}
@@ -149,9 +152,9 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={() => setIsMunakosahOpen(true)}
           title="Anjungan Cek Kamar Mandiri Jemaah & Tamu (Munakosah Papua)"
-          className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs group whitespace-nowrap shrink-0 cursor-pointer"
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-emerald-900 bg-slate-100/80 hover:bg-emerald-50/80 border border-slate-200/70 hover:border-emerald-200 px-3 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
         >
-          <span className="text-sm shrink-0">🕋</span>
+          <span className="text-xs shrink-0">🕋</span>
           <span className="hidden sm:inline">Cek Kamar</span>
         </button>
 
@@ -159,10 +162,10 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onOpenHelpGuide}
           title="Buka Buku Panduan & SOP Operasional SIPAH (F1 atau ?)"
-          className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+          className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-emerald-900 bg-slate-100/80 hover:bg-emerald-50/80 border border-slate-200/70 hover:border-emerald-200 px-3 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
         >
-          <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-          <span className="hidden sm:inline">Panduan SOP</span>
+          <BookOpen className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+          <span>Panduan SOP</span>
         </button>
 
         {/* Demo Data Reset Button (Super Admin Only) */}
@@ -170,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={handleResetData}
             title="Reset database ke Demo Seed Data (Super Admin Only)"
-            className="hidden lg:flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 px-2.5 py-1.5 rounded-lg transition-colors shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+            className="hidden lg:flex items-center gap-1.5 text-xs font-medium text-amber-800 hover:text-amber-900 bg-amber-50/80 hover:bg-amber-100/80 border border-amber-200/70 px-2.5 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5 text-amber-700 shrink-0" />
             <span>Reset Demo</span>
@@ -249,9 +252,9 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="relative" ref={userRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2 p-1 sm:px-2 sm:py-1 rounded-xl hover:bg-slate-100 transition-colors text-left shrink-0 whitespace-nowrap cursor-pointer"
+            className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1 rounded-xl hover:bg-slate-100/80 transition-colors text-left shrink-0 whitespace-nowrap cursor-pointer border border-transparent hover:border-slate-200/60"
           >
-            <div className="w-8 h-8 rounded-full bg-emerald-800 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-800 to-emerald-700 text-white font-bold flex items-center justify-center text-xs shadow-xs ring-2 ring-emerald-600/20 shrink-0">
               {currentUser?.name.charAt(0) || 'U'}
             </div>
             <div className="hidden md:block leading-tight">
@@ -265,18 +268,18 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* User Menu Dropdown */}
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white shadow-2xl border border-slate-200 p-2 z-50 animate-in fade-in slide-in-from-top-2">
-              <div className="p-3 bg-gradient-to-r from-emerald-50 to-amber-50/50 rounded-xl mb-2 border border-emerald-100">
+            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-slate-200/80 p-2 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="p-3 bg-gradient-to-br from-emerald-50 via-slate-50 to-amber-50/40 rounded-xl mb-2 border border-emerald-100/80">
                 <p className="text-xs font-bold text-slate-900">{currentUser?.name}</p>
                 <p className="text-[11px] text-slate-600 truncate">{currentUser?.email}</p>
-                <div className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-800 text-white px-2 py-0.5 rounded-full">
-                  <Shield className="w-3 h-3" />
+                <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-0.5 rounded-full shadow-2xs">
+                  <Shield className="w-3 h-3 text-amber-300" />
                   {roleLabels[currentRole]}
                 </div>
               </div>
 
               {/* Role Switcher for Instant Testing */}
-              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Ganti Role Pengguna (Demo):
               </div>
               <div className="space-y-0.5">
@@ -297,9 +300,9 @@ export const Header: React.FC<HeaderProps> = ({
                         'dashboard';
                       onNavigate(defaultPage);
                     }}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors ${
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all ${
                       currentUser?.id === u.id
-                        ? 'bg-emerald-800 text-white font-semibold'
+                        ? 'bg-emerald-800 text-white font-semibold shadow-xs'
                         : 'text-slate-700 hover:bg-slate-100'
                     }`}
                   >
@@ -316,7 +319,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onNavigate('landing');
                   setShowUserMenu(false);
                 }}
-                className="w-full text-left px-2.5 py-2 rounded-lg text-xs font-semibold text-emerald-800 hover:bg-emerald-50 flex items-center gap-2 transition-colors cursor-pointer"
+                className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-emerald-800 hover:bg-emerald-50 flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <Compass className="w-4 h-4 text-emerald-600" />
                 <span>Lihat Beranda Publik (Landing)</span>
@@ -328,7 +331,7 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowUserMenu(false);
                   toast.info('Keluar', 'Anda telah keluar dari aplikasi.');
                 }}
-                className="w-full text-left px-2.5 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
+                className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Keluar dari Aplikasi</span>

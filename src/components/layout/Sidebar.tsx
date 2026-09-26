@@ -46,10 +46,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItemClass = (pageKey: string) => {
     const isActive = currentPage === pageKey;
-    return `group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
+    return `group relative flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
       isActive
-        ? 'bg-emerald-700/80 text-white shadow-sm font-bold'
-        : 'text-emerald-100/80 hover:bg-emerald-800/40 hover:text-white'
+        ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold shadow-md shadow-emerald-950/40 ring-1 ring-emerald-400/30'
+        : 'text-emerald-100/75 hover:text-white hover:bg-white/[0.08] font-medium'
     }`;
   };
 
