@@ -551,6 +551,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
+        {/* Public Landing Portal Preview Button */}
+        <div className="p-3 pb-0 bg-emerald-950/40">
+          <button
+            onClick={() => {
+              onNavigate('landing');
+              onCloseMobile();
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-200 hover:text-white hover:bg-emerald-900/80 bg-emerald-900/30 border border-emerald-700/40 transition-all text-left"
+            title="Buka Beranda Publik (Landing Page)"
+          >
+            <Compass className="w-4 h-4 text-emerald-400 shrink-0" />
+            {!collapsed && <span>Beranda Publik</span>}
+          </button>
+        </div>
+
         {/* Help & SOP Button */}
         <div className="p-3 border-t border-emerald-900/60 bg-emerald-950/40">
           <button

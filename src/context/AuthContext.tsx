@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const found = allUsers.find(u => u.id === savedUserId);
         if (found) return found;
       }
-      return allUsers[0] || null;
+      return null;
     } catch {
       return null;
     }

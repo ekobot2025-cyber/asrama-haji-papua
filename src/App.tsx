@@ -33,12 +33,14 @@ import { UsersPage } from './pages/system/UsersPage';
 import { AuditLogPage } from './pages/system/AuditLogPage';
 import { SettingsPage } from './pages/system/SettingsPage';
 import { FrontDeskPosPage } from './pages/operations/FrontDeskPosPage';
+import { LandingPage } from './pages/landing/LandingPage';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
 import { Button } from './components/common/Button';
 import { UserRole } from './types';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, currentUser } = useAuth();
+  const [authView, setAuthView] = useState<'landing' | 'login'>('landing');
   const [currentPage, setCurrentPage] = useState<string>(() => {
     try {
       const savedUser = db.getUsers().find(u => u.id === localStorage.getItem('sipah_auth_user_id'));
@@ -119,7 +121,20 @@ const AppContent: React.FC = () => {
   };
 
   if (!isAuthenticated) {
-    return <LoginPage />;
+    if (authView === 'login') {
+      return <LoginPage onBackToLanding={() => setAuthView('landing')} />;
+    }
+    return <LandingPage onGoToLogin={() => setAuthView('login')} />;
+  }
+
+  // If authenticated user navigates to 'landing', render LandingPage with quick access back to dashboard
+  if (currentPage === 'landing' && currentUser) {
+    return (
+      <LandingPage
+        onGoToLogin={() => handleNavigate(getDefaultPageForRole(currentUser.role))}
+        currentUser={currentUser}
+      />
+    );
   }
 
   const renderPage = () => {

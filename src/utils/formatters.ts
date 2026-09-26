@@ -13,6 +13,8 @@ export function formatCurrency(amount: number | undefined | null): string {
   }).format(amount);
 }
 
+export const formatRupiah = formatCurrency;
+
 export function formatDateIndo(dateStr: string | Date | undefined | null): string {
   if (!dateStr) return '-';
   try {

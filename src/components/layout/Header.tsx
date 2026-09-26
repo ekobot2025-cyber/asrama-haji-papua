@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, Search, Bell, Clock, ChevronDown, CheckCircle, 
-  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield, BookOpen, Receipt
+  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield, BookOpen, Receipt, Compass
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
@@ -310,6 +310,17 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
 
               <div className="my-1.5 border-t border-slate-100" />
+
+              <button
+                onClick={() => {
+                  onNavigate('landing');
+                  setShowUserMenu(false);
+                }}
+                className="w-full text-left px-2.5 py-2 rounded-lg text-xs font-semibold text-emerald-800 hover:bg-emerald-50 flex items-center gap-2 transition-colors cursor-pointer"
+              >
+                <Compass className="w-4 h-4 text-emerald-600" />
+                <span>Lihat Beranda Publik (Landing)</span>
+              </button>
 
               <button
                 onClick={() => {
