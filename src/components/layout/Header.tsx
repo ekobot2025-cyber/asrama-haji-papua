@@ -40,8 +40,8 @@ export const Header: React.FC<HeaderProps> = ({
     const updateTime = () => {
       const now = new Date();
       // Formatted in Indonesian with WIT
-      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
       
       const dayName = days[now.getDay()];
       const day = now.getDate();
@@ -107,11 +107,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Global Search Bar */}
         <div 
           onClick={onOpenGlobalSearch}
-          className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-100 border border-slate-200/80 text-xs text-slate-500 cursor-pointer transition-all w-64 md:w-80 group"
+          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/80 hover:bg-slate-100 border border-slate-200/80 text-xs text-slate-500 cursor-pointer transition-all w-36 md:w-48 lg:w-56 xl:w-64 group shrink"
         >
-          <Search className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-colors" />
-          <span className="truncate">Cari reservasi, tamu, rombongan, kamar...</span>
-          <kbd className="ml-auto text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-400">
+          <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700 transition-colors shrink-0" />
+          <span className="truncate">Cari data sistem...</span>
+          <kbd className="ml-auto text-[9px] font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-400 shrink-0">
             ⌘K
           </kbd>
         </div>
@@ -119,17 +119,17 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Mobile Search Icon */}
         <button
           onClick={onOpenGlobalSearch}
-          className="sm:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+          className="sm:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer"
         >
           <Search className="w-5 h-5" />
         </button>
       </div>
 
       {/* Right Area: Time, Reseed Button, Notifications, User Menu */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {/* WIT Clock */}
-        <div className="hidden xl:flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200/60 font-medium">
-          <Clock className="w-3.5 h-3.5 text-emerald-800" />
+        <div className="hidden xl:flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200/60 font-medium whitespace-nowrap shrink-0">
+          <Clock className="w-3.5 h-3.5 text-emerald-800 shrink-0" />
           <span>{currentTime}</span>
         </div>
 
@@ -138,10 +138,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => onNavigate('frontdesk-pos')}
             title="Buka Kasir & Transaksi Resepsionis 1-Klik (Front Desk POS)"
-            className="flex items-center gap-1.5 text-[11px] font-black text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500/50 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all shadow-xs group"
+            className="flex items-center gap-1.5 text-[11px] font-black text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500/50 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all shadow-xs group whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <Receipt className="w-3.5 h-3.5 text-slate-900 group-hover:scale-110 transition-transform" />
-            <span className="hidden sm:inline">Kasir Resepsionis</span>
+            <Receipt className="w-3.5 h-3.5 text-slate-900 group-hover:scale-110 transition-transform shrink-0" />
+            <span className="hidden sm:inline">Kasir POS</span>
           </button>
         )}
 
@@ -149,19 +149,19 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={() => setIsMunakosahOpen(true)}
           title="Anjungan Cek Kamar Mandiri Jemaah & Tamu (Munakosah Papua)"
-          className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs group"
+          className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs group whitespace-nowrap shrink-0 cursor-pointer"
         >
-          <span className="text-sm">🕋</span>
-          <span className="hidden sm:inline">Cek Kamar Jemaah</span>
+          <span className="text-sm shrink-0">🕋</span>
+          <span className="hidden sm:inline">Cek Kamar</span>
         </button>
 
         {/* Help Guide SOP Button */}
         <button
           onClick={onOpenHelpGuide}
           title="Buka Buku Panduan & SOP Operasional SIPAH (F1 atau ?)"
-          className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs"
+          className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
         >
-          <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+          <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
           <span className="hidden sm:inline">Panduan SOP</span>
         </button>
 
@@ -170,10 +170,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={handleResetData}
             title="Reset database ke Demo Seed Data (Super Admin Only)"
-            className="hidden md:flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 px-2.5 py-1.5 rounded-lg transition-colors shadow-2xs"
+            className="hidden lg:flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 px-2.5 py-1.5 rounded-lg transition-colors shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
-            <span>Reset Demo Data</span>
+            <RotateCcw className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span>Reset Demo</span>
           </button>
         )}
 
@@ -249,18 +249,18 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="relative" ref={userRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2.5 p-1 sm:px-2 sm:py-1 rounded-xl hover:bg-slate-100 transition-colors text-left"
+            className="flex items-center gap-2 p-1 sm:px-2 sm:py-1 rounded-xl hover:bg-slate-100 transition-colors text-left shrink-0 whitespace-nowrap cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full bg-emerald-800 text-white font-bold flex items-center justify-center text-xs shadow-xs">
+            <div className="w-8 h-8 rounded-full bg-emerald-800 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0">
               {currentUser?.name.charAt(0) || 'U'}
             </div>
             <div className="hidden md:block leading-tight">
-              <p className="text-xs font-bold text-slate-800 truncate max-w-[130px]">{currentUser?.name}</p>
-              <p className="text-[10px] font-semibold text-emerald-800">
+              <p className="text-xs font-bold text-slate-800 truncate max-w-[120px]">{currentUser?.name}</p>
+              <p className="text-[10px] font-semibold text-emerald-800 truncate max-w-[120px]">
                 {roleLabels[currentRole] || currentRole}
               </p>
             </div>
-            <ChevronDown className="w-4 h-4 text-slate-400 hidden sm:block" />
+            <ChevronDown className="w-4 h-4 text-slate-400 hidden sm:block shrink-0" />
           </button>
 
           {/* User Menu Dropdown */}
