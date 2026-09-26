@@ -55,7 +55,8 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
     }
   }, [initialReservationId]);
 
-  const getGuestOrGroupName = (rsv: Reservation): string => {
+  const getGuestOrGroupName = (rsv?: Reservation | null): string => {
+    if (!rsv) return '';
     if (rsv.group_id) {
       const g = groups.find((grp) => grp.id === rsv.group_id);
       if (g) return g.group_name;
@@ -67,7 +68,8 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
     return rsv.activity_name || 'Tamu';
   };
 
-  const getInstitutionName = (rsv: Reservation): string => {
+  const getInstitutionName = (rsv?: Reservation | null): string => {
+    if (!rsv) return '';
     if (!rsv.institution_id) return 'Mandiri / Individu';
     const inst = institutions.find((i) => i.id === rsv.institution_id);
     return inst ? inst.name : 'Instansi';

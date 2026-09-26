@@ -43,7 +43,8 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
   const groups = db.getGroups();
   const institutions = db.getInstitutions();
 
-  const getGuestOrGroupName = (rsv: Reservation): string => {
+  const getGuestOrGroupName = (rsv?: Reservation | null): string => {
+    if (!rsv) return '';
     if (rsv.group_id) {
       const g = groups.find((grp) => grp.id === rsv.group_id);
       if (g) return g.group_name;
@@ -55,7 +56,8 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
     return rsv.activity_name || 'Tamu Asrama Haji';
   };
 
-  const getInstitutionName = (rsv: Reservation): string => {
+  const getInstitutionName = (rsv?: Reservation | null): string => {
+    if (!rsv) return '';
     if (!rsv.institution_id) return 'Individu / Mandiri';
     const inst = institutions.find((i) => i.id === rsv.institution_id);
     return inst ? inst.name : 'Instansi Pemerintah';
@@ -294,8 +296,8 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
         title={verifyModal.isApprove ? 'Verifikasi dan Setujui Reservasi' : 'Tolak Permohonan Reservasi'}
         message={
           verifyModal.isApprove
-            ? `Apakah Anda yakin ingin memverifikasi dan menyetujui reservasi ${verifyModal.reservation?.reservation_no} untuk ${getGuestOrGroupName(verifyModal.reservation!)}? Status akan berubah menjadi CONFIRMED.`
-            : `Apakah Anda yakin ingin menolak reservasi ${verifyModal.reservation?.reservation_no}? Status akan berubah menjadi REJECTED.`
+            ? `Apakah Anda yakin ingin memverifikasi dan menyetujui reservasi ${verifyModal.reservation?.reservation_no || ''} untuk ${getGuestOrGroupName(verifyModal.reservation)}? Status akan berubah menjadi CONFIRMED.`
+            : `Apakah Anda yakin ingin menolak reservasi ${verifyModal.reservation?.reservation_no || ''}? Status akan berubah menjadi REJECTED.`
         }
         confirmText={verifyModal.isApprove ? 'Ya, Setujui Reservasi' : 'Ya, Tolak Permohonan'}
         variant={verifyModal.isApprove ? 'primary' : 'danger'}

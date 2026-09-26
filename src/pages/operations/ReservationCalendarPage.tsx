@@ -29,7 +29,8 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
   const guests = db.getGuests();
   const groups = db.getGroups();
 
-  const getGuestOrGroupName = (rsv: Reservation): string => {
+  const getGuestOrGroupName = (rsv?: Reservation | null): string => {
+    if (!rsv) return '';
     if (rsv.group_id) {
       const g = groups.find((grp) => grp.id === rsv.group_id);
       if (g) return g.group_name;
