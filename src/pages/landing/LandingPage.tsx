@@ -67,9 +67,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-950 text-white text-[11px] py-2 px-4 border-b border-emerald-800/80">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="bg-amber-400 text-emerald-950 font-black px-2 py-0.5 rounded text-[10px] tracking-wide uppercase">
-              Resmi Kemenag RI
-            </span>
             <span className="text-emerald-100 font-medium">
               UPT Asrama Haji Transit Jayapura &bull; Provinsi Papua (Zona Waktu WIT)
             </span>
