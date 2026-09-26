@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, Search, Bell, Clock, ChevronDown, CheckCircle, 
-  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield
+  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
@@ -11,6 +11,7 @@ import { db } from '../../db/database';
 interface HeaderProps {
   onOpenMobileMenu: () => void;
   onOpenGlobalSearch: () => void;
+  onOpenHelpGuide: () => void;
   onNavigate: (page: string, targetId?: string) => void;
   collapsed: boolean;
 }
@@ -18,6 +19,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   onOpenMobileMenu,
   onOpenGlobalSearch,
+  onOpenHelpGuide,
   onNavigate,
   collapsed,
 }) => {
@@ -127,6 +129,16 @@ export const Header: React.FC<HeaderProps> = ({
           <Clock className="w-3.5 h-3.5 text-emerald-800" />
           <span>{currentTime}</span>
         </div>
+
+        {/* Help Guide SOP Button */}
+        <button
+          onClick={onOpenHelpGuide}
+          title="Buka Buku Panduan & SOP Operasional SIPAH (F1 atau ?)"
+          className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs"
+        >
+          <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+          <span className="hidden sm:inline">Panduan SOP</span>
+        </button>
 
         {/* Demo Data Reset Button */}
         <button

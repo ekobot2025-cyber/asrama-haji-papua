@@ -2,23 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { 
   Building2, BedDouble, Filter, Search, Calendar, 
   Users, CheckCircle2, Clock, Sparkles, Wrench, 
-  AlertCircle, RefreshCw, Layers, ArrowRight, ShieldCheck 
+  AlertCircle, RefreshCw, Layers, ArrowRight, ShieldCheck,
+  User, Phone, MapPin, Tag, LogIn, LogOut, Check
 } from 'lucide-react';
 import { db } from '../../db/database';
-import { Room, Building, Floor, RoomType, Bed, Guest, RoomStatus } from '../../types';
+import { Room, Building, Floor, RoomType, Bed, Guest, RoomStatus, RoomAssignment, Reservation } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { formatCurrency, formatDateIndo } from '../../utils/formatters';
+import { formatCurrency, formatDateIndo, maskNik } from '../../utils/formatters';
 
 interface RoomStatusBoardPageProps {
   onNavigate: (page: string, targetId?: string) => void;
 }
 
 export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavigate }) => {
-  const { currentUser, hasPermission } = useAuth();
+  const { currentUser } = useAuth();
   const toast = useToast();
 
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -27,11 +28,14 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
   const [floors, setFloors] = useState<Floor[]>([]);
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
+  const [assignments, setAssignments] = useState<RoomAssignment[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
 
   // Filters
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('all');
   const [selectedFloorId, setSelectedFloorId] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedGenderFilter, setSelectedGenderFilter] = useState<string>('all');
   const [searchNumber, setSearchNumber] = useState<string>('');
 
   // Selected room for detail modal
@@ -45,20 +49,13 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
     setFloors(db.getFloors());
     setRoomTypes(db.getRoomTypes());
     setGuests(db.getGuests());
+    setAssignments(db.getRoomAssignments());
+    setReservations(db.getReservations());
   };
 
   useEffect(() => {
     loadData();
   }, []);
-
-  // Filtered rooms
-  const filteredRooms = rooms.filter((r) => {
-    if (selectedBuildingId !== 'all' && r.building_id !== selectedBuildingId) return false;
-    if (selectedFloorId !== 'all' && r.floor_id !== selectedFloorId) return false;
-    if (selectedStatus !== 'all' && r.status !== selectedStatus) return false;
-    if (searchNumber && !r.room_number.toLowerCase().includes(searchNumber.toLowerCase())) return false;
-    return true;
-  });
 
   const getBuildingName = (bldId: string) => {
     return buildings.find((b) => b.id === bldId)?.name || 'Gedung Asrama';
@@ -76,6 +73,46 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
     return beds.filter((b) => b.room_id === roomId);
   };
 
+  // Helper to determine gender profile of a room
+  const getRoomGenderProfile = (roomId: string) => {
+    const activeAssigns = assignments.filter(
+      (a) => a.room_id === roomId && (a.status === 'ACTIVE' || a.status === 'CHECKED_IN')
+    );
+    if (activeAssigns.length === 0) {
+      return { type: 'EMPTY', label: 'Kosong', badge: 'bg-slate-100 text-slate-600 border-slate-200', icon: '⚪' };
+    }
+    const assignedGuests = activeAssigns
+      .map((a) => guests.find((g) => g.id === a.guest_id))
+      .filter(Boolean) as Guest[];
+
+    const hasMale = assignedGuests.some((g) => g.gender === 'L');
+    const hasFemale = assignedGuests.some((g) => g.gender === 'P');
+
+    if (hasMale && hasFemale) {
+      return { type: 'MIXED', label: 'Campur / Keluarga', badge: 'bg-amber-100 text-amber-900 border-amber-300', icon: '👥' };
+    }
+    if (hasMale) {
+      return { type: 'IKHWAN', label: 'Ikhwan (Pria)', badge: 'bg-teal-100 text-teal-900 border-teal-300', icon: '👳‍♂️' };
+    }
+    if (hasFemale) {
+      return { type: 'AKHWAT', label: 'Akhwat (Wanita)', badge: 'bg-purple-100 text-purple-900 border-purple-300', icon: '🧕' };
+    }
+    return { type: 'EMPTY', label: 'Kosong', badge: 'bg-slate-100 text-slate-600 border-slate-200', icon: '⚪' };
+  };
+
+  // Filtered rooms
+  const filteredRooms = rooms.filter((r) => {
+    if (selectedBuildingId !== 'all' && r.building_id !== selectedBuildingId) return false;
+    if (selectedFloorId !== 'all' && r.floor_id !== selectedFloorId) return false;
+    if (selectedStatus !== 'all' && r.status !== selectedStatus) return false;
+    if (selectedGenderFilter !== 'all') {
+      const profile = getRoomGenderProfile(r.id);
+      if (profile.type !== selectedGenderFilter) return false;
+    }
+    if (searchNumber && !r.room_number.toLowerCase().includes(searchNumber.toLowerCase())) return false;
+    return true;
+  });
+
   const handleOpenRoomModal = (room: Room) => {
     setSelectedRoom(room);
     setIsModalOpen(true);
@@ -87,6 +124,14 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
     toast.success('Status Diperbarui', `Kamar ${selectedRoom.room_number} berhasil diubah ke ${newStatus}.`);
     loadData();
     setSelectedRoom((prev) => (prev ? { ...prev, status: newStatus } : null));
+  };
+
+  const handleQuickMarkReady = () => {
+    if (!selectedRoom || !currentUser) return;
+    db.updateRoomStatus(selectedRoom.id, 'AVAILABLE');
+    toast.success('Kamar Siap Digunakan', `Kamar ${selectedRoom.room_number} telah ditandai AVAILABLE (Selesai Inspeksi).`);
+    loadData();
+    setSelectedRoom((prev) => (prev ? { ...prev, status: 'AVAILABLE', housekeeping_status: 'READY' } : null));
   };
 
   // Group filtered rooms by Building & Floor
@@ -110,21 +155,31 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            Peta Status Kamar (Room Status Board)
+            Peta Status Kamar & Tempat Tidur
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Visualisasi status kamar dan alokasi tempat tidur (bed) di seluruh gedung UPT Asrama Haji Papua.
+            Visualisasi status kamar, alokasi bed individual, dan kepatuhan syariah (Ikhwan / Akhwat) di seluruh wisma Asrama Haji Papua.
           </p>
         </div>
 
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={loadData}
-          icon={<RefreshCw className="w-4 h-4 text-emerald-800" />}
-        >
-          Muat Ulang Status
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={loadData}
+            icon={<RefreshCw className="w-4 h-4 text-emerald-800" />}
+          >
+            Muat Ulang
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => onNavigate('room-assignment')}
+            icon={<Layers className="w-4 h-4" />}
+          >
+            Penempatan Kamar
+          </Button>
+        </div>
       </div>
 
       {/* Status Counters Bar */}
@@ -132,7 +187,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'AVAILABLE' ? 'all' : 'AVAILABLE')}
           className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'AVAILABLE' ? 'ring-2 ring-emerald-600 bg-emerald-50/70 border-emerald-300' : 'bg-white border-slate-200'
+            selectedStatus === 'AVAILABLE' ? 'ring-2 ring-emerald-600 bg-emerald-50/70 border-emerald-300' : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
           <div>
@@ -145,7 +200,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'OCCUPIED' ? 'all' : 'OCCUPIED')}
           className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'OCCUPIED' ? 'ring-2 ring-blue-600 bg-blue-50/70 border-blue-300' : 'bg-white border-slate-200'
+            selectedStatus === 'OCCUPIED' ? 'ring-2 ring-blue-600 bg-blue-50/70 border-blue-300' : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
           <div>
@@ -158,7 +213,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'RESERVED' ? 'all' : 'RESERVED')}
           className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'RESERVED' ? 'ring-2 ring-amber-600 bg-amber-50/70 border-amber-300' : 'bg-white border-slate-200'
+            selectedStatus === 'RESERVED' ? 'ring-2 ring-amber-600 bg-amber-50/70 border-amber-300' : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
           <div>
@@ -171,7 +226,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'CLEANING' ? 'all' : 'CLEANING')}
           className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'CLEANING' ? 'ring-2 ring-orange-600 bg-orange-50/70 border-orange-300' : 'bg-white border-slate-200'
+            selectedStatus === 'CLEANING' ? 'ring-2 ring-orange-600 bg-orange-50/70 border-orange-300' : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
           <div>
@@ -184,7 +239,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'MAINTENANCE' ? 'all' : 'MAINTENANCE')}
           className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
-            selectedStatus === 'MAINTENANCE' ? 'ring-2 ring-rose-600 bg-rose-50/70 border-rose-300' : 'bg-white border-slate-200'
+            selectedStatus === 'MAINTENANCE' ? 'ring-2 ring-rose-600 bg-rose-50/70 border-rose-300' : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
           <div>
@@ -198,7 +253,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
       {/* Filter Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center gap-3">
         {/* Search Room */}
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[180px]">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
             Cari No Kamar
           </label>
@@ -215,7 +270,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         </div>
 
         {/* Filter Gedung */}
-        <div className="w-full sm:w-48">
+        <div className="w-full sm:w-44">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
             Gedung
           </label>
@@ -235,7 +290,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         </div>
 
         {/* Filter Lantai */}
-        <div className="w-full sm:w-44">
+        <div className="w-full sm:w-40">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
             Lantai
           </label>
@@ -253,14 +308,33 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
           </select>
         </div>
 
+        {/* Filter Gender Syariah */}
+        <div className="w-full sm:w-44">
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+            Penempatan Syariah
+          </label>
+          <select
+            value={selectedGenderFilter}
+            onChange={(e) => setSelectedGenderFilter(e.target.value)}
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+          >
+            <option value="all">Semua Kamar</option>
+            <option value="IKHWAN">👳‍♂️ Ikhwan (Pria)</option>
+            <option value="AKHWAT">🧕 Akhwat (Wanita)</option>
+            <option value="MIXED">👥 Campur / Mandiri</option>
+            <option value="EMPTY">⚪ Kosong (Tersedia)</option>
+          </select>
+        </div>
+
         {/* Reset Filter Button */}
-        {(selectedBuildingId !== 'all' || selectedFloorId !== 'all' || selectedStatus !== 'all' || searchNumber) && (
+        {(selectedBuildingId !== 'all' || selectedFloorId !== 'all' || selectedStatus !== 'all' || selectedGenderFilter !== 'all' || searchNumber) && (
           <div className="self-end pb-0.5">
             <button
               onClick={() => {
                 setSelectedBuildingId('all');
                 setSelectedFloorId('all');
                 setSelectedStatus('all');
+                setSelectedGenderFilter('all');
                 setSearchNumber('');
               }}
               className="text-xs text-rose-600 hover:underline font-semibold"
@@ -296,6 +370,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                 {roomList.map((r) => {
                   const roomBeds = getBedsForRoom(r.id);
                   const occupiedBedsCount = roomBeds.filter((b) => b.status === 'OCCUPIED').length;
+                  const genderProfile = getRoomGenderProfile(r.id);
 
                   // Card border color based on status
                   const statusStyles: Record<RoomStatus, { border: string; bg: string; text: string }> = {
@@ -312,11 +387,11 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                     <div
                       key={r.id}
                       onClick={() => handleOpenRoomModal(r)}
-                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all duration-150 hover:shadow-md flex flex-col justify-between ${currentStyle.border} ${currentStyle.bg} group`}
+                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all duration-150 hover:shadow-md flex flex-col justify-between ${currentStyle.border} ${currentStyle.bg} group relative overflow-hidden`}
                     >
                       <div>
                         {/* Header: Room Number and Status */}
-                        <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center justify-between mb-1">
                           <span className="text-base font-black text-slate-900 group-hover:text-emerald-800 transition-colors">
                             {r.room_number}
                           </span>
@@ -328,6 +403,14 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                             'bg-rose-100 text-rose-800'
                           }`}>
                             {r.status}
+                          </span>
+                        </div>
+
+                        {/* Gender Pill Badge */}
+                        <div className="mb-2">
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border flex items-center gap-1 w-max ${genderProfile.badge}`}>
+                            <span>{genderProfile.icon}</span>
+                            <span>{genderProfile.label}</span>
                           </span>
                         </div>
 
@@ -375,11 +458,11 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={`Detail Kamar ${selectedRoom.room_number}`}
+          title={`Detail & Penghuni Kamar ${selectedRoom.room_number}`}
           subtitle={`${getBuildingName(selectedRoom.building_id)} — ${getFloorName(selectedRoom.floor_id)}`}
           maxWidth="lg"
           footer={
-            <div className="flex items-center justify-between w-full">
+            <div className="flex items-center justify-between w-full flex-wrap gap-2">
               {/* Quick status change buttons */}
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-[11px] text-slate-500 font-semibold mr-1">Ubah Status:</span>
@@ -398,9 +481,29 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                   </button>
                 ))}
               </div>
-              <Button size="sm" variant="secondary" onClick={() => setIsModalOpen(false)}>
-                Tutup
-              </Button>
+              <div className="flex items-center gap-2">
+                {selectedRoom.status === 'CLEANING' && (
+                  <Button size="sm" variant="primary" onClick={handleQuickMarkReady} icon={<Check className="w-3.5 h-3.5" />}>
+                    Tandai Selesai Bersih
+                  </Button>
+                )}
+                {selectedRoom.status === 'OCCUPIED' && (
+                  <Button 
+                    size="sm" 
+                    variant="secondary" 
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      onNavigate('checkout');
+                    }}
+                    icon={<LogOut className="w-3.5 h-3.5" />}
+                  >
+                    Ke Menu Checkout
+                  </Button>
+                )}
+                <Button size="sm" variant="secondary" onClick={() => setIsModalOpen(false)}>
+                  Tutup
+                </Button>
+              </div>
             </div>
           }
         >
@@ -413,28 +516,83 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                 <p className="text-slate-500 text-[11px]">{formatCurrency(selectedRoom.rate_per_night)} / malam</p>
               </div>
               <div className="text-right space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Status Saat Ini</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">Status Kamar</span>
                 <Badge status={selectedRoom.status} size="md" />
               </div>
             </div>
 
-            {/* Beds List */}
+            {/* Beds and Guest Allocations */}
             <div>
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-emerald-800" /> Alokasi Tempat Tidur (Bed) ({selectedRoom.capacity} Bed)
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-emerald-800" /> Alokasi Tempat Tidur & Penghuni ({selectedRoom.capacity} Bed)
+                </span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getRoomGenderProfile(selectedRoom.id).badge}`}>
+                  {getRoomGenderProfile(selectedRoom.id).icon} {getRoomGenderProfile(selectedRoom.id).label}
+                </span>
               </h4>
-              <div className="grid grid-cols-2 gap-2">
-                {getBedsForRoom(selectedRoom.id).map((b) => (
-                  <div key={b.id} className="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center justify-between">
-                    <div>
-                      <p className="font-bold text-slate-900">{b.bed_code}</p>
-                      <p className="text-[10px] text-slate-500">
-                        {b.current_guest_id ? 'Ditempati Tamu' : 'Kosong / Tersedia'}
-                      </p>
+
+              <div className="space-y-2.5">
+                {getBedsForRoom(selectedRoom.id).map((b) => {
+                  const assign = assignments.find(
+                    (a) => a.bed_id === b.id && (a.status === 'ACTIVE' || a.status === 'CHECKED_IN')
+                  );
+                  const guest = assign 
+                    ? guests.find((g) => g.id === assign.guest_id) 
+                    : (b.current_guest_id ? guests.find((g) => g.id === b.current_guest_id) : null);
+                  const rsv = assign ? reservations.find((rv) => rv.id === assign.reservation_id) : null;
+
+                  return (
+                    <div 
+                      key={b.id} 
+                      className={`p-3 rounded-xl border transition-all ${
+                        guest ? 'bg-blue-50/40 border-blue-200' : 'bg-white border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-black text-sm text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                            {b.bed_code}
+                          </span>
+                          <Badge status={b.status} size="sm" />
+                        </div>
+
+                        {guest && (
+                          <span className="text-[10px] font-semibold text-blue-800 bg-blue-100 px-2 py-0.5 rounded-full">
+                            {guest.guest_type}
+                          </span>
+                        )}
+                      </div>
+
+                      {guest ? (
+                        <div className="mt-2 text-xs space-y-1 bg-white p-2.5 rounded-lg border border-blue-100">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                              {guest.gender === 'L' ? '👳‍♂️' : '🧕'} {guest.full_name}
+                            </span>
+                            <span className="text-[11px] text-slate-500 font-mono">
+                              NIK: {maskNik(guest.nik)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-[11px] text-slate-500">
+                            <span>No. HP: {guest.phone}</span>
+                            <span>Asal: {guest.regency_city}</span>
+                          </div>
+                          {rsv && (
+                            <div className="pt-1 border-t border-slate-100 text-[10px] text-slate-500 flex justify-between">
+                              <span>Reservasi: <strong className="text-slate-800">{rsv.reservation_no}</strong></span>
+                              <span>Status: <strong className="text-emerald-700">{rsv.status}</strong></span>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-slate-400 italic mt-1.5 ml-1">
+                          Tempat tidur kosong dan siap ditempatkan tamu.
+                        </p>
+                      )}
                     </div>
-                    <Badge status={b.status} size="sm" />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

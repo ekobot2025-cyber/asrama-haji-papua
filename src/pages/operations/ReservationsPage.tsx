@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   CalendarCheck, Plus, Search, Filter, Eye, CheckCircle2, 
-  XCircle, UserCheck, LogIn, Printer, Calendar, Users, 
+  XCircle, UserCheck, LogIn, LogOut, Printer, Calendar, Users, 
   Briefcase, Landmark, FileText, ChevronRight 
 } from 'lucide-react';
 import { db } from '../../db/database';
@@ -371,10 +371,21 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                         {rsv.status === 'CONFIRMED' && (
                           <button
                             onClick={() => onNavigate('checkin', rsv.id)}
-                            className="p-1.5 rounded-lg bg-amber-50 text-amber-800 hover:bg-amber-100 transition-colors"
+                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors"
                             title="Proses Check-in"
                           >
                             <LogIn className="w-4 h-4" />
+                          </button>
+                        )}
+
+                        {/* Check-out Quick Button */}
+                        {rsv.status === 'CHECKED_IN' && (
+                          <button
+                            onClick={() => onNavigate('checkout', rsv.id)}
+                            className="p-1.5 rounded-lg bg-orange-50 text-orange-800 hover:bg-orange-100 transition-colors"
+                            title="Proses Check-out Tamu"
+                          >
+                            <LogOut className="w-4 h-4" />
                           </button>
                         )}
 

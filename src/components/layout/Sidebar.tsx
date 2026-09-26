@@ -4,7 +4,7 @@ import {
   Users, UserCheck, BedDouble, Building2, Layers, Hotel, 
   Sparkles, Wrench, Receipt, CreditCard, FileText, BarChart3, 
   Settings, ShieldAlert, History, ChevronDown, ChevronRight, 
-  Landmark, UserCog, Briefcase, Award, Compass, ChevronLeft
+  Landmark, UserCog, Briefcase, Award, Compass, ChevronLeft, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -15,6 +15,7 @@ interface SidebarProps {
   onCloseMobile: () => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  onOpenHelpGuide?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -24,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
   collapsed,
   onToggleCollapse,
+  onOpenHelpGuide,
 }) => {
   const { currentRole } = useAuth();
 
@@ -395,6 +397,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </ul>
             )}
           </div>
+        </div>
+
+        {/* Help & SOP Button */}
+        <div className="p-3 border-t border-emerald-900/60 bg-emerald-950/40">
+          <button
+            onClick={() => {
+              if (onOpenHelpGuide) onOpenHelpGuide();
+              onCloseMobile();
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-300 hover:bg-amber-400/20 bg-amber-500/10 border border-amber-400/30 transition-all text-left"
+            title="Buku Panduan & SOP Operasional SIPAH"
+          >
+            <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
+            {!collapsed && <span>Buku Panduan SOP</span>}
+          </button>
         </div>
 
         {/* Sidebar Footer: Papua Pattern Motif & Version */}
