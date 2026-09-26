@@ -363,6 +363,14 @@ class DatabaseService {
       this.beds = this.beds.map(b => b.room_id === roomId ? { ...b, status: 'MAINTENANCE' } : b);
     }
 
+    // Sync with housekeeping task if present
+    const hkTask = this.housekeepingTasks.find(t => t.room_id === roomId);
+    if (hkTask) {
+      if (hkStatus) hkTask.status = hkStatus;
+      if (notes !== undefined) hkTask.notes = notes;
+      localStorage.setItem(`${STORAGE_PREFIX}housekeepingTasks`, JSON.stringify(this.housekeepingTasks));
+    }
+
     localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
     localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
   }
@@ -503,6 +511,36 @@ class DatabaseService {
           }
           return b;
         });
+      }
+
+      // Sync with housekeepingTasks
+      const hkTask = this.housekeepingTasks.find(t => t.room_id === roomData.id);
+      if (hkTask) {
+        if (roomData.housekeeping_status) {
+          hkTask.status = roomData.housekeeping_status as HousekeepingStatus;
+        }
+        if (roomData.notes !== undefined) {
+          hkTask.notes = roomData.notes;
+        }
+        if (user) {
+          if (hkTask.status === 'IN_CLEANING') hkTask.assigned_to = user.name;
+          if (hkTask.status === 'INSPECTED' || hkTask.status === 'READY') hkTask.inspected_by = user.name;
+        }
+        localStorage.setItem(`${STORAGE_PREFIX}housekeepingTasks`, JSON.stringify(this.housekeepingTasks));
+      } else if (roomData.housekeeping_status && roomData.housekeeping_status !== 'READY') {
+        const newTask: HousekeepingTask = {
+          id: `hk-${Date.now()}`,
+          room_id: roomData.id!,
+          task_type: 'REGULAR_CLEAN',
+          status: roomData.housekeeping_status as HousekeepingStatus,
+          priority: 'MEDIUM',
+          assigned_to: user?.name || 'Housekeeping',
+          notes: roomData.notes || '',
+          started_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+        };
+        this.housekeepingTasks.unshift(newTask);
+        localStorage.setItem(`${STORAGE_PREFIX}housekeepingTasks`, JSON.stringify(this.housekeepingTasks));
       }
 
       localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
@@ -1184,36 +1222,66 @@ class DatabaseService {
   }
 
   // --- Housekeeping Operations ---
-  public updateHousekeepingTask(taskId: string, status: HousekeepingStatus, user: User, notes?: string): boolean {
+  public updateHousekeepingTask(
+    taskId: string, 
+    status: HousekeepingStatus, 
+    user: User, 
+    notes?: string,
+    roomStatus?: RoomStatus,
+    assignedTo?: string
+  ): boolean {
     const task = this.housekeepingTasks.find(t => t.id === taskId);
     if (!task) return false;
 
     task.status = status;
-    if (notes) task.notes = notes;
+    if (notes !== undefined) task.notes = notes;
+    if (assignedTo) task.assigned_to = assignedTo;
+
     if (status === 'IN_CLEANING') {
       task.started_at = task.started_at || new Date().toISOString();
-      task.assigned_to = user.name;
+      if (!task.assigned_to) task.assigned_to = user.name;
     } else if (status === 'INSPECTED' || status === 'READY') {
       task.completed_at = new Date().toISOString();
       task.inspected_by = user.name;
     }
 
-    // Update Room housekeeping_status and Room status
+    // Update Room housekeeping_status, room status, and notes
     const room = this.rooms.find(r => r.id === task.room_id);
     if (room) {
       room.housekeeping_status = status;
-      if (status === 'READY') {
-        // When housekeeping is READY, room transitions from CLEANING to AVAILABLE
-        if (room.status === 'CLEANING') {
+      if (notes !== undefined) {
+        room.notes = notes;
+      }
+      
+      // Determine physical room status
+      if (roomStatus) {
+        room.status = roomStatus;
+      } else if (status === 'READY') {
+        if (room.status !== 'OCCUPIED') {
           room.status = 'AVAILABLE';
         }
+      } else if (status === 'DIRTY' || status === 'IN_CLEANING') {
+        if (room.status !== 'OCCUPIED' && room.status !== 'MAINTENANCE') {
+          room.status = 'CLEANING';
+        }
+      }
+
+      // If room is now AVAILABLE, also ensure beds in this room are available (unless occupied or reserved)
+      if (room.status === 'AVAILABLE') {
+        this.beds = this.beds.map(b => {
+          if (b.room_id === room.id && b.status !== 'OCCUPIED' && b.status !== 'RESERVED') {
+            return { ...b, status: 'AVAILABLE' };
+          }
+          return b;
+        });
+        localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
       }
     }
 
     localStorage.setItem(`${STORAGE_PREFIX}housekeepingTasks`, JSON.stringify(this.housekeepingTasks));
     localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
 
-    this.logAudit(user.name, user.role, 'UPDATE_HOUSEKEEPING', 'Housekeeping', `Update status kebersihan kamar ${room?.room_number || ''} menjadi ${status}`, taskId);
+    this.logAudit(user.name, user.role, 'UPDATE_HOUSEKEEPING', 'Housekeeping', `Update status kebersihan kamar ${room?.room_number || ''} menjadi ${status} (${room?.status || ''})`, taskId);
 
     return true;
   }

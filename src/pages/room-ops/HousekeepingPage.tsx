@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CheckCircle2, Clock, Search, Filter, 
-  RotateCw, RefreshCw, UserCheck, ShieldCheck 
+  RotateCw, RefreshCw, UserCheck, ShieldCheck, Edit, AlertTriangle
 } from 'lucide-react';
 import { db } from '../../db/database';
-import { HousekeepingTask, Room, HousekeepingStatus } from '../../types';
+import { HousekeepingTask, Room, HousekeepingStatus, RoomStatus } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
@@ -24,6 +24,8 @@ export const HousekeepingPage: React.FC = () => {
   // Action Modal
   const [selectedTask, setSelectedTask] = useState<HousekeepingTask | null>(null);
   const [newStatus, setNewStatus] = useState<HousekeepingStatus>('IN_CLEANING');
+  const [roomConditionStatus, setRoomConditionStatus] = useState<RoomStatus>('CLEANING');
+  const [assignedStaff, setAssignedStaff] = useState('');
   const [taskNotes, setTaskNotes] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -40,10 +42,34 @@ export const HousekeepingPage: React.FC = () => {
     return rooms.find((r) => r.id === roomId)?.room_number || roomId;
   };
 
-  const handleOpenActionModal = (task: HousekeepingTask, targetStatus: HousekeepingStatus) => {
+  const getRoom = (roomId: string) => {
+    return rooms.find((r) => r.id === roomId);
+  };
+
+  const handleOpenActionModal = (task: HousekeepingTask, targetStatus?: HousekeepingStatus) => {
     setSelectedTask(task);
-    setNewStatus(targetStatus);
-    setTaskNotes(task.notes || '');
+    const room = rooms.find(r => r.id === task.room_id);
+    
+    // Default next status if not specified
+    const nextHkStatus = targetStatus || (
+      task.status === 'DIRTY' ? 'IN_CLEANING' :
+      task.status === 'IN_CLEANING' ? 'INSPECTED' :
+      task.status === 'INSPECTED' ? 'READY' : task.status
+    );
+
+    setNewStatus(nextHkStatus);
+    setTaskNotes(task.notes || room?.notes || '');
+    setAssignedStaff(task.assigned_to || currentUser?.name || 'Petugas Housekeeping');
+    
+    // Auto sync room condition status
+    if (nextHkStatus === 'READY') {
+      setRoomConditionStatus('AVAILABLE');
+    } else if (nextHkStatus === 'DIRTY' || nextHkStatus === 'IN_CLEANING') {
+      setRoomConditionStatus(room?.status === 'MAINTENANCE' ? 'MAINTENANCE' : 'CLEANING');
+    } else {
+      setRoomConditionStatus(room?.status || 'CLEANING');
+    }
+
     setIsModalOpen(true);
   };
 
@@ -51,17 +77,25 @@ export const HousekeepingPage: React.FC = () => {
     e.preventDefault();
     if (!selectedTask || !currentUser) return;
 
+    // Harmonize final room status
+    const finalRoomStatus: RoomStatus = 
+      newStatus === 'READY' && roomConditionStatus === 'CLEANING'
+        ? 'AVAILABLE'
+        : roomConditionStatus;
+
     const success = db.updateHousekeepingTask(
       selectedTask.id,
       newStatus,
       currentUser,
-      taskNotes
+      taskNotes,
+      finalRoomStatus,
+      assignedStaff
     );
 
     if (success) {
       toast.success(
-        'Status Kebersihan Diperbarui',
-        `Kamar ${getRoomNumber(selectedTask.room_id)} kini berstatus ${newStatus}.`
+        'Kondisi & Status Kamar Diperbarui',
+        `Kamar ${getRoomNumber(selectedTask.room_id)}: Kebersihan [${newStatus}] | Kondisi Fisik [${finalRoomStatus}].`
       );
       setIsModalOpen(false);
       loadData();
@@ -221,12 +255,13 @@ export const HousekeepingPage: React.FC = () => {
                       </td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Quick Workflow Progression */}
                           {t.status === 'DIRTY' && (
                             <Button
                               size="sm"
                               variant="secondary"
                               onClick={() => handleOpenActionModal(t, 'IN_CLEANING')}
-                              className="text-[11px] py-1"
+                              className="text-[11px] py-1 font-bold"
                             >
                               Mulai Bersihkan
                             </Button>
@@ -236,7 +271,7 @@ export const HousekeepingPage: React.FC = () => {
                               size="sm"
                               variant="amber"
                               onClick={() => handleOpenActionModal(t, 'INSPECTED')}
-                              className="text-[11px] py-1"
+                              className="text-[11px] py-1 font-bold"
                             >
                               Inspeksi
                             </Button>
@@ -246,16 +281,29 @@ export const HousekeepingPage: React.FC = () => {
                               size="sm"
                               variant="primary"
                               onClick={() => handleOpenActionModal(t, 'READY')}
-                              className="text-[11px] py-1"
+                              className="text-[11px] py-1 font-bold"
                             >
                               Set Ready (Available)
                             </Button>
                           )}
                           {t.status === 'READY' && (
-                            <span className="text-[11px] text-emerald-700 font-bold flex items-center gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Siap Ditempati
-                            </span>
+                            <button
+                              onClick={() => handleOpenActionModal(t, 'DIRTY')}
+                              className="text-[11px] px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 text-amber-800 font-bold hover:bg-amber-100 transition-colors"
+                              title="Tandai kamar kotor / perlu dibersihkan kembali"
+                            >
+                              Set Kotor
+                            </button>
                           )}
+
+                          {/* Dedicated Edit Kondisi Button */}
+                          <button
+                            onClick={() => handleOpenActionModal(t, t.status)}
+                            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-emerald-800 hover:bg-emerald-50 hover:border-emerald-300 transition-colors"
+                            title="Edit Kondisi & Status Kamar"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -267,47 +315,86 @@ export const HousekeepingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal Update Status Housekeeping */}
+      {/* Modal Update Status & Kondisi Housekeeping */}
       {selectedTask && (
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={`Update Status Kebersihan Kamar ${getRoomNumber(selectedTask.room_id)}`}
+          title={`Update Kondisi & Kebersihan: Kamar ${getRoomNumber(selectedTask.room_id)}`}
           maxWidth="md"
         >
           <form onSubmit={handleUpdateStatus} className="space-y-4 text-xs">
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Status Baru *</label>
-              <select
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value as HousekeepingStatus)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white font-semibold"
-              >
-                <option value="DIRTY">DIRTY (Kotor)</option>
-                <option value="IN_CLEANING">IN CLEANING (Sedang Dibersihkan)</option>
-                <option value="INSPECTED">INSPECTED (Telah Diinspeksi)</option>
-                <option value="READY">READY (Siap & Otomatis Available)</option>
-              </select>
+            {/* Header info room & current status */}
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Kamar Target</span>
+                <span className="font-extrabold text-slate-900 text-sm">Kamar {getRoomNumber(selectedTask.room_id)}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Status Kebersihan Saat Ini</span>
+                <Badge status={selectedTask.status} size="sm" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Status Kebersihan Baru *</label>
+                <select
+                  value={newStatus}
+                  onChange={(e) => {
+                    const val = e.target.value as HousekeepingStatus;
+                    setNewStatus(val);
+                    if (val === 'READY') {
+                      setRoomConditionStatus('AVAILABLE');
+                    } else if (val === 'DIRTY' || val === 'IN_CLEANING') {
+                      if (roomConditionStatus === 'AVAILABLE') {
+                        setRoomConditionStatus('CLEANING');
+                      }
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white font-semibold focus:ring-2 focus:ring-emerald-700"
+                >
+                  <option value="DIRTY">DIRTY (Kotor / Perlu Dikerjakan)</option>
+                  <option value="IN_CLEANING">IN CLEANING (Sedang Dibersihkan)</option>
+                  <option value="INSPECTED">INSPECTED (Telah Diinspeksi)</option>
+                  <option value="READY">READY (Selesai & Siap Huni)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Kondisi Fisik Kamar *</label>
+                <select
+                  value={roomConditionStatus}
+                  onChange={(e) => setRoomConditionStatus(e.target.value as RoomStatus)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white font-semibold focus:ring-2 focus:ring-emerald-700"
+                >
+                  <option value="AVAILABLE">AVAILABLE (Tersedia / Siap Huni)</option>
+                  <option value="CLEANING">CLEANING (Dalam Pembersihan)</option>
+                  <option value="MAINTENANCE">MAINTENANCE (Kerusakan / Perbaikan)</option>
+                  <option value="OCCUPIED">OCCUPIED (Sedang Dihuni Tamu)</option>
+                </select>
+              </div>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Petugas / Pemeriksa</label>
+              <label className="block font-bold text-slate-700 mb-1">Petugas Kebersihan / Pemeriksa</label>
               <input
                 type="text"
-                disabled
-                value={currentUser?.name || 'Petugas'}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-slate-100 font-semibold"
+                value={assignedStaff}
+                onChange={(e) => setAssignedStaff(e.target.value)}
+                placeholder="Nama petugas housekeeping yang bertugas"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white font-semibold focus:ring-2 focus:ring-emerald-700"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Catatan Kebersihan / Hasil Inspeksi</label>
+              <label className="block font-bold text-slate-700 mb-1">Catatan Kondisi Fisik & Hasil Kebersihan</label>
               <textarea
                 rows={3}
                 value={taskNotes}
                 onChange={(e) => setTaskNotes(e.target.value)}
-                placeholder="Linen diganti baru, kamar mandi disanitasi, pewangi ruangan dipasang..."
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                placeholder="Contoh: Sprei dan sarung bantal telah diganti baru, kamar mandi disanitasi, pewangi ruangan dipasang, AC dingin normal..."
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
               />
             </div>
 
@@ -316,7 +403,7 @@ export const HousekeepingPage: React.FC = () => {
                 Batal
               </Button>
               <Button variant="primary" type="submit">
-                Simpan & Perbarui Status
+                Simpan & Terapkan Perubahan
               </Button>
             </div>
           </form>
