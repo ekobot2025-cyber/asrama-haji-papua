@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
-import { Printer, CheckCircle2, QrCode, FileText, Plus, ShieldCheck, ArrowRight } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Printer, CheckCircle2, QrCode, FileText, Plus, ShieldCheck, ArrowRight, Download, Loader2 } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { formatCurrency, formatDateTimeIndo, formatDateIndo } from '../../utils/formatters';
+import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { useToast } from '../../context/ToastContext';
 
 export interface PosReceiptData {
   receiptNo: string;
@@ -52,9 +54,30 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
   onViewSpma,
 }) => {
   const receiptRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const toast = useToast();
 
-  const handlePrint = () => {
-    window.print();
+  const cleanFilename = `Struk_Kasir_${data.receiptNo.replace(/[\/\\:]/g, '_')}`;
+
+  const handleDownloadPdf = async (openInNewTab = false) => {
+    if (!receiptRef.current) return;
+    setIsGenerating(true);
+    try {
+      await downloadElementAsPdf(receiptRef.current, cleanFilename, {
+        orientation: 'portrait',
+        openInNewTab: openInNewTab,
+        scale: 2.5,
+      });
+      toast.success(
+        'Struk PDF Berhasil Dibuat',
+        `File PDF ${cleanFilename}.pdf telah berhasil diunduh.`
+      );
+    } catch (err) {
+      console.error('PDF export error:', err);
+      toast.error('Gagal Ekspor PDF', 'Terjadi kesalahan saat memproses struk PDF.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const getPaymentMethodLabel = (method: string) => {
@@ -84,7 +107,7 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
               icon={<Plus className="w-4 h-4 text-emerald-800" />}
               className="w-full sm:w-auto"
             >
-              Transaksi Baru (F2)
+              Baru (F2)
             </Button>
             {onViewSpma && (
               <Button
@@ -94,19 +117,32 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
                 icon={<FileText className="w-4 h-4 text-indigo-700" />}
                 className="w-full sm:w-auto"
               >
-                Cetak SPMA
+                SPMA
               </Button>
             )}
           </div>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handlePrint}
-            icon={<Printer className="w-4 h-4" />}
-            className="w-full sm:w-auto shadow-md"
-          >
-            Cetak Struk Kasir (80mm)
-          </Button>
+          <div className="flex items-center gap-1.5 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDownloadPdf(true)}
+              disabled={isGenerating}
+              icon={<Printer className="w-4 h-4 text-emerald-800" />}
+              title="Pratinjau struk di tab baru"
+            >
+              Pratinjau
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handleDownloadPdf(false)}
+              disabled={isGenerating}
+              icon={isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              className="shadow-md"
+            >
+              {isGenerating ? 'Membuat...' : 'Unduh PDF'}
+            </Button>
+          </div>
         </div>
       }
     >

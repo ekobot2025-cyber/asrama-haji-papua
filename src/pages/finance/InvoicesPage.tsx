@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   FileText, Search, Printer, Plus, CreditCard, 
-  Download, Eye, CheckCircle2, AlertCircle, Building2, ScrollText, QrCode
+  Download, Eye, CheckCircle2, AlertCircle, Building2, ScrollText, QrCode, Loader2
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { Invoice, InvoiceItem, AppSettings, Reservation } from '../../types';
@@ -11,6 +11,8 @@ import { Modal } from '../../components/common/Modal';
 import { ExtraChargeModal } from '../../components/finance/ExtraChargeModal';
 import { SpkContractModal } from '../../components/finance/SpkContractModal';
 import { formatCurrency, formatDateIndo } from '../../utils/formatters';
+import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { useToast } from '../../context/ToastContext';
 
 interface InvoicesPageProps {
   initialInvoiceId?: string;
@@ -18,6 +20,7 @@ interface InvoicesPageProps {
 }
 
 export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, onNavigate }) => {
+  const toast = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [settings, setSettings] = useState<AppSettings>(db.getSettings());
@@ -65,8 +68,26 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
     return invoiceItems.filter((i) => i.invoice_id === invoiceId);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const invoicePrintRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handleDownloadInvoicePdf = async (openInNewTab = false) => {
+    if (!invoicePrintRef.current || !previewInvoice) return;
+    setIsGeneratingPdf(true);
+    const filename = `Invoice_${previewInvoice.invoice_no.replace(/[\/\\:]/g, '_')}`;
+    try {
+      await downloadElementAsPdf(invoicePrintRef.current, filename, {
+        orientation: 'portrait',
+        openInNewTab: openInNewTab,
+        scale: 2.5,
+      });
+      toast.success('Invoice PDF Berhasil Dibuat', `File ${filename}.pdf telah berhasil diunduh.`);
+    } catch (err) {
+      console.error('Invoice PDF error:', err);
+      toast.error('Gagal Ekspor PDF', 'Terjadi kesalahan saat memproses Invoice PDF.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   return (
@@ -282,14 +303,35 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                   + Tambah Layanan Folio
                 </Button>
               </div>
-              <Button size="sm" variant="primary" onClick={handlePrint} icon={<Printer className="w-4 h-4" />}>
-                Cetak Invoice (A4)
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleDownloadInvoicePdf(true)}
+                  disabled={isGeneratingPdf}
+                  icon={<Printer className="w-4 h-4 text-emerald-800" />}
+                >
+                  Pratinjau PDF
+                </Button>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => handleDownloadInvoicePdf(false)}
+                  disabled={isGeneratingPdf}
+                  icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                >
+                  {isGeneratingPdf ? 'Membuat PDF...' : 'Unduh Invoice PDF (.pdf)'}
+                </Button>
+              </div>
             </div>
           }
         >
           {/* Printable A4 Document Sheet */}
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 text-slate-800 space-y-6 printable-sheet">
+          <div className="bg-slate-100 p-2 sm:p-4 rounded-2xl overflow-y-auto max-h-[75vh]">
+            <div 
+              ref={invoicePrintRef} 
+              className="bg-white p-6 sm:p-8 text-slate-800 space-y-6 max-w-[794px] mx-auto shadow-sm"
+            >
             {/* Government & UPT Header */}
             <div className="border-b-2 border-slate-900 pb-4 flex items-center justify-between">
               <div>
@@ -430,7 +472,8 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
               </div>
             </div>
           </div>
-        </Modal>
+        </div>
+      </Modal>
       )}
 
       {/* Extra Charge / Guest Folio Modal */}

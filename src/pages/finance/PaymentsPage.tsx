@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   CreditCard, Plus, Search, Printer, Receipt, 
-  CheckCircle2, DollarSign, Download, Eye, FileText, ArrowRight 
+  CheckCircle2, DollarSign, Download, Eye, FileText, ArrowRight, Loader2
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { Payment, Invoice, AppSettings, Reservation } from '../../types';
@@ -12,6 +12,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { terbilang } from '../../utils/terbilang';
 import { formatCurrency, formatDateIndo, formatDateTimeIndo } from '../../utils/formatters';
+import { downloadElementAsPdf } from '../../utils/pdfGenerator';
 
 interface PaymentsPageProps {
   initialInvoiceId?: string;
@@ -103,8 +104,26 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
     setIsReceiptOpen(true);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const receiptPrintRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handleDownloadReceiptPdf = async (openInNewTab = false) => {
+    if (!receiptPrintRef.current || !selectedPayment) return;
+    setIsGeneratingPdf(true);
+    const filename = `Kwitansi_${selectedPayment.receipt_no.replace(/[\/\\:]/g, '_')}`;
+    try {
+      await downloadElementAsPdf(receiptPrintRef.current, filename, {
+        orientation: 'portrait',
+        openInNewTab: openInNewTab,
+        scale: 2.5,
+      });
+      toast.success('Kwitansi PDF Berhasil Dibuat', `File ${filename}.pdf telah siap.`);
+    } catch (err) {
+      console.error('Kwitansi PDF error:', err);
+      toast.error('Gagal Ekspor PDF', 'Terjadi kesalahan saat memproses Kwitansi PDF.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const filtered = payments.filter((p) => {
@@ -334,18 +353,39 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
           title={`Kwitansi Pembayaran Resmi — ${selectedPayment.receipt_no}`}
           maxWidth="3xl"
           footer={
-            <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
               <Button size="sm" variant="secondary" onClick={() => setIsReceiptOpen(false)}>
                 Tutup
               </Button>
-              <Button size="sm" variant="primary" onClick={handlePrint} icon={<Printer className="w-4 h-4" />}>
-                Cetak Kwitansi (A4)
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleDownloadReceiptPdf(true)}
+                  disabled={isGeneratingPdf}
+                  icon={<Printer className="w-4 h-4 text-emerald-800" />}
+                >
+                  Pratinjau PDF
+                </Button>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => handleDownloadReceiptPdf(false)}
+                  disabled={isGeneratingPdf}
+                  icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                >
+                  {isGeneratingPdf ? 'Membuat PDF...' : 'Unduh Kwitansi PDF (.pdf)'}
+                </Button>
+              </div>
             </div>
           }
         >
           {/* Printable Kwitansi Sheet */}
-          <div className="bg-white p-6 sm:p-8 rounded-xl border-2 border-slate-800 text-slate-900 space-y-6 printable-sheet">
+          <div className="bg-slate-100 p-2 sm:p-4 rounded-2xl overflow-y-auto max-h-[75vh]">
+            <div 
+              ref={receiptPrintRef}
+              className="bg-white p-6 sm:p-8 text-slate-900 space-y-6 max-w-[794px] mx-auto shadow-sm"
+            >
             {/* Kop Surat Resmi */}
             <div className="border-b-2 border-slate-900 pb-3 flex items-center justify-between">
               <div>
@@ -417,7 +457,8 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
               </div>
             </div>
           </div>
-        </Modal>
+        </div>
+      </Modal>
       )}
     </div>
   );

@@ -1,18 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Award, TrendingUp, DollarSign, Users, Briefcase, 
   Calendar, Printer, Download, Filter, Building2, 
-  BedDouble, CheckCircle2, ChevronRight, BarChart3 
+  BedDouble, CheckCircle2, ChevronRight, BarChart3, Loader2
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { formatCurrency } from '../../utils/formatters';
 import { Button } from '../../components/common/Button';
+import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { useToast } from '../../context/ToastContext';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
   CartesianGrid, PieChart, Pie, Cell, LineChart, Line 
 } from 'recharts';
 
 export const ExecutiveDashboardPage: React.FC = () => {
+  const toast = useToast();
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [timeFilter, setTimeFilter] = useState<'today' | 'week' | 'month' | 'year' | 'custom'>('month');
 
   const reservations = db.getReservations();
@@ -45,8 +50,23 @@ export const ExecutiveDashboardPage: React.FC = () => {
     { room: 'Kamar A205 (VIP Suite)', bld: 'Gedung Nabire', daysOccupied: 20, occupancy: 67 },
   ];
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownloadDashboardPdf = async (openInNewTab = false) => {
+    if (!dashboardRef.current) return;
+    setIsGeneratingPdf(true);
+    const filename = `Dashboard_Eksekutif_SIMAHA_${timeFilter}_${new Date().toISOString().split('T')[0]}`;
+    try {
+      await downloadElementAsPdf(dashboardRef.current, filename, {
+        orientation: 'landscape',
+        openInNewTab: openInNewTab,
+        scale: 2,
+      });
+      toast.success('Ringkasan Eksekutif PDF Berhasil Dibuat', `File ${filename}.pdf telah siap.`);
+    } catch (err) {
+      console.error('Executive PDF error:', err);
+      toast.error('Gagal Ekspor PDF', 'Terjadi kesalahan saat memproses Dashboard Eksekutif PDF.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   return (
@@ -96,17 +116,30 @@ export const ExecutiveDashboardPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={handlePrint}
-            icon={<Printer className="w-4 h-4" />}
+            onClick={() => handleDownloadDashboardPdf(true)}
+            disabled={isGeneratingPdf}
+            icon={<Printer className="w-4 h-4 text-emerald-800" />}
             className="hidden sm:inline-flex bg-white"
           >
-            Cetak Ringkasan
+            Pratinjau PDF
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => handleDownloadDashboardPdf(false)}
+            disabled={isGeneratingPdf}
+            icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            className="inline-flex"
+          >
+            {isGeneratingPdf ? 'Membuat PDF...' : 'Unduh PDF (.pdf)'}
           </Button>
         </div>
       </div>
 
-      {/* KPI Cards for Executives */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* Main Dashboard Printable Container */}
+      <div ref={dashboardRef} className="space-y-6 bg-slate-50/50 p-2 sm:p-4 rounded-2xl">
+        {/* KPI Cards for Executives */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Okupansi */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
@@ -251,6 +284,7 @@ export const ExecutiveDashboardPage: React.FC = () => {
             </table>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

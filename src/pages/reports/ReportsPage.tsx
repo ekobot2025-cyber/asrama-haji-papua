@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   BarChart3, Printer, Download, Filter, Calendar, 
-  FileSpreadsheet, Building2, Users, BedDouble, DollarSign 
+  FileSpreadsheet, Building2, Users, BedDouble, DollarSign, Loader2
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { Reservation, Guest, Room, Payment, Facility, Building, AppSettings } from '../../types';
 import { Button } from '../../components/common/Button';
 import { formatCurrency, formatDateIndo, calculateNights, maskNik } from '../../utils/formatters';
+import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { useToast } from '../../context/ToastContext';
 
 export const ReportsPage: React.FC = () => {
+  const toast = useToast();
+  const reportPrintRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
   const [reportType, setReportType] = useState<
     'penginapan' | 'okupansi' | 'reservasi' | 'tamu' | 'keuangan' | 'fasilitas' | 'night_audit'
   >('penginapan');
@@ -36,8 +42,24 @@ export const ReportsPage: React.FC = () => {
     setSettings(db.getSettings());
   }, []);
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownloadReportPdf = async (openInNewTab = false) => {
+    if (!reportPrintRef.current) return;
+    setIsGeneratingPdf(true);
+    const dateStr = new Date().toISOString().split('T')[0];
+    const filename = `Laporan_SIMAHA_${reportType.toUpperCase()}_${dateStr}`;
+    try {
+      await downloadElementAsPdf(reportPrintRef.current, filename, {
+        orientation: 'portrait',
+        openInNewTab: openInNewTab,
+        scale: 2.5,
+      });
+      toast.success('Laporan PDF Berhasil Dibuat', `File ${filename}.pdf telah siap.`);
+    } catch (err) {
+      console.error('Report PDF error:', err);
+      toast.error('Gagal Ekspor PDF', 'Terjadi kesalahan saat memproses Laporan PDF.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const handleExportCSV = () => {
@@ -82,7 +104,7 @@ export const ReportsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -93,12 +115,23 @@ export const ReportsPage: React.FC = () => {
             Ekspor Excel (CSV)
           </Button>
           <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDownloadReportPdf(true)}
+            disabled={isGeneratingPdf}
+            icon={<Printer className="w-4 h-4 text-emerald-800" />}
+            className="bg-white"
+          >
+            Pratinjau PDF
+          </Button>
+          <Button
             variant="primary"
             size="sm"
-            onClick={handlePrint}
-            icon={<Printer className="w-4 h-4" />}
+            onClick={() => handleDownloadReportPdf(false)}
+            disabled={isGeneratingPdf}
+            icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
           >
-            Cetak Laporan
+            {isGeneratingPdf ? 'Membuat PDF...' : 'Unduh Laporan PDF (.pdf)'}
           </Button>
         </div>
       </div>
@@ -166,7 +199,10 @@ export const ReportsPage: React.FC = () => {
       </div>
 
       {/* Report Sheet Content (Print-Ready) */}
-      <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs printable-sheet">
+      <div 
+        ref={reportPrintRef}
+        className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs printable-sheet"
+      >
         {/* Formal Header */}
         <div className="border-b-2 border-slate-900 pb-4 mb-6 flex items-center justify-between">
           <div>

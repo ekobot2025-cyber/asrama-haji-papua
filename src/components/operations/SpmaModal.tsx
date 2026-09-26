@@ -1,9 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { Printer, Download, QrCode, CheckCircle2, Building, BedDouble, ShieldCheck, Tag, ArrowRight } from 'lucide-react';
+import { Printer, Download, QrCode, CheckCircle2, Building, BedDouble, ShieldCheck, Tag, ArrowRight, Loader2 } from 'lucide-react';
 import { Reservation, Guest, Room, Bed, Building as BuildingType } from '../../types';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { formatDateIndo, maskNik } from '../../utils/formatters';
+import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { useToast } from '../../context/ToastContext';
 
 interface SpmaModalProps {
   isOpen: boolean;
@@ -26,12 +28,32 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'SPMA' | 'LUGGAGE_TAG'>('SPMA');
   const printRef = useRef<HTMLDivElement>(null);
-
-  const handlePrint = () => {
-    window.print();
-  };
+  const [isGenerating, setIsGenerating] = useState(false);
+  const toast = useToast();
 
   const spmaNo = reservation.spma_no || `SPMA/AHP/2026/${reservation.id.slice(-4)}`;
+  const cleanFilename = `${activeTab === 'SPMA' ? 'Dokumen_SPMA' : 'Label_Bagasi'}_${spmaNo.replace(/[\/\\:]/g, '_')}`;
+
+  const handleDownloadPdf = async (openInNewTab = false) => {
+    if (!printRef.current) return;
+    setIsGenerating(true);
+    try {
+      await downloadElementAsPdf(printRef.current, cleanFilename, {
+        orientation: activeTab === 'SPMA' ? 'portrait' : 'landscape',
+        openInNewTab: openInNewTab,
+        scale: 2.5,
+      });
+      toast.success(
+        'Dokumen PDF Berhasil Dibuat',
+        `File PDF ${cleanFilename}.pdf telah berhasil diekspor langsung.`
+      );
+    } catch (err) {
+      console.error('PDF export error:', err);
+      toast.error('Gagal Ekspor PDF', 'Terjadi kesalahan saat memproses dokumen PDF.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <Modal
@@ -41,7 +63,7 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
       subtitle="Dokumen Penempatan Jemaah & Tamu Resmi Berstandar Munakosah Kemenag"
       maxWidth="2xl"
       footer={
-        <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTab('SPMA')}
@@ -70,19 +92,30 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
               Tutup
             </Button>
             <Button
-              variant="primary"
-              onClick={handlePrint}
-              icon={<Printer className="w-4 h-4" />}
+              variant="outline"
+              onClick={() => handleDownloadPdf(true)}
+              disabled={isGenerating}
+              icon={<Printer className="w-4 h-4 text-emerald-800" />}
+              title="Buka dokumen PDF di tab baru untuk dicetak"
             >
-              Cetak Dokumen (A4)
+              Pratinjau PDF
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => handleDownloadPdf(false)}
+              disabled={isGenerating}
+              icon={isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            >
+              {isGenerating ? 'Membuat PDF...' : 'Unduh Dokumen PDF (.pdf)'}
             </Button>
           </div>
         </div>
       }
     >
-      <div ref={printRef} className="space-y-4 text-xs text-slate-800 print:text-black">
-        {activeTab === 'SPMA' ? (
-          <div className="border border-slate-300 rounded-2xl p-6 bg-white shadow-xs print:border-none print:shadow-none print:p-0">
+      <div className="bg-slate-100 p-2 sm:p-4 rounded-2xl overflow-y-auto max-h-[75vh]">
+        <div ref={printRef} className="space-y-4 text-xs text-slate-800 bg-white p-6 sm:p-8 shadow-sm mx-auto max-w-[794px]">
+          {activeTab === 'SPMA' ? (
+            <div>
             {/* Kop Surat Kemenag Papua */}
             <div className="border-b-2 border-emerald-950 pb-4 mb-4 text-center">
               <div className="flex items-center justify-center gap-3 mb-1">
@@ -291,6 +324,7 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
             </div>
           </div>
         )}
+        </div>
       </div>
     </Modal>
   );

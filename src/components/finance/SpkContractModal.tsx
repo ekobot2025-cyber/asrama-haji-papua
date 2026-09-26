@@ -1,9 +1,11 @@
-import React, { useRef } from 'react';
-import { Printer, FileText, CheckCircle2, ShieldCheck, Download } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Printer, FileText, CheckCircle2, ShieldCheck, Download, Loader2 } from 'lucide-react';
 import { Invoice, Reservation } from '../../types';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { formatCurrency, formatDateIndo } from '../../utils/formatters';
+import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { useToast } from '../../context/ToastContext';
 
 interface SpkContractModalProps {
   isOpen: boolean;
@@ -19,12 +21,32 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
   reservation,
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
-
-  const handlePrint = () => {
-    window.print();
-  };
+  const [isGenerating, setIsGenerating] = useState(false);
+  const toast = useToast();
 
   const spkNo = invoice.spk_contract_no || `SPK/AHP/KS/2026/${invoice.id.slice(-4)}`;
+  const cleanFilename = `Surat_Perjanjian_SPK_${spkNo.replace(/[\/\\:]/g, '_')}`;
+
+  const handleDownloadPdf = async (openInNewTab = false) => {
+    if (!printRef.current) return;
+    setIsGenerating(true);
+    try {
+      await downloadElementAsPdf(printRef.current, cleanFilename, {
+        orientation: 'portrait',
+        openInNewTab: openInNewTab,
+        scale: 2.5,
+      });
+      toast.success(
+        'Dokumen PDF Berhasil Dibuat',
+        `File PDF ${cleanFilename}.pdf telah berhasil diekspor langsung.`
+      );
+    } catch (err) {
+      console.error('PDF export error:', err);
+      toast.error('Gagal Ekspor PDF', 'Terjadi kesalahan saat memproses dokumen PDF.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <Modal
@@ -34,27 +56,40 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
       subtitle="Standar Dokumen Hukum & Akuntabilitas PNBP UPT Asrama Haji Papua"
       maxWidth="2xl"
       footer={
-        <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
           <span className="font-mono text-xs text-slate-500">
-            Nomor Dokumen: {spkNo}
+            Nomor: {spkNo}
           </span>
           <div className="flex items-center gap-2">
             <Button variant="secondary" onClick={onClose}>
               Tutup
             </Button>
             <Button
-              variant="primary"
-              onClick={handlePrint}
-              icon={<Printer className="w-4 h-4" />}
+              variant="outline"
+              onClick={() => handleDownloadPdf(true)}
+              disabled={isGenerating}
+              icon={<Printer className="w-4 h-4 text-emerald-800" />}
+              title="Buka dokumen PDF di tab baru untuk dicetak"
             >
-              Cetak Surat Perjanjian (A4)
+              Pratinjau PDF
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => handleDownloadPdf(false)}
+              disabled={isGenerating}
+              icon={isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            >
+              {isGenerating ? 'Membuat PDF...' : 'Unduh Dokumen PDF (.pdf)'}
             </Button>
           </div>
         </div>
       }
     >
-      <div ref={printRef} className="space-y-4 text-xs text-slate-800 print:text-black leading-relaxed">
-        <div className="border border-slate-300 rounded-2xl p-6 bg-white shadow-xs print:border-none print:shadow-none print:p-0">
+      <div className="bg-slate-100 p-2 sm:p-4 rounded-2xl overflow-y-auto max-h-[75vh]">
+        <div 
+          ref={printRef} 
+          className="bg-white p-6 sm:p-8 text-xs text-slate-900 leading-relaxed font-sans shadow-sm mx-auto max-w-[794px]"
+        >
           {/* Kop Surat Kemenag Papua */}
           <div className="border-b-2 border-emerald-950 pb-4 mb-4 text-center">
             <div className="flex items-center justify-center gap-3 mb-1">
