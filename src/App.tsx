@@ -34,6 +34,7 @@ import { AuditLogPage } from './pages/system/AuditLogPage';
 import { SettingsPage } from './pages/system/SettingsPage';
 import { FrontDeskPosPage } from './pages/operations/FrontDeskPosPage';
 import { LandingPage } from './pages/landing/LandingPage';
+import { ScrollToTopButton } from './components/common/ScrollToTopButton';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
 import { Button } from './components/common/Button';
 import { UserRole } from './types';
@@ -296,6 +297,7 @@ export const App: React.FC = () => {
         <NotificationProvider>
           <ToastProvider>
             <AppContent />
+            <ScrollToTopButton />
           </ToastProvider>
         </NotificationProvider>
       </AuthProvider>
