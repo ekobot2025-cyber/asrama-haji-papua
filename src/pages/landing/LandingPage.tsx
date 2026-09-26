@@ -243,7 +243,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-900/80 border border-emerald-700/60 text-amber-300 text-xs font-bold shadow-xs">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Pelayanan Prima & Standar Hospitality Modern di Bumi Cenderawasih</span>
+                <span>Sistem Informasi Manajemen Asrama Haji (SIMAHA) Terpadu Papua</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight sm:leading-[1.15]">
