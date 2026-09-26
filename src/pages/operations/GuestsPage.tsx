@@ -111,7 +111,15 @@ export const GuestsPage: React.FC = () => {
     loadData();
   };
 
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
+
   const handleDeleteGuest = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data master tamu.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteGuest(deleteTarget.id, currentUser || undefined);
@@ -265,13 +273,15 @@ export const GuestsPage: React.FC = () => {
                       >
                         <Edit className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => setDeleteTarget(g)}
-                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                        title="Hapus Data Tamu"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {!isHousekeeping && (
+                        <button
+                          onClick={() => setDeleteTarget(g)}
+                          className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                          title="Hapus Data Tamu"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -85,7 +85,15 @@ export const InstitutionsPage: React.FC = () => {
     loadData();
   };
 
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
+
   const handleDelete = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data instansi.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteInstitution(deleteTarget.id, currentUser || undefined);
@@ -188,13 +196,15 @@ export const InstitutionsPage: React.FC = () => {
               >
                 Edit Instansi
               </Button>
-              <button
-                onClick={() => setDeleteTarget(inst)}
-                className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                title="Hapus Instansi"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {!isHousekeeping && (
+                <button
+                  onClick={() => setDeleteTarget(inst)}
+                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                  title="Hapus Instansi"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         ))}

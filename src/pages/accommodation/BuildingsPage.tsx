@@ -11,6 +11,7 @@ import { useToast } from '../../context/ToastContext';
 export const BuildingsPage: React.FC = () => {
   const { currentUser } = useAuth();
   const toast = useToast();
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
 
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -38,6 +39,11 @@ export const BuildingsPage: React.FC = () => {
   }, []);
 
   const handleOpenModal = (bld?: Building) => {
+    if (isHousekeeping && !bld) {
+      toast.error('Akses Dibatasi', 'Petugas Housekeeping hanya dapat memperbarui kondisi gedung yang sudah ada.');
+      return;
+    }
+
     if (bld) {
       setEditingBuilding(bld);
       setFormData({
@@ -67,6 +73,25 @@ export const BuildingsPage: React.FC = () => {
       return;
     }
 
+    if (isHousekeeping && editingBuilding) {
+      db.saveBuilding({
+        id: editingBuilding.id,
+        code: editingBuilding.code,
+        name: editingBuilding.name,
+        total_floors: editingBuilding.total_floors,
+        description: formData.description,
+        status: formData.status,
+      }, currentUser || undefined);
+
+      toast.success(
+        'Kondisi Gedung Diperbarui',
+        `Status operasional & catatan gedung ${editingBuilding.name} berhasil disimpan.`
+      );
+      setIsModalOpen(false);
+      loadData();
+      return;
+    }
+
     db.saveBuilding({
       id: editingBuilding?.id,
       code: formData.code.toUpperCase(),
@@ -85,6 +110,12 @@ export const BuildingsPage: React.FC = () => {
   };
 
   const handleDeleteBuilding = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data master gedung.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteBuilding(deleteTarget.id, currentUser || undefined);
@@ -111,14 +142,21 @@ export const BuildingsPage: React.FC = () => {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => handleOpenModal()}
-          icon={<Plus className="w-4 h-4" />}
-        >
-          Tambah Gedung Baru
-        </Button>
+        {isHousekeeping ? (
+          <div className="bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 text-xs font-bold text-amber-800 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <span>Housekeeping: Mode Kondisi Gedung</span>
+          </div>
+        ) : (
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => handleOpenModal()}
+            icon={<Plus className="w-4 h-4" />}
+          >
+            Tambah Gedung Baru
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -176,15 +214,17 @@ export const BuildingsPage: React.FC = () => {
                   onClick={() => handleOpenModal(b)}
                   icon={<Edit className="w-3.5 h-3.5 text-slate-600" />}
                 >
-                  Edit Gedung
+                  {isHousekeeping ? 'Update Kondisi Gedung' : 'Edit Gedung'}
                 </Button>
-                <button
-                  onClick={() => setDeleteTarget(b)}
-                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                  title="Hapus Gedung"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {!isHousekeeping && (
+                  <button
+                    onClick={() => setDeleteTarget(b)}
+                    className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                    title="Hapus Gedung"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
           );
@@ -195,53 +235,86 @@ export const BuildingsPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingBuilding ? `Edit Data Gedung: ${editingBuilding.name}` : 'Tambah Gedung Akomodasi Baru'}
+        title={
+          isHousekeeping
+            ? `Pembaruan Kondisi & Perawatan Gedung: ${editingBuilding?.name}`
+            : editingBuilding
+              ? `Edit Data Gedung: ${editingBuilding.name}`
+              : 'Tambah Gedung Akomodasi Baru'
+        }
         maxWidth="md"
       >
         <form onSubmit={handleSaveBuilding} className="space-y-4 text-xs">
+          {isHousekeeping && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Mode Housekeeping: Pembaruan Kondisi & Operasional</p>
+                <p className="text-[11px] text-amber-700 mt-0.5 leading-relaxed">
+                  Kode gedung, nama fisik, dan jumlah lantai dikunci oleh sistem. Anda hanya berwenang memperbarui status operasional/pemeliharaan dan catatan perawatan gedung.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Kode Gedung *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Kode Gedung {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+              </label>
               <input
                 type="text"
                 required
+                readOnly={isHousekeeping}
                 placeholder="GDD / GDE / GD-VIP"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl uppercase font-mono focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl uppercase font-mono focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                }`}
               />
             </div>
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Jumlah Lantai *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Jumlah Lantai {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+              </label>
               <input
                 type="number"
                 min="1"
                 required
+                readOnly={isHousekeeping}
                 value={formData.total_floors}
                 onChange={(e) => setFormData({ ...formData, total_floors: parseInt(e.target.value) || 1 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                }`}
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Nama Gedung *</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              Nama Gedung {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+            </label>
             <input
               type="text"
               required
+              readOnly={isHousekeeping}
               placeholder="Contoh: Gedung Biak Numfor / Gedung Timika"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+              }`}
             />
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Status Operasional Gedung</label>
+            <label className="block font-bold text-slate-700 mb-1">Status Operasional & Kesiapan Gedung</label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 font-medium"
             >
               <option value="ACTIVE">Aktif (Siap Digunakan)</option>
               <option value="MAINTENANCE">Dalam Pemeliharaan / Renovasi</option>
@@ -250,10 +323,12 @@ export const BuildingsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Deskripsi & Peruntukan</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              {isHousekeeping ? 'Catatan Kondisi & Perawatan Gedung' : 'Deskripsi & Peruntukan'}
+            </label>
             <textarea
               rows={3}
-              placeholder="Contoh: Gedung akomodasi jamaah reguler dan peserta bimtek kedinasan..."
+              placeholder="Contoh: Gedung dalam kondisi bersih, pembersihan rutin lantai dan koridor..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
@@ -265,7 +340,7 @@ export const BuildingsPage: React.FC = () => {
               Batal
             </Button>
             <Button variant="primary" type="submit">
-              {editingBuilding ? 'Simpan Perubahan' : 'Simpan Gedung'}
+              {isHousekeeping ? 'Simpan Kondisi Gedung' : editingBuilding ? 'Simpan Perubahan' : 'Simpan Gedung'}
             </Button>
           </div>
         </form>

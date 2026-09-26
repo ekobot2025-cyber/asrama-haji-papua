@@ -13,6 +13,7 @@ import { formatCurrency } from '../../utils/formatters';
 export const RoomsPage: React.FC = () => {
   const { currentUser } = useAuth();
   const toast = useToast();
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
 
   const [rooms, setRooms] = useState<Room[]>([]);
   const [buildings, setBuildings] = useState<Building[]>([]);
@@ -50,6 +51,11 @@ export const RoomsPage: React.FC = () => {
   }, []);
 
   const handleOpenModal = (room?: Room) => {
+    if (isHousekeeping && !room) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping hanya dapat memperbarui kondisi kamar yang sudah ada.');
+      return;
+    }
+
     if (room) {
       setEditingRoom(room);
       setFormData({
@@ -87,6 +93,30 @@ export const RoomsPage: React.FC = () => {
       return;
     }
 
+    if (isHousekeeping && editingRoom) {
+      // Housekeeping only updates conditions, housekeeping status, and notes
+      db.saveRoom({
+        id: editingRoom.id,
+        room_number: editingRoom.room_number,
+        building_id: editingRoom.building_id,
+        floor_id: editingRoom.floor_id,
+        room_type_id: editingRoom.room_type_id,
+        capacity: editingRoom.capacity,
+        rate_per_night: editingRoom.rate_per_night,
+        status: formData.status,
+        housekeeping_status: formData.housekeeping_status,
+        notes: formData.notes,
+      }, currentUser || undefined);
+
+      toast.success(
+        'Kondisi Kamar Diperbarui',
+        `Status dan catatan kebersihan kamar ${editingRoom.room_number} berhasil diperbarui.`
+      );
+      setIsModalOpen(false);
+      loadData();
+      return;
+    }
+
     db.saveRoom({
       id: editingRoom?.id,
       room_number: formData.room_number.toUpperCase(),
@@ -109,6 +139,11 @@ export const RoomsPage: React.FC = () => {
   };
 
   const handleDeleteRoom = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data master kamar.');
+      setDeleteTarget(null);
+      return;
+    }
     if (!deleteTarget) return;
 
     const res = db.deleteRoom(deleteTarget.id, currentUser || undefined);
@@ -144,14 +179,21 @@ export const RoomsPage: React.FC = () => {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => handleOpenModal()}
-          icon={<Plus className="w-4 h-4" />}
-        >
-          Tambah Kamar Baru
-        </Button>
+        {!isHousekeeping ? (
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => handleOpenModal()}
+            icon={<Plus className="w-4 h-4" />}
+          >
+            Tambah Kamar Baru
+          </Button>
+        ) : (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 text-xs font-semibold">
+            <AlertTriangle className="w-4 h-4 text-amber-700" />
+            <span>Mode Housekeeping: Pembaruan Status & Kondisi</span>
+          </div>
+        )}
       </div>
 
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center gap-3">
@@ -233,17 +275,19 @@ export const RoomsPage: React.FC = () => {
                       <button
                         onClick={() => handleOpenModal(r)}
                         className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
-                        title="Edit Data Kamar"
+                        title={isHousekeeping ? "Update Kondisi & Kebersihan Kamar" : "Edit Data Kamar"}
                       >
                         <Edit className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => setDeleteTarget(r)}
-                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                        title="Hapus Kamar"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {!isHousekeeping && (
+                        <button
+                          onClick={() => setDeleteTarget(r)}
+                          className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                          title="Hapus Kamar"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -257,28 +301,54 @@ export const RoomsPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingRoom ? `Edit Data Kamar: ${editingRoom.room_number}` : 'Tambah Kamar Baru'}
+        title={isHousekeeping ? `Update Status & Kebersihan Kamar: ${editingRoom?.room_number}` : editingRoom ? `Edit Data Kamar: ${editingRoom.room_number}` : 'Tambah Kamar Baru'}
         maxWidth="md"
       >
         <form onSubmit={handleSaveRoom} className="space-y-4 text-xs">
+          {isHousekeeping && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Mode Petugas Housekeeping</p>
+                <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+                  Data master kamar (nomor, gedung, jenis, kapasitas, tarif) bersifat terkunci. Anda hanya berwenang memperbarui <strong>Status Kamar</strong>, <strong>Status Kebersihan</strong>, dan <strong>Catatan Kondisi Fisik</strong>.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Nomor Kamar *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Nomor Kamar {isHousekeeping && <span className="text-slate-400 font-normal">(Terkunci)</span>}
+              </label>
               <input
                 type="text"
                 required
+                disabled={isHousekeeping}
                 placeholder="Contoh: A301 / B205"
                 value={formData.room_number}
                 onChange={(e) => setFormData({ ...formData, room_number: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border rounded-xl font-bold uppercase ${
+                  isHousekeeping 
+                    ? 'bg-slate-100 text-slate-500 cursor-not-allowed border-slate-200' 
+                    : 'border-slate-200 focus:ring-2 focus:ring-emerald-700'
+                }`}
               />
             </div>
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Gedung *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Gedung {isHousekeeping && <span className="text-slate-400 font-normal">(Terkunci)</span>}
+              </label>
               <select
+                disabled={isHousekeeping}
                 value={formData.building_id}
                 onChange={(e) => setFormData({ ...formData, building_id: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border rounded-xl ${
+                  isHousekeeping 
+                    ? 'bg-slate-100 text-slate-500 cursor-not-allowed border-slate-200' 
+                    : 'bg-white border-slate-200 focus:ring-2 focus:ring-emerald-700'
+                }`}
               >
                 {buildings.map((b) => (
                   <option key={b.id} value={b.id}>{b.name}</option>
@@ -289,11 +359,18 @@ export const RoomsPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Jenis Kamar *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Jenis Kamar {isHousekeeping && <span className="text-slate-400 font-normal">(Terkunci)</span>}
+              </label>
               <select
+                disabled={isHousekeeping}
                 value={formData.room_type_id}
                 onChange={(e) => setFormData({ ...formData, room_type_id: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border rounded-xl ${
+                  isHousekeeping 
+                    ? 'bg-slate-100 text-slate-500 cursor-not-allowed border-slate-200' 
+                    : 'bg-white border-slate-200 focus:ring-2 focus:ring-emerald-700'
+                }`}
               >
                 {roomTypes.map((t) => (
                   <option key={t.id} value={t.id}>{t.name} ({t.code})</option>
@@ -301,27 +378,39 @@ export const RoomsPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Kapasitas Bed *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Kapasitas Bed {isHousekeeping && <span className="text-slate-400 font-normal">(Terkunci)</span>}
+              </label>
               <input
                 type="number"
                 min="1"
                 max="20"
                 required
+                disabled={isHousekeeping}
                 value={formData.capacity}
                 onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 1 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border rounded-xl ${
+                  isHousekeeping 
+                    ? 'bg-slate-100 text-slate-500 cursor-not-allowed border-slate-200' 
+                    : 'border-slate-200 focus:ring-2 focus:ring-emerald-700'
+                }`}
               />
-              <span className="text-[10px] text-slate-400 mt-0.5 block">Tempat tidur akan disinkronkan otomatis</span>
+              {!isHousekeeping && (
+                <span className="text-[10px] text-slate-400 mt-0.5 block">Tempat tidur akan disinkronkan otomatis</span>
+              )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Status & Kebersihan (Bisa diedit oleh Housekeeping) */}
+          <div className="grid grid-cols-2 gap-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-200/80">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Status Kamar</label>
+              <label className="block font-bold text-emerald-950 mb-1">
+                Status Kamar <span className="text-emerald-700 text-[10px]">(Dapat Diedit)</span>
+              </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as RoomStatus })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-emerald-300 rounded-xl bg-white font-bold text-slate-900 focus:ring-2 focus:ring-emerald-700"
               >
                 <option value="AVAILABLE">AVAILABLE (Tersedia)</option>
                 <option value="RESERVED">RESERVED (Dipesan)</option>
@@ -331,13 +420,15 @@ export const RoomsPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Status Housekeeping</label>
+              <label className="block font-bold text-emerald-950 mb-1">
+                Status Housekeeping <span className="text-emerald-700 text-[10px]">(Dapat Diedit)</span>
+              </label>
               <select
                 value={formData.housekeeping_status}
                 onChange={(e) => setFormData({ ...formData, housekeeping_status: e.target.value as HousekeepingStatus })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-emerald-300 rounded-xl bg-white font-bold text-slate-900 focus:ring-2 focus:ring-emerald-700"
               >
-                <option value="READY">READY (Bersih & Siap)</option>
+                <option value="READY">READY (Bersih & Siap Huni)</option>
                 <option value="INSPECTED">INSPECTED (Telah Diinspeksi)</option>
                 <option value="IN_CLEANING">IN_CLEANING (Proses Pembersihan)</option>
                 <option value="DIRTY">DIRTY (Kotor Pasca Checkout)</option>
@@ -346,22 +437,31 @@ export const RoomsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Tarif Sewa Per Malam (Rp) *</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              Tarif Sewa Per Malam (Rp) {isHousekeeping && <span className="text-slate-400 font-normal">(Terkunci)</span>}
+            </label>
             <input
               type="number"
               step="10000"
               required
+              disabled={isHousekeeping}
               value={formData.rate_per_night}
               onChange={(e) => setFormData({ ...formData, rate_per_night: parseInt(e.target.value) || 0 })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-700"
+              className={`w-full px-3 py-2 border rounded-xl font-bold ${
+                isHousekeeping 
+                  ? 'bg-slate-100 text-slate-500 cursor-not-allowed border-slate-200' 
+                  : 'text-emerald-900 border-slate-200 focus:ring-2 focus:ring-emerald-700'
+              }`}
             />
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Catatan / Posisi Kamar</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              Catatan Kondisi / Kebersihan Kamar <span className="text-emerald-700 text-[10px]">(Dapat Diedit)</span>
+            </label>
             <input
               type="text"
-              placeholder="Contoh: Menghadap lapangan manasik, dekat lift / tangga darurat"
+              placeholder="Contoh: AC berfungsi dingin, sprei baru diganti, handuk lengkap"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
@@ -373,7 +473,7 @@ export const RoomsPage: React.FC = () => {
               Batal
             </Button>
             <Button variant="primary" type="submit">
-              {editingRoom ? 'Simpan Perubahan Kamar' : 'Simpan Kamar & Generate Bed'}
+              {isHousekeeping ? 'Simpan Kondisi & Status Kamar' : editingRoom ? 'Simpan Perubahan Kamar' : 'Simpan Kamar & Generate Bed'}
             </Button>
           </div>
         </form>

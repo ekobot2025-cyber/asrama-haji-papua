@@ -394,6 +394,9 @@ class DatabaseService {
   }
 
   public deleteUser(id: string, currentUser?: User): { success: boolean; message: string } {
+    if (currentUser?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak memiliki izin menghapus pengguna.' };
+    }
     const userToDelete = this.users.find(u => u.id === id);
     if (!userToDelete) return { success: false, message: 'Pengguna tidak ditemukan' };
 
@@ -432,6 +435,9 @@ class DatabaseService {
   }
 
   public deleteBuilding(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus data master gedung. Anda hanya berwenang memperbarui status/kondisi.' };
+    }
     const bld = this.buildings.find(b => b.id === id);
     if (!bld) return { success: false, message: 'Gedung tidak ditemukan' };
 
@@ -544,6 +550,9 @@ class DatabaseService {
   }
 
   public deleteRoom(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus master kamar. Anda hanya berwenang memperbarui status/kondisi kebersihan.' };
+    }
     const room = this.rooms.find(r => r.id === id);
     if (!room) return { success: false, message: 'Kamar tidak ditemukan' };
 
@@ -603,6 +612,9 @@ class DatabaseService {
   }
 
   public deleteBed(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus data tempat tidur. Anda hanya berwenang memperbarui status/kondisi.' };
+    }
     const bed = this.beds.find(b => b.id === id);
     if (!bed) return { success: false, message: 'Tempat tidur tidak ditemukan' };
 
@@ -651,6 +663,9 @@ class DatabaseService {
   }
 
   public deleteRoomType(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus tipe kamar.' };
+    }
     const rType = this.roomTypes.find(t => t.id === id);
     if (!rType) return { success: false, message: 'Tipe kamar tidak ditemukan' };
 
@@ -696,6 +711,9 @@ class DatabaseService {
   }
 
   public deleteFacility(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus fasilitas. Anda hanya berwenang memperbarui status/kondisi.' };
+    }
     const fac = this.facilities.find(f => f.id === id);
     if (!fac) return { success: false, message: 'Fasilitas tidak ditemukan' };
 
@@ -730,6 +748,9 @@ class DatabaseService {
   }
 
   public deleteInstitution(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus data instansi.' };
+    }
     const inst = this.institutions.find(i => i.id === id);
     if (!inst) return { success: false, message: 'Instansi tidak ditemukan' };
 
@@ -766,6 +787,9 @@ class DatabaseService {
   }
 
   public deleteRate(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus data tarif.' };
+    }
     const rateItem = this.rates.find(r => r.id === id);
     if (!rateItem) return { success: false, message: 'Item tarif tidak ditemukan' };
 
@@ -776,6 +800,9 @@ class DatabaseService {
   }
 
   public deleteGuest(id: string, user?: User): { success: boolean; message: string } {
+    if (user?.role === 'HOUSEKEEPING') {
+      return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus data tamu.' };
+    }
     const guest = this.guests.find(g => g.id === id);
     if (!guest) return { success: false, message: 'Tamu tidak ditemukan' };
 

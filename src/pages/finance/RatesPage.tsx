@@ -93,7 +93,15 @@ export const RatesPage: React.FC = () => {
     loadData();
   };
 
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
+
   const handleDeleteRate = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data master tarif.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteRate(deleteTarget.id, currentUser || undefined);
@@ -230,13 +238,15 @@ export const RatesPage: React.FC = () => {
                       >
                         <Edit className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => setDeleteTarget(item)}
-                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                        title="Hapus Tarif"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {!isHousekeeping && (
+                        <button
+                          onClick={() => setDeleteTarget(item)}
+                          className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                          title="Hapus Tarif"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

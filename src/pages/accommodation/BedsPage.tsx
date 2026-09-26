@@ -12,6 +12,7 @@ import { useToast } from '../../context/ToastContext';
 export const BedsPage: React.FC = () => {
   const { currentUser } = useAuth();
   const toast = useToast();
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
 
   const [beds, setBeds] = useState<Bed[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -42,6 +43,11 @@ export const BedsPage: React.FC = () => {
   const getRoomNumber = (roomId: string) => rooms.find((r) => r.id === roomId)?.room_number || '-';
 
   const handleOpenModal = (bed?: Bed) => {
+    if (isHousekeeping && !bed) {
+      toast.error('Akses Dibatasi', 'Petugas Housekeeping hanya dapat memperbarui kondisi tempat tidur yang sudah ada.');
+      return;
+    }
+
     if (bed) {
       setEditingBed(bed);
       setFormData({
@@ -72,6 +78,24 @@ export const BedsPage: React.FC = () => {
       return;
     }
 
+    if (isHousekeeping && editingBed) {
+      db.saveBed({
+        id: editingBed.id,
+        bed_code: editingBed.bed_code,
+        room_id: editingBed.room_id,
+        status: formData.status,
+        notes: formData.notes,
+      }, currentUser || undefined);
+
+      toast.success(
+        'Kondisi Bed Diperbarui',
+        `Kondisi fisik dan kebersihan bed ${editingBed.bed_code} berhasil disimpan.`
+      );
+      setIsModalOpen(false);
+      loadData();
+      return;
+    }
+
     db.saveBed({
       id: editingBed?.id,
       bed_code: formData.bed_code.toUpperCase(),
@@ -89,6 +113,12 @@ export const BedsPage: React.FC = () => {
   };
 
   const handleDeleteBed = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data master tempat tidur.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteBed(deleteTarget.id, currentUser || undefined);
@@ -127,14 +157,21 @@ export const BedsPage: React.FC = () => {
           <div className="bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 text-xs font-bold text-emerald-900">
             Total Terdaftar: {beds.length} Bed
           </div>
-          <Button
-            variant="primary"
-            size="md"
-            onClick={() => handleOpenModal()}
-            icon={<Plus className="w-4 h-4" />}
-          >
-            Tambah Bed
-          </Button>
+          {isHousekeeping ? (
+            <div className="bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 text-xs font-bold text-amber-800 flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>Housekeeping: Mode Kondisi Bed</span>
+            </div>
+          ) : (
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => handleOpenModal()}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              Tambah Bed
+            </Button>
+          )}
         </div>
       </div>
 
@@ -194,17 +231,19 @@ export const BedsPage: React.FC = () => {
                 <button
                   onClick={() => handleOpenModal(b)}
                   className="p-1 rounded text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
-                  title="Edit Status Bed"
+                  title={isHousekeeping ? "Update Kondisi & Kebersihan Bed" : "Edit Status Bed"}
                 >
                   <Edit className="w-3 h-3" />
                 </button>
-                <button
-                  onClick={() => setDeleteTarget(b)}
-                  className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                  title="Hapus Bed"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
+                {!isHousekeeping && (
+                  <button
+                    onClick={() => setDeleteTarget(b)}
+                    className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                    title="Hapus Bed"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -215,16 +254,39 @@ export const BedsPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingBed ? `Edit Tempat Tidur: ${editingBed.bed_code}` : 'Tambah Tempat Tidur Baru'}
+        title={
+          isHousekeeping
+            ? `Pembaruan Kondisi Bed: ${editingBed?.bed_code}`
+            : editingBed
+              ? `Edit Tempat Tidur: ${editingBed.bed_code}`
+              : 'Tambah Tempat Tidur Baru'
+        }
         maxWidth="md"
       >
         <form onSubmit={handleSaveBed} className="space-y-4 text-xs">
+          {isHousekeeping && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Mode Housekeeping: Pembaruan Kondisi & Kebersihan</p>
+                <p className="text-[11px] text-amber-700 mt-0.5 leading-relaxed">
+                  Penempatan kamar dan kode bed dikunci oleh sistem. Anda hanya berwenang memperbarui status kelayakan/kebersihan bed dan catatan kondisi fisik (kasur, sprei, bantal).
+                </p>
+              </div>
+            </div>
+          )}
+
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Kamar *</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              Kamar {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+            </label>
             <select
               value={formData.room_id}
+              disabled={isHousekeeping}
               onChange={(e) => setFormData({ ...formData, room_id: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 ${
+                isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed opacity-90' : ''
+              }`}
             >
               {rooms.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -236,14 +298,19 @@ export const BedsPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Kode Bed *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Kode Bed {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+              </label>
               <input
                 type="text"
                 required
+                readOnly={isHousekeeping}
                 placeholder="A101-B01"
                 value={formData.bed_code}
                 onChange={(e) => setFormData({ ...formData, bed_code: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono uppercase font-bold focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl font-mono uppercase font-bold focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                }`}
               />
             </div>
             <div>
@@ -251,7 +318,7 @@ export const BedsPage: React.FC = () => {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as BedStatus })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 font-medium"
               >
                 <option value="AVAILABLE">AVAILABLE (Kosong & Bersih)</option>
                 <option value="RESERVED">RESERVED (Telah Dipesan)</option>
@@ -262,10 +329,12 @@ export const BedsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Catatan Tempat Tidur</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              Catatan Kondisi Fisik & Kebersihan Bed
+            </label>
             <input
               type="text"
-              placeholder="Contoh: Ranjang bawah dekat jendela / dekat pintu"
+              placeholder="Contoh: Ranjang bawah dekat jendela, sprei baru diganti, kondisi kasur baik"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
@@ -277,7 +346,11 @@ export const BedsPage: React.FC = () => {
               Batal
             </Button>
             <Button variant="primary" type="submit">
-              {editingBed ? 'Simpan Perubahan Bed' : 'Simpan Bed'}
+              {isHousekeeping
+                ? 'Simpan Kondisi Bed'
+                : editingBed
+                  ? 'Simpan Perubahan Bed'
+                  : 'Simpan Bed'}
             </Button>
           </div>
         </form>

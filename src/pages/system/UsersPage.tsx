@@ -90,7 +90,15 @@ export const UsersPage: React.FC = () => {
     loadData();
   };
 
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
+
   const handleDeleteUser = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data pengguna sistem.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteUser(deleteTarget.id, currentUser || undefined);
@@ -195,7 +203,7 @@ export const UsersPage: React.FC = () => {
                 >
                   Edit Akun
                 </Button>
-                {u.role !== 'SUPER_ADMIN' && (
+                {u.role !== 'SUPER_ADMIN' && !isHousekeeping && (
                   <button
                     onClick={() => setDeleteTarget(u)}
                     className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"

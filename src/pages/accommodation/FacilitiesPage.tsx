@@ -13,6 +13,7 @@ import { formatCurrency } from '../../utils/formatters';
 export const FacilitiesPage: React.FC = () => {
   const { currentUser } = useAuth();
   const toast = useToast();
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
 
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,6 +42,11 @@ export const FacilitiesPage: React.FC = () => {
   }, []);
 
   const handleOpenModal = (fac?: Facility) => {
+    if (isHousekeeping && !fac) {
+      toast.error('Akses Dibatasi', 'Petugas Housekeeping hanya dapat memperbarui kondisi fasilitas yang sudah ada.');
+      return;
+    }
+
     if (fac) {
       setEditingFacility(fac);
       setFormData({
@@ -78,6 +84,29 @@ export const FacilitiesPage: React.FC = () => {
       return;
     }
 
+    if (isHousekeeping && editingFacility) {
+      db.saveFacility({
+        id: editingFacility.id,
+        name: editingFacility.name,
+        type: editingFacility.type,
+        location: editingFacility.location,
+        capacity: editingFacility.capacity,
+        daily_rate: editingFacility.daily_rate,
+        hourly_rate: editingFacility.hourly_rate,
+        status: formData.status,
+        description: formData.description,
+        amenities: editingFacility.amenities,
+      }, currentUser || undefined);
+
+      toast.success(
+        'Kondisi Fasilitas Diperbarui',
+        `Kesiapan & catatan kebersihan fasilitas ${editingFacility.name} berhasil disimpan.`
+      );
+      setIsModalOpen(false);
+      loadData();
+      return;
+    }
+
     const amenitiesList = formData.amenities
       .split(',')
       .map((item) => item.trim())
@@ -105,6 +134,12 @@ export const FacilitiesPage: React.FC = () => {
   };
 
   const handleDeleteFacility = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data master fasilitas.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteFacility(deleteTarget.id, currentUser || undefined);
@@ -139,14 +174,21 @@ export const FacilitiesPage: React.FC = () => {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => handleOpenModal()}
-          icon={<Plus className="w-4 h-4" />}
-        >
-          Tambah Fasilitas Baru
-        </Button>
+        {isHousekeeping ? (
+          <div className="bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 text-xs font-bold text-amber-800 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <span>Housekeeping: Mode Kondisi Fasilitas</span>
+          </div>
+        ) : (
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => handleOpenModal()}
+            icon={<Plus className="w-4 h-4" />}
+          >
+            Tambah Fasilitas Baru
+          </Button>
+        )}
       </div>
 
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center gap-3">
@@ -221,15 +263,17 @@ export const FacilitiesPage: React.FC = () => {
                 onClick={() => handleOpenModal(fac)}
                 icon={<Edit className="w-3.5 h-3.5 text-slate-600" />}
               >
-                Edit Fasilitas
+                {isHousekeeping ? 'Update Kondisi Fasilitas' : 'Edit Fasilitas'}
               </Button>
-              <button
-                onClick={() => setDeleteTarget(fac)}
-                className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                title="Hapus Fasilitas"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {!isHousekeeping && (
+                <button
+                  onClick={() => setDeleteTarget(fac)}
+                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                  title="Hapus Fasilitas"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -239,29 +283,57 @@ export const FacilitiesPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingFacility ? `Edit Fasilitas: ${editingFacility.name}` : 'Tambah Fasilitas & Aula Baru'}
+        title={
+          isHousekeeping
+            ? `Pembaruan Kondisi & Kebersihan Fasilitas: ${editingFacility?.name}`
+            : editingFacility
+              ? `Edit Fasilitas: ${editingFacility.name}`
+              : 'Tambah Fasilitas & Aula Baru'
+        }
         maxWidth="md"
       >
         <form onSubmit={handleSaveFacility} className="space-y-4 text-xs">
+          {isHousekeeping && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Mode Housekeeping: Pembaruan Kondisi & Kesiapan Fasilitas</p>
+                <p className="text-[11px] text-amber-700 mt-0.5 leading-relaxed">
+                  Data master, spesifikasi aula, dan tarif sewa dikunci oleh sistem. Anda hanya berwenang memperbarui status ketersediaan dan catatan kebersihan/kondisi fasilitas.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Nama Fasilitas / Aula *</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              Nama Fasilitas / Aula {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+            </label>
             <input
               type="text"
               required
+              readOnly={isHousekeeping}
               placeholder="Contoh: Aula Utama Cenderawasih"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+              }`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Jenis Fasilitas *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Jenis Fasilitas {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+              </label>
               <select
                 value={formData.type}
+                disabled={isHousekeeping}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as Facility['type'] })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed opacity-90' : ''
+                }`}
               >
                 <option value="AULA">Aula Pertemuan / Serbaguna</option>
                 <option value="RUANG_RAPAT">Ruang Rapat / VIP Meeting</option>
@@ -273,72 +345,94 @@ export const FacilitiesPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Kapasitas (Orang) *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Kapasitas (Orang) {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+              </label>
               <input
                 type="number"
                 min="1"
                 required
+                readOnly={isHousekeeping}
                 value={formData.capacity}
                 onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 1 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                }`}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Lokasi Gedung / Posisi</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Lokasi Gedung / Posisi {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>}
+              </label>
               <input
                 type="text"
+                readOnly={isHousekeeping}
                 placeholder="Gedung Utama Lt. 1 / Samping Masjid"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                }`}
               />
             </div>
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Status Ketersediaan</label>
+              <label className="block font-bold text-slate-700 mb-1">Status Kesiapan & Ketersediaan</label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as Facility['status'] })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 font-medium"
               >
-                <option value="AVAILABLE">AVAILABLE (Tersedia)</option>
+                <option value="AVAILABLE">AVAILABLE (Tersedia & Bersih)</option>
                 <option value="OCCUPIED">OCCUPIED (Sedang Digunakan)</option>
-                <option value="MAINTENANCE">MAINTENANCE (Pemeliharaan)</option>
+                <option value="MAINTENANCE">MAINTENANCE (Pemeliharaan / Perbaikan)</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Tarif Sewa Harian (Rp) *</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Tarif Sewa Harian (Rp) {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>} *
+              </label>
               <input
                 type="number"
                 step="50000"
                 required
+                readOnly={isHousekeeping}
                 value={formData.daily_rate}
                 onChange={(e) => setFormData({ ...formData, daily_rate: parseInt(e.target.value) || 0 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                }`}
               />
             </div>
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Tarif Per Jam (Opsional)</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                Tarif Per Jam {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>}
+              </label>
               <input
                 type="number"
                 step="50000"
+                readOnly={isHousekeeping}
                 value={formData.hourly_rate}
                 onChange={(e) => setFormData({ ...formData, hourly_rate: parseInt(e.target.value) || 0 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                  isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                }`}
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              {isHousekeeping ? 'Catatan Kebersihan & Kondisi Fasilitas' : 'Deskripsi Singkat'}
+            </label>
             <textarea
               rows={2}
-              placeholder="Deskripsikan luas ruangan, spesifikasi sound, peruntukan acara..."
+              placeholder="Deskripsikan kondisi kebersihan, kesiapan sound, AC, dan perlengkapan aula..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
@@ -346,13 +440,18 @@ export const FacilitiesPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Kelengkapan & Fasilitas (Pisahkan koma)</label>
+            <label className="block font-bold text-slate-700 mb-1">
+              Kelengkapan & Fasilitas {isHousekeeping && <span className="text-[10px] text-slate-400 font-normal">(Terkunci)</span>}
+            </label>
             <input
               type="text"
+              readOnly={isHousekeeping}
               placeholder="Sound System Wireless, Proyektor LCD, AC Standing, Meja & Kursi"
               value={formData.amenities}
               onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+              }`}
             />
           </div>
 
@@ -361,7 +460,7 @@ export const FacilitiesPage: React.FC = () => {
               Batal
             </Button>
             <Button variant="primary" type="submit">
-              {editingFacility ? 'Simpan Perubahan' : 'Simpan Fasilitas'}
+              {isHousekeeping ? 'Simpan Kondisi Fasilitas' : editingFacility ? 'Simpan Perubahan' : 'Simpan Fasilitas'}
             </Button>
           </div>
         </form>

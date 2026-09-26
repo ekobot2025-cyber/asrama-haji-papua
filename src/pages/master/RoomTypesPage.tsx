@@ -90,7 +90,15 @@ export const RoomTypesPage: React.FC = () => {
     loadData();
   };
 
+  const isHousekeeping = currentUser?.role === 'HOUSEKEEPING';
+
   const handleDeleteType = () => {
+    if (isHousekeeping) {
+      toast.error('Akses Ditolak', 'Petugas Housekeeping tidak diizinkan menghapus data jenis kamar.');
+      setDeleteTarget(null);
+      return;
+    }
+
     if (!deleteTarget) return;
 
     const res = db.deleteRoomType(deleteTarget.id, currentUser || undefined);
@@ -177,13 +185,15 @@ export const RoomTypesPage: React.FC = () => {
               >
                 Edit Jenis Kamar
               </Button>
-              <button
-                onClick={() => setDeleteTarget(t)}
-                className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                title="Hapus Jenis Kamar"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {!isHousekeeping && (
+                <button
+                  onClick={() => setDeleteTarget(t)}
+                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                  title="Hapus Jenis Kamar"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         ))}
