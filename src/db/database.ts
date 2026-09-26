@@ -13,7 +13,7 @@ import {
 } from './seedData';
 import { terbilang } from '../utils/terbilang';
 
-const DB_VERSION = 'sipah_papua_v1.0';
+const DB_VERSION = 'simaha_papua_v2.5_munakosah_siasah';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -47,9 +47,9 @@ class DatabaseService {
   }
 
   public initialize(forceReset = false): void {
-    const isInitialized = localStorage.getItem(`${STORAGE_PREFIX}initialized`);
+    const currentVersion = localStorage.getItem(`${STORAGE_PREFIX}initialized`);
 
-    if (!isInitialized || forceReset) {
+    if (!currentVersion || currentVersion !== DB_VERSION || forceReset) {
       this.seedDatabase();
     } else {
       this.loadFromStorage();
@@ -218,6 +218,43 @@ class DatabaseService {
 
       if (!this.rooms.length) {
         this.seedDatabase();
+      } else {
+        // Fallback migration to ensure all reservations have SPMA & package_type
+        let needsSave = false;
+        this.reservations.forEach((r, idx) => {
+          if (!r.spma_no) {
+            r.spma_no = `SPMA/AHP/2026/09/${String(idx + 1).padStart(4, '0')}`;
+            needsSave = true;
+          }
+          if (!r.package_type) {
+            r.package_type = 'REGULER';
+            needsSave = true;
+          }
+        });
+
+        // Fallback migration to ensure all invoices have PNBP and SIMPONI
+        this.invoices.forEach((inv, idx) => {
+          if (!inv.pnbp_account_code) {
+            inv.pnbp_account_code = inv.total_amount > 5000000 ? '425111' : '425112';
+            inv.pnbp_account_name = inv.pnbp_account_code === '425111' 
+              ? 'Pendapatan Sewa Gedung, Bangunan, Ruangan & Fasilitas Aula'
+              : 'Pendapatan Sewa Kamar / Asrama / Wisma (PP No. 59/2020)';
+            needsSave = true;
+          }
+          if (!inv.simponi_billing_code) {
+            inv.simponi_billing_code = `820260926${String(idx + 1).padStart(5, '0')}`;
+            inv.billing_expired_at = '2026-09-30T23:59:59Z';
+            needsSave = true;
+          }
+          if (!inv.spk_contract_no && inv.pnbp_account_code === '425111') {
+            inv.spk_contract_no = `SPK/AHP/KS/2026/${String(idx + 1).padStart(3, '0')}`;
+            needsSave = true;
+          }
+        });
+
+        if (needsSave) {
+          this.saveAll();
+        }
       }
     } catch {
       this.seedDatabase();
