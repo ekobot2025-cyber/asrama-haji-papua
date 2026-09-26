@@ -3,7 +3,7 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { GlobalSearchModal } from './GlobalSearchModal';
 import { HelpGuideModal } from '../common/HelpGuideModal';
-import { BookOpen, HelpCircle } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 interface AppLayoutProps {
   currentPage: string;
@@ -20,6 +20,27 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const [collapsed, setCollapsed] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Monitor window scroll to show/hide scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      setShowScrollTop(scrollY > 200);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll to top when currentPage changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Keyboard shortcut Ctrl+K / Cmd+K for search, and F1 / ? for Help SOP
   useEffect(() => {
@@ -77,18 +98,19 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </main>
       </div>
 
-      {/* Floating Quick Help Guide Trigger Button (Bottom Right) */}
-      <div className="fixed bottom-4 right-4 z-20 no-print">
+      {/* Floating Scroll to Top Button (Bottom Right) */}
+      <div className="fixed bottom-6 right-6 z-30 no-print">
         <button
-          onClick={() => setIsHelpOpen(true)}
-          title="Buku Panduan & SOP Operasional (Tekan F1)"
-          className="flex items-center gap-2 bg-gradient-to-r from-emerald-800 to-emerald-950 text-white px-3.5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border border-emerald-600/50 group"
+          onClick={handleScrollToTop}
+          title="Kembali ke Halaman Paling Atas"
+          aria-label="Kembali ke Halaman Paling Atas"
+          className={`flex items-center justify-center w-11 h-11 rounded-full bg-emerald-800 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all duration-300 border border-emerald-600/40 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 cursor-pointer ${
+            showScrollTop
+              ? 'opacity-100 scale-100 pointer-events-auto'
+              : 'opacity-0 scale-75 pointer-events-none'
+          }`}
         >
-          <HelpCircle className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
-          <span className="text-xs font-bold tracking-wide hidden sm:inline">Panduan SOP</span>
-          <kbd className="hidden md:inline text-[9px] bg-emerald-900/80 px-1.5 py-0.5 rounded border border-emerald-700/60 font-mono text-emerald-200">
-            F1
-          </kbd>
+          <ArrowUp className="w-5 h-5 text-amber-300 stroke-[2.5]" />
         </button>
       </div>
 
