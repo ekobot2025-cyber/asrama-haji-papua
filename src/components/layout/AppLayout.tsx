@@ -33,6 +33,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         e.preventDefault();
         setIsSearchOpen((prev) => !prev);
       }
+      // Escape shortcut to close modals
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+        setIsHelpOpen(false);
+      }
       // F1 or ? (when not typing in an input)
       if (e.key === 'F1') {
         e.preventDefault();

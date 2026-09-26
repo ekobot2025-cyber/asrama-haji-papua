@@ -25,6 +25,22 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     }
   }, [isOpen]);
 
+  // Global ESC key listener to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const term = searchTerm.toLowerCase().trim();
@@ -95,19 +111,36 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
               placeholder="Cari nomor reservasi, nama tamu, rombongan, nomor kamar, invoice..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClose();
+                }
+              }}
               className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
             />
             {searchTerm && (
               <button 
+                type="button"
                 onClick={() => setSearchTerm('')} 
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                title="Hapus teks pencarian"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
-            <span className="text-[10px] font-mono bg-slate-100 text-slate-500 px-2 py-1 rounded border border-slate-200 shrink-0">
-              ESC
-            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              title="Tutup Pencarian (Tekan ESC)"
+              className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-rose-700 bg-slate-100 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-rose-200 transition-colors shrink-0 cursor-pointer group"
+            >
+              <span className="text-[10px] font-mono bg-white px-1 py-0.5 rounded border border-slate-200 group-hover:border-rose-200 text-slate-500 group-hover:text-rose-600">
+                ESC
+              </span>
+              <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
+            </button>
           </div>
 
           {/* Results Area */}
@@ -261,6 +294,23 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 )}
               </>
             )}
+          </div>
+
+          {/* Modal Footer with explicit Tutup button and keyboard hint */}
+          <div className="border-t border-slate-200 px-4 py-2.5 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+            <div className="flex items-center gap-2 text-[11px]">
+              <span>Tekan <kbd className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700 font-bold">ESC</kbd> untuk menutup</span>
+              <span className="hidden sm:inline">&bull;</span>
+              <span className="hidden sm:inline">Pencarian Global SIMAHA</span>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3.5 py-1.5 rounded-lg bg-slate-200/80 hover:bg-rose-100 text-slate-700 hover:text-rose-700 font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Tutup (ESC)</span>
+            </button>
           </div>
         </div>
       </div>
