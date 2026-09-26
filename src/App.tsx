@@ -33,6 +33,9 @@ import { UsersPage } from './pages/system/UsersPage';
 import { AuditLogPage } from './pages/system/AuditLogPage';
 import { SettingsPage } from './pages/system/SettingsPage';
 import { FrontDeskPosPage } from './pages/operations/FrontDeskPosPage';
+import { ShieldAlert, ArrowRight } from 'lucide-react';
+import { Button } from './components/common/Button';
+import { UserRole } from './types';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, currentUser } = useAuth();
@@ -40,10 +43,74 @@ const AppContent: React.FC = () => {
     try {
       const savedUser = db.getUsers().find(u => u.id === localStorage.getItem('sipah_auth_user_id'));
       if (savedUser?.role === 'RESEPSIONIS') return 'frontdesk-pos';
+      if (savedUser?.role === 'HOUSEKEEPING') return 'housekeeping';
+      if (savedUser?.role === 'KEUANGAN') return 'invoices';
+      if (savedUser?.role === 'PIMPINAN') return 'executive-dashboard';
     } catch {}
     return 'dashboard';
   });
   const [targetId, setTargetId] = useState<string | undefined>(undefined);
+
+  const canAccessRole = (role: UserRole, page: string): boolean => {
+    if (role === 'SUPER_ADMIN') return true;
+
+    switch (page) {
+      case 'dashboard':
+        return ['ADMIN_PENGINAPAN', 'KEUANGAN', 'PIMPINAN'].includes(role);
+      case 'executive-dashboard':
+        return role === 'PIMPINAN';
+      case 'frontdesk-pos':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS'].includes(role);
+      case 'reservations':
+      case 'reservation-calendar':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'PIMPINAN', 'KEUANGAN'].includes(role);
+      case 'checkin':
+      case 'checkout':
+      case 'room-assignment':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS'].includes(role);
+      case 'guests':
+      case 'groups':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'KEUANGAN'].includes(role);
+      case 'room-status-board':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'HOUSEKEEPING', 'PIMPINAN'].includes(role);
+      case 'buildings':
+      case 'rooms':
+      case 'beds':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'HOUSEKEEPING'].includes(role);
+      case 'facilities':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'PIMPINAN'].includes(role);
+      case 'housekeeping':
+      case 'maintenance':
+        return ['ADMIN_PENGINAPAN', 'HOUSEKEEPING'].includes(role);
+      case 'rates':
+      case 'invoices':
+      case 'payments':
+        return ['ADMIN_PENGINAPAN', 'KEUANGAN', 'RESEPSIONIS', 'PIMPINAN'].includes(role);
+      case 'reports':
+        return ['ADMIN_PENGINAPAN', 'KEUANGAN', 'PIMPINAN'].includes(role);
+      case 'master-institutions':
+      case 'master-room-types':
+        return role === 'ADMIN_PENGINAPAN';
+      case 'system-users':
+      case 'audit-logs':
+      case 'settings':
+        return false;
+      default:
+        return true;
+    }
+  };
+
+  const getDefaultPageForRole = (role: UserRole): string => {
+    switch (role) {
+      case 'HOUSEKEEPING': return 'housekeeping';
+      case 'RESEPSIONIS': return 'frontdesk-pos';
+      case 'KEUANGAN': return 'invoices';
+      case 'PIMPINAN': return 'executive-dashboard';
+      case 'ADMIN_PENGINAPAN': return 'dashboard';
+      case 'SUPER_ADMIN': return 'dashboard';
+      default: return 'dashboard';
+    }
+  };
 
   const handleNavigate = (page: string, id?: string) => {
     setCurrentPage(page);
@@ -56,6 +123,40 @@ const AppContent: React.FC = () => {
   }
 
   const renderPage = () => {
+    // RBAC Security Guard: Check if current role has permission to access the requested page
+    if (currentUser && !canAccessRole(currentUser.role, currentPage)) {
+      const allowedTarget = getDefaultPageForRole(currentUser.role);
+      return (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-rose-200 shadow-sm space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-200 shadow-xs">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <div>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-100 text-rose-800 tracking-wider">
+              Akses Dibatasi (RBAC Guard)
+            </span>
+            <h2 className="text-xl font-black text-slate-900 mt-2">
+              Hak Akses Tidak Memadai
+            </h2>
+            <p className="text-xs text-slate-600 max-w-md mt-1 leading-relaxed">
+              Akun Anda saat ini (<strong>{currentUser.name}</strong> &bull; Peran: <strong className="text-rose-700">{currentUser.role}</strong>) tidak memiliki hak akses untuk membuka modul <strong>{currentPage}</strong> sesuai Standar Operasional Prosedur (SOP) UPT Asrama Haji Papua.
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => handleNavigate(allowedTarget)}
+              icon={<ArrowRight className="w-4 h-4" />}
+            >
+              Kembali ke Menu Utama ({allowedTarget})
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     switch (currentPage) {
       case 'frontdesk-pos':
         return <FrontDeskPosPage onNavigate={handleNavigate} />;

@@ -133,15 +133,17 @@ export const Header: React.FC<HeaderProps> = ({
           <span>{currentTime}</span>
         </div>
 
-        {/* Kasir Resepsionis POS Quick Button */}
-        <button
-          onClick={() => onNavigate('frontdesk-pos')}
-          title="Buka Kasir & Transaksi Resepsionis 1-Klik (Front Desk POS)"
-          className="flex items-center gap-1.5 text-[11px] font-black text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500/50 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all shadow-xs group"
-        >
-          <Receipt className="w-3.5 h-3.5 text-slate-900 group-hover:scale-110 transition-transform" />
-          <span className="hidden sm:inline">Kasir Resepsionis</span>
-        </button>
+        {/* Kasir Resepsionis POS Quick Button (Only for Receptionist & Admins) */}
+        {['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'RESEPSIONIS'].includes(currentRole) && (
+          <button
+            onClick={() => onNavigate('frontdesk-pos')}
+            title="Buka Kasir & Transaksi Resepsionis 1-Klik (Front Desk POS)"
+            className="flex items-center gap-1.5 text-[11px] font-black text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500/50 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all shadow-xs group"
+          >
+            <Receipt className="w-3.5 h-3.5 text-slate-900 group-hover:scale-110 transition-transform" />
+            <span className="hidden sm:inline">Kasir Resepsionis</span>
+          </button>
+        )}
 
         {/* Cek Kamar Mandiri Munakosah Papua */}
         <button
@@ -163,15 +165,17 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline">Panduan SOP</span>
         </button>
 
-        {/* Demo Data Reset Button */}
-        <button
-          onClick={handleResetData}
-          title="Reset database ke Demo Seed Data"
-          className="hidden md:flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 px-2.5 py-1.5 rounded-lg transition-colors shadow-2xs"
-        >
-          <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
-          <span>Reset Demo Data</span>
-        </button>
+        {/* Demo Data Reset Button (Super Admin Only) */}
+        {currentRole === 'SUPER_ADMIN' && (
+          <button
+            onClick={handleResetData}
+            title="Reset database ke Demo Seed Data (Super Admin Only)"
+            className="hidden md:flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 px-2.5 py-1.5 rounded-lg transition-colors shadow-2xs"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
+            <span>Reset Demo Data</span>
+          </button>
+        )}
 
         {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
@@ -283,6 +287,15 @@ export const Header: React.FC<HeaderProps> = ({
                       switchUser(u.id);
                       setShowUserMenu(false);
                       toast.info(`Beralih Peran`, `Sekarang login sebagai ${u.name} (${roleLabels[u.role]})`);
+                      
+                      // Auto-navigate to primary workspace for selected role
+                      const defaultPage = 
+                        u.role === 'HOUSEKEEPING' ? 'housekeeping' :
+                        u.role === 'RESEPSIONIS' ? 'frontdesk-pos' :
+                        u.role === 'KEUANGAN' ? 'invoices' :
+                        u.role === 'PIMPINAN' ? 'executive-dashboard' :
+                        'dashboard';
+                      onNavigate(defaultPage);
                     }}
                     className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors ${
                       currentUser?.id === u.id

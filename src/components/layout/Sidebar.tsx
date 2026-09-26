@@ -58,6 +58,71 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onCloseMobile();
   };
 
+  // Role-Based Access Control (RBAC) Menu Permission Matrix
+  const canAccess = (pageKey: string): boolean => {
+    if (currentRole === 'SUPER_ADMIN') return true;
+
+    switch (pageKey) {
+      case 'dashboard':
+        return ['ADMIN_PENGINAPAN', 'KEUANGAN', 'PIMPINAN'].includes(currentRole);
+      case 'executive-dashboard':
+        return currentRole === 'PIMPINAN';
+      case 'frontdesk-pos':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS'].includes(currentRole);
+      case 'reservations':
+      case 'reservation-calendar':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'PIMPINAN', 'KEUANGAN'].includes(currentRole);
+      case 'checkin':
+      case 'checkout':
+      case 'room-assignment':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS'].includes(currentRole);
+      case 'guests':
+      case 'groups':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'KEUANGAN'].includes(currentRole);
+      case 'room-status-board':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'HOUSEKEEPING', 'PIMPINAN'].includes(currentRole);
+      case 'buildings':
+      case 'rooms':
+      case 'beds':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'HOUSEKEEPING'].includes(currentRole);
+      case 'facilities':
+        return ['ADMIN_PENGINAPAN', 'RESEPSIONIS', 'PIMPINAN'].includes(currentRole);
+      case 'housekeeping':
+      case 'maintenance':
+        return ['ADMIN_PENGINAPAN', 'HOUSEKEEPING'].includes(currentRole);
+      case 'rates':
+      case 'invoices':
+      case 'payments':
+        return ['ADMIN_PENGINAPAN', 'KEUANGAN', 'RESEPSIONIS', 'PIMPINAN'].includes(currentRole);
+      case 'reports':
+        return ['ADMIN_PENGINAPAN', 'KEUANGAN', 'PIMPINAN'].includes(currentRole);
+      case 'master-institutions':
+      case 'master-room-types':
+        return currentRole === 'ADMIN_PENGINAPAN';
+      case 'system-users':
+      case 'audit-logs':
+      case 'settings':
+        return false;
+      default:
+        return false;
+    }
+  };
+
+  // Section Visibility Computations
+  const hasUtamaSection = canAccess('dashboard') || canAccess('executive-dashboard');
+  const hasOperasionalSection = 
+    canAccess('frontdesk-pos') || canAccess('reservations') || canAccess('reservation-calendar') || 
+    canAccess('checkin') || canAccess('checkout') || canAccess('room-assignment') || 
+    canAccess('guests') || canAccess('groups');
+  const hasPenginapanSection = 
+    canAccess('room-status-board') || canAccess('buildings') || canAccess('rooms') || 
+    canAccess('beds') || canAccess('facilities');
+  const hasKamarOpsSection = canAccess('housekeeping') || canAccess('maintenance');
+  const hasKeuanganSection = canAccess('rates') || canAccess('invoices') || canAccess('payments');
+  const hasLaporanSection = canAccess('reports');
+  const hasMasterSection = canAccess('master-institutions') || canAccess('master-room-types');
+  const hasSistemSection = canAccess('system-users') || canAccess('audit-logs') || canAccess('settings');
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -82,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Brand / Logo */}
         <div className="p-4 border-b border-emerald-800/40 flex items-center justify-between">
           <div 
-            onClick={() => handleNav('dashboard')} 
+            onClick={() => handleNav(currentRole === 'RESEPSIONIS' ? 'frontdesk-pos' : currentRole === 'HOUSEKEEPING' ? 'housekeeping' : currentRole === 'PIMPINAN' ? 'executive-dashboard' : 'dashboard')} 
             className="flex items-center gap-3 cursor-pointer select-none overflow-hidden"
           >
             {/* Islamic Star / Papuan Emblem Motif */}
@@ -116,306 +181,374 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Navigation list */}
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 custom-scrollbar">
           {/* UTAMA */}
-          <div>
-            {!collapsed && <p className="px-3 text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider mb-1">Utama</p>}
-            <ul className="space-y-1">
-              <li>
-                <div onClick={() => handleNav('dashboard')} className={navItemClass('dashboard')} title="Dashboard">
-                  <LayoutDashboard className="w-4 h-4 shrink-0 text-emerald-300" />
-                  {!collapsed && <span>Dashboard Operasional</span>}
-                </div>
-              </li>
-              <li>
-                <div onClick={() => handleNav('executive-dashboard')} className={navItemClass('executive-dashboard')} title="Dashboard Pimpinan">
-                  <Award className="w-4 h-4 shrink-0 text-amber-400" />
-                  {!collapsed && <span className="text-amber-200">Dashboard Pimpinan</span>}
-                </div>
-              </li>
-            </ul>
-          </div>
+          {hasUtamaSection && (
+            <div>
+              {!collapsed && <p className="px-3 text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider mb-1">Utama</p>}
+              <ul className="space-y-1">
+                {canAccess('dashboard') && (
+                  <li>
+                    <div onClick={() => handleNav('dashboard')} className={navItemClass('dashboard')} title="Dashboard Operasional">
+                      <LayoutDashboard className="w-4 h-4 shrink-0 text-emerald-300" />
+                      {!collapsed && <span>Dashboard Operasional</span>}
+                    </div>
+                  </li>
+                )}
+                {canAccess('executive-dashboard') && (
+                  <li>
+                    <div onClick={() => handleNav('executive-dashboard')} className={navItemClass('executive-dashboard')} title="Dashboard Pimpinan">
+                      <Award className="w-4 h-4 shrink-0 text-amber-400" />
+                      {!collapsed && <span className="text-amber-200 font-bold">Dashboard Pimpinan</span>}
+                    </div>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
 
           {/* OPERASIONAL */}
-          <div>
-            {!collapsed ? (
-              <div 
-                onClick={() => toggleSection('operasional')} 
-                className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
-              >
-                <span>Operasional</span>
-                {openSections.operasional ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </div>
-            ) : null}
+          {hasOperasionalSection && (
+            <div>
+              {!collapsed ? (
+                <div 
+                  onClick={() => toggleSection('operasional')} 
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                >
+                  <span>Operasional</span>
+                  {openSections.operasional ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              ) : null}
 
-            {(collapsed || openSections.operasional) && (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <div 
-                    onClick={() => handleNav('frontdesk-pos')} 
-                    className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
-                      currentPage === 'frontdesk-pos'
-                        ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
-                        : 'bg-emerald-900/60 text-amber-300 hover:bg-emerald-800 hover:text-white border border-amber-400/30'
-                    }`} 
-                    title="Kasir & Transaksi Resepsionis (Front Desk POS)"
-                  >
-                    <Receipt className="w-4 h-4 shrink-0 text-amber-400 animate-pulse" />
-                    {!collapsed && (
-                      <div className="flex items-center justify-between w-full">
-                        <span className="font-bold">Kasir Resepsionis (POS)</span>
-                        <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.2 rounded">KASIR</span>
+              {(collapsed || openSections.operasional) && (
+                <ul className="space-y-1 mt-1">
+                  {canAccess('frontdesk-pos') && (
+                    <li>
+                      <div 
+                        onClick={() => handleNav('frontdesk-pos')} 
+                        className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+                          currentPage === 'frontdesk-pos'
+                            ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
+                            : 'bg-emerald-900/60 text-amber-300 hover:bg-emerald-800 hover:text-white border border-amber-400/30'
+                        }`} 
+                        title="Kasir & Transaksi Resepsionis (Front Desk POS)"
+                      >
+                        <Receipt className="w-4 h-4 shrink-0 text-amber-400 animate-pulse" />
+                        {!collapsed && (
+                          <div className="flex items-center justify-between w-full">
+                            <span className="font-bold">Kasir Resepsionis (POS)</span>
+                            <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.2 rounded">KASIR</span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('reservations')} className={navItemClass('reservations')} title="Reservasi">
-                    <CalendarCheck className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Reservasi</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('reservation-calendar')} className={navItemClass('reservation-calendar')} title="Bagan Jadwal / Tape Chart (Room Rack)">
-                    <CalendarDays className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Tape Chart & Kalender</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('checkin')} className={navItemClass('checkin')} title="Check-in">
-                    <LogIn className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Check-in Tamu</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('checkout')} className={navItemClass('checkout')} title="Check-out">
-                    <LogOut className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Check-out Tamu</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('room-assignment')} className={navItemClass('room-assignment')} title="Penempatan Kamar">
-                    <UserCheck className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Penempatan Kamar</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('guests')} className={navItemClass('guests')} title="Data Tamu">
-                    <Users className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Data Tamu</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('groups')} className={navItemClass('groups')} title="Rombongan">
-                    <Briefcase className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Rombongan</span>}
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
+                    </li>
+                  )}
+                  {canAccess('reservations') && (
+                    <li>
+                      <div onClick={() => handleNav('reservations')} className={navItemClass('reservations')} title="Reservasi">
+                        <CalendarCheck className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Reservasi</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('reservation-calendar') && (
+                    <li>
+                      <div onClick={() => handleNav('reservation-calendar')} className={navItemClass('reservation-calendar')} title="Bagan Jadwal / Tape Chart (Room Rack)">
+                        <CalendarDays className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Tape Chart & Kalender</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('checkin') && (
+                    <li>
+                      <div onClick={() => handleNav('checkin')} className={navItemClass('checkin')} title="Check-in">
+                        <LogIn className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Check-in Tamu</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('checkout') && (
+                    <li>
+                      <div onClick={() => handleNav('checkout')} className={navItemClass('checkout')} title="Check-out">
+                        <LogOut className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Check-out Tamu</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('room-assignment') && (
+                    <li>
+                      <div onClick={() => handleNav('room-assignment')} className={navItemClass('room-assignment')} title="Penempatan Kamar">
+                        <UserCheck className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Penempatan Kamar</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('guests') && (
+                    <li>
+                      <div onClick={() => handleNav('guests')} className={navItemClass('guests')} title="Data Tamu">
+                        <Users className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Data Tamu</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('groups') && (
+                    <li>
+                      <div onClick={() => handleNav('groups')} className={navItemClass('groups')} title="Rombongan">
+                        <Briefcase className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Rombongan</span>}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* PENGINAPAN */}
-          <div>
-            {!collapsed ? (
-              <div 
-                onClick={() => toggleSection('penginapan')} 
-                className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
-              >
-                <span>Penginapan & Kamar</span>
-                {openSections.penginapan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </div>
-            ) : null}
+          {hasPenginapanSection && (
+            <div>
+              {!collapsed ? (
+                <div 
+                  onClick={() => toggleSection('penginapan')} 
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                >
+                  <span>Penginapan & Kamar</span>
+                  {openSections.penginapan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              ) : null}
 
-            {(collapsed || openSections.penginapan) && (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <div onClick={() => handleNav('room-status-board')} className={navItemClass('room-status-board')} title="Status Kamar (Room Board)">
-                    <Hotel className="w-4 h-4 shrink-0 text-amber-400" />
-                    {!collapsed && <span className="font-semibold text-amber-200">Room Status Board</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('buildings')} className={navItemClass('buildings')} title="Gedung">
-                    <Building2 className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Gedung</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('rooms')} className={navItemClass('rooms')} title="Kamar">
-                    <BedDouble className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Data Kamar</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('beds')} className={navItemClass('beds')} title="Tempat Tidur (Bed)">
-                    <Layers className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Tempat Tidur (Bed)</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('facilities')} className={navItemClass('facilities')} title="Fasilitas Asrama">
-                    <Landmark className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Fasilitas & Aula</span>}
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
+              {(collapsed || openSections.penginapan) && (
+                <ul className="space-y-1 mt-1">
+                  {canAccess('room-status-board') && (
+                    <li>
+                      <div onClick={() => handleNav('room-status-board')} className={navItemClass('room-status-board')} title="Status Kamar (Room Board)">
+                        <Hotel className="w-4 h-4 shrink-0 text-amber-400" />
+                        {!collapsed && <span className="font-semibold text-amber-200">Room Status Board</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('buildings') && (
+                    <li>
+                      <div onClick={() => handleNav('buildings')} className={navItemClass('buildings')} title="Gedung">
+                        <Building2 className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Gedung</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('rooms') && (
+                    <li>
+                      <div onClick={() => handleNav('rooms')} className={navItemClass('rooms')} title="Kamar">
+                        <BedDouble className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Data Kamar</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('beds') && (
+                    <li>
+                      <div onClick={() => handleNav('beds')} className={navItemClass('beds')} title="Tempat Tidur (Bed)">
+                        <Layers className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Tempat Tidur (Bed)</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('facilities') && (
+                    <li>
+                      <div onClick={() => handleNav('facilities')} className={navItemClass('facilities')} title="Fasilitas Asrama">
+                        <Landmark className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Fasilitas & Aula</span>}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
 
-          {/* OPERASIONAL KAMAR */}
-          <div>
-            {!collapsed ? (
-              <div 
-                onClick={() => toggleSection('kamarOps')} 
-                className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
-              >
-                <span>Operasional Kamar</span>
-                {openSections.kamarOps ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </div>
-            ) : null}
+          {/* OPERASIONAL KAMAR (HOUSEKEEPING & MAINTENANCE) */}
+          {hasKamarOpsSection && (
+            <div>
+              {!collapsed ? (
+                <div 
+                  onClick={() => toggleSection('kamarOps')} 
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                >
+                  <span>Operasional Kamar</span>
+                  {openSections.kamarOps ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              ) : null}
 
-            {(collapsed || openSections.kamarOps) && (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <div onClick={() => handleNav('housekeeping')} className={navItemClass('housekeeping')} title="Housekeeping">
-                    <Sparkles className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Housekeeping</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('maintenance')} className={navItemClass('maintenance')} title="Maintenance">
-                    <Wrench className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Maintenance & Kerusakan</span>}
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
+              {(collapsed || openSections.kamarOps) && (
+                <ul className="space-y-1 mt-1">
+                  {canAccess('housekeeping') && (
+                    <li>
+                      <div onClick={() => handleNav('housekeeping')} className={navItemClass('housekeeping')} title="Housekeeping">
+                        <Sparkles className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Housekeeping</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('maintenance') && (
+                    <li>
+                      <div onClick={() => handleNav('maintenance')} className={navItemClass('maintenance')} title="Maintenance">
+                        <Wrench className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Maintenance & Kerusakan</span>}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* KEUANGAN */}
-          <div>
-            {!collapsed ? (
-              <div 
-                onClick={() => toggleSection('keuangan')} 
-                className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
-              >
-                <span>Keuangan</span>
-                {openSections.keuangan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </div>
-            ) : null}
+          {hasKeuanganSection && (
+            <div>
+              {!collapsed ? (
+                <div 
+                  onClick={() => toggleSection('keuangan')} 
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                >
+                  <span>Keuangan</span>
+                  {openSections.keuangan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              ) : null}
 
-            {(collapsed || openSections.keuangan) && (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <div onClick={() => handleNav('rates')} className={navItemClass('rates')} title="Master Tarif">
-                    <Receipt className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Tarif Kamar & Fasilitas</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('invoices')} className={navItemClass('invoices')} title="Tagihan & Invoice">
-                    <FileText className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Tagihan & Invoice</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('payments')} className={navItemClass('payments')} title="Pembayaran & Kwitansi">
-                    <CreditCard className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Pembayaran & Kwitansi</span>}
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
+              {(collapsed || openSections.keuangan) && (
+                <ul className="space-y-1 mt-1">
+                  {canAccess('rates') && (
+                    <li>
+                      <div onClick={() => handleNav('rates')} className={navItemClass('rates')} title="Master Tarif">
+                        <Receipt className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Tarif Kamar & Fasilitas</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('invoices') && (
+                    <li>
+                      <div onClick={() => handleNav('invoices')} className={navItemClass('invoices')} title="Tagihan & Invoice">
+                        <FileText className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Tagihan & Invoice</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('payments') && (
+                    <li>
+                      <div onClick={() => handleNav('payments')} className={navItemClass('payments')} title="Pembayaran & Kwitansi">
+                        <CreditCard className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Pembayaran & Kwitansi</span>}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* LAPORAN */}
-          <div>
-            {!collapsed ? (
-              <div 
-                onClick={() => toggleSection('laporan')} 
-                className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
-              >
-                <span>Laporan Manajemen</span>
-                {openSections.laporan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </div>
-            ) : null}
+          {hasLaporanSection && (
+            <div>
+              {!collapsed ? (
+                <div 
+                  onClick={() => toggleSection('laporan')} 
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                >
+                  <span>Laporan Manajemen</span>
+                  {openSections.laporan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              ) : null}
 
-            {(collapsed || openSections.laporan) && (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <div onClick={() => handleNav('reports')} className={navItemClass('reports')} title="Semua Laporan">
-                    <BarChart3 className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Laporan Terpadu</span>}
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
+              {(collapsed || openSections.laporan) && (
+                <ul className="space-y-1 mt-1">
+                  {canAccess('reports') && (
+                    <li>
+                      <div onClick={() => handleNav('reports')} className={navItemClass('reports')} title="Semua Laporan">
+                        <BarChart3 className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Laporan Terpadu</span>}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* MASTER DATA */}
-          <div>
-            {!collapsed ? (
-              <div 
-                onClick={() => toggleSection('master')} 
-                className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
-              >
-                <span>Master Data</span>
-                {openSections.master ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </div>
-            ) : null}
+          {hasMasterSection && (
+            <div>
+              {!collapsed ? (
+                <div 
+                  onClick={() => toggleSection('master')} 
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                >
+                  <span>Master Data</span>
+                  {openSections.master ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              ) : null}
 
-            {(collapsed || openSections.master) && (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <div onClick={() => handleNav('master-institutions')} className={navItemClass('master-institutions')} title="Instansi">
-                    <Landmark className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Instansi & Lembaga</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('master-room-types')} className={navItemClass('master-room-types')} title="Jenis Kamar">
-                    <BedDouble className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Jenis Kamar</span>}
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
+              {(collapsed || openSections.master) && (
+                <ul className="space-y-1 mt-1">
+                  {canAccess('master-institutions') && (
+                    <li>
+                      <div onClick={() => handleNav('master-institutions')} className={navItemClass('master-institutions')} title="Instansi">
+                        <Landmark className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Instansi & Lembaga</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('master-room-types') && (
+                    <li>
+                      <div onClick={() => handleNav('master-room-types')} className={navItemClass('master-room-types')} title="Jenis Kamar">
+                        <BedDouble className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Jenis Kamar</span>}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
 
-          {/* SISTEM */}
-          <div>
-            {!collapsed ? (
-              <div 
-                onClick={() => toggleSection('sistem')} 
-                className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
-              >
-                <span>Sistem & Keamanan</span>
-                {openSections.sistem ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </div>
-            ) : null}
+          {/* SISTEM & KEAMANAN (SUPER ADMIN ONLY) */}
+          {hasSistemSection && (
+            <div>
+              {!collapsed ? (
+                <div 
+                  onClick={() => toggleSection('sistem')} 
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                >
+                  <span>Sistem & Keamanan</span>
+                  {openSections.sistem ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              ) : null}
 
-            {(collapsed || openSections.sistem) && (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <div onClick={() => handleNav('system-users')} className={navItemClass('system-users')} title="Pengguna & Role">
-                    <UserCog className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Pengguna & Role</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('audit-logs')} className={navItemClass('audit-logs')} title="Audit Log">
-                    <History className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Audit Log Sistem</span>}
-                  </div>
-                </li>
-                <li>
-                  <div onClick={() => handleNav('settings')} className={navItemClass('settings')} title="Pengaturan">
-                    <Settings className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Pengaturan Sistem</span>}
-                  </div>
-                </li>
-              </ul>
-            )}
-          </div>
+              {(collapsed || openSections.sistem) && (
+                <ul className="space-y-1 mt-1">
+                  {canAccess('system-users') && (
+                    <li>
+                      <div onClick={() => handleNav('system-users')} className={navItemClass('system-users')} title="Pengguna & Role">
+                        <UserCog className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Pengguna & Role</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('audit-logs') && (
+                    <li>
+                      <div onClick={() => handleNav('audit-logs')} className={navItemClass('audit-logs')} title="Audit Log">
+                        <History className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Audit Log Sistem</span>}
+                      </div>
+                    </li>
+                  )}
+                  {canAccess('settings') && (
+                    <li>
+                      <div onClick={() => handleNav('settings')} className={navItemClass('settings')} title="Pengaturan">
+                        <Settings className="w-4 h-4 shrink-0 text-emerald-300" />
+                        {!collapsed && <span>Pengaturan Sistem</span>}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Help & SOP Button */}
@@ -433,15 +566,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Sidebar Footer: Papua Pattern Motif & Version */}
+        {/* Sidebar Footer: Role Indicator & Version */}
         <div className="p-3 border-t border-emerald-900/60 bg-emerald-950/80 text-[10px] text-emerald-300/70 flex items-center justify-between">
           {!collapsed ? (
             <>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping" />
-                <span className="font-medium text-emerald-200">Asrama Haji Jayapura</span>
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block shrink-0" />
+                <span className="font-bold text-amber-300 truncate">{currentRole}</span>
               </div>
-              <span className="font-mono text-[9px] bg-emerald-900/80 px-1.5 py-0.5 rounded text-amber-300">v1.0 WIT</span>
+              <span className="font-mono text-[9px] bg-emerald-900/80 px-1.5 py-0.5 rounded text-emerald-200 shrink-0">SIMAHA</span>
             </>
           ) : (
             <div className="mx-auto w-2 h-2 rounded-full bg-emerald-400" />
