@@ -11,7 +11,7 @@ import { Modal } from '../../components/common/Modal';
 import { ExtraChargeModal } from '../../components/finance/ExtraChargeModal';
 import { SpkContractModal } from '../../components/finance/SpkContractModal';
 import { formatCurrency, formatDateIndo } from '../../utils/formatters';
-import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { downloadElementAsPdf, printElementDirectly } from '../../utils/pdfGenerator';
 import { useToast } from '../../context/ToastContext';
 
 interface InvoicesPageProps {
@@ -71,14 +71,21 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
   const invoicePrintRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const handleDownloadInvoicePdf = async (openInNewTab = false) => {
+  const handleDirectPrint = () => {
+    if (!invoicePrintRef.current || !previewInvoice) return;
+    printElementDirectly(invoicePrintRef.current, previewInvoice.invoice_no);
+    toast.info('Menyiapkan Cetak', 'Dialog cetak dibuka langsung tanpa tab baru.');
+  };
+
+  const handleDownloadInvoicePdf = async () => {
     if (!invoicePrintRef.current || !previewInvoice) return;
     setIsGeneratingPdf(true);
     const filename = `Invoice_${previewInvoice.invoice_no.replace(/[\/\\:]/g, '_')}`;
     try {
       await downloadElementAsPdf(invoicePrintRef.current, filename, {
         orientation: 'portrait',
-        openInNewTab: openInNewTab,
+        openInNewTab: false,
+        fitToSinglePage: true,
         scale: 2.5,
       });
       toast.success('Invoice PDF Berhasil Dibuat', `File ${filename}.pdf telah berhasil diunduh.`);
@@ -307,16 +314,16 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleDownloadInvoicePdf(true)}
-                  disabled={isGeneratingPdf}
+                  onClick={handleDirectPrint}
                   icon={<Printer className="w-4 h-4 text-emerald-800" />}
+                  title="Cetak langsung invoice tanpa tab baru"
                 >
-                  Pratinjau PDF
+                  Cetak Langsung
                 </Button>
                 <Button
                   size="sm"
                   variant="primary"
-                  onClick={() => handleDownloadInvoicePdf(false)}
+                  onClick={handleDownloadInvoicePdf}
                   disabled={isGeneratingPdf}
                   icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 >

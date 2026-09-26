@@ -3,20 +3,18 @@ import autoTable from 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 
 /**
- * Universal HTML-to-PDF Downloader
- * Captures any DOM document container, strips web UI artifacts (shadows, rounded corners),
- * renders at retina 2x resolution, and saves directly as an A4 .pdf file.
+ * Core HTML-to-PDF Engine
+ * Captures any DOM element container and returns jsPDF instance, Blob, and Blob URL.
  */
-export async function downloadElementAsPdf(
+export async function generatePdfBlobFromElement(
   element: HTMLElement,
-  filename: string,
   options: {
     orientation?: 'portrait' | 'landscape';
-    openInNewTab?: boolean;
     scale?: number;
+    fitToSinglePage?: boolean;
   } = {}
-): Promise<void> {
-  const { orientation = 'portrait', openInNewTab = false, scale = 2 } = options;
+): Promise<{ pdf: jsPDF; blob: Blob; blobUrl: string }> {
+  const { orientation = 'portrait', scale = 2.5, fitToSinglePage = false } = options;
 
   // 1. Temporarily prepare element for document capture (remove web borders, shadows, rounded corners)
   const originalShadow = element.style.boxShadow;
@@ -61,33 +59,45 @@ export async function downloadElementAsPdf(
     });
 
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    let heightLeft = imgHeight;
-    let position = 0;
+    if (fitToSinglePage) {
+      // Force strictly 1 single A4 page with proportional fit
+      let imgWidth = pdfWidth;
+      let imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    // First page
-    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-    heightLeft -= pdfHeight;
+      if (imgHeight > pdfHeight) {
+        imgHeight = pdfHeight;
+        imgWidth = (canvas.width * imgHeight) / canvas.height;
+      }
 
-    // Multi-page support if document is longer than 1 A4 page
-    while (heightLeft > 5) {
-      position -= pdfHeight;
-      pdf.addPage();
+      const xOffset = Math.max(0, (pdfWidth - imgWidth) / 2);
+      const yOffset = Math.max(0, (pdfHeight - imgHeight) / 2);
+
+      pdf.addImage(imgData, 'JPEG', xOffset, yOffset, imgWidth, imgHeight, undefined, 'FAST');
+    } else {
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // First page
       pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
       heightLeft -= pdfHeight;
+
+      // Multi-page support if document is longer than 1 A4 page
+      while (heightLeft > 5) {
+        position -= pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+      }
     }
 
-    const cleanFilename = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    const blob = pdf.output('blob');
+    const blobUrl = URL.createObjectURL(blob);
 
-    if (openInNewTab) {
-      const blobUrl = pdf.output('bloburl');
-      window.open(blobUrl as unknown as string, '_blank');
-    }
-
-    // Trigger direct file download
-    pdf.save(cleanFilename);
+    return { pdf, blob, blobUrl };
   } finally {
     // Restore original styles
     element.style.boxShadow = originalShadow;
@@ -101,6 +111,130 @@ export async function downloadElementAsPdf(
       innerCard.style.borderRadius = originalInnerRadius;
     }
   }
+}
+
+/**
+ * Universal HTML-to-PDF Downloader
+ * Captures any DOM document container, strips web UI artifacts (shadows, rounded corners),
+ * renders at retina 2.5x resolution, and saves directly as an A4 .pdf file.
+ */
+export async function downloadElementAsPdf(
+  element: HTMLElement,
+  filename: string,
+  options: {
+    orientation?: 'portrait' | 'landscape';
+    openInNewTab?: boolean;
+    scale?: number;
+    fitToSinglePage?: boolean;
+  } = {}
+): Promise<{ pdf: jsPDF; blob: Blob; blobUrl: string }> {
+  const { openInNewTab = false } = options;
+  const result = await generatePdfBlobFromElement(element, options);
+
+  const cleanFilename = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+
+  if (openInNewTab) {
+    window.open(result.blobUrl, '_blank');
+  }
+
+  // Trigger direct file download
+  result.pdf.save(cleanFilename);
+  return result;
+}
+
+/**
+ * Direct Print Without Opening New Tab
+ * Prints the document cleanly inside an invisible iframe directly on the current page.
+ * Uses exact A4 print styles to avoid browser headers, footers, and modal borders.
+ */
+export function printElementDirectly(
+  element: HTMLElement, 
+  title = 'Cetak Dokumen',
+  options: { orientation?: 'portrait' | 'landscape' } = {}
+): void {
+  const { orientation = 'portrait' } = options;
+  // Remove existing print iframe if any
+  const existingIframe = document.getElementById('ahp-direct-print-iframe');
+  if (existingIframe) {
+    existingIframe.remove();
+  }
+
+  const iframe = document.createElement('iframe');
+  iframe.id = 'ahp-direct-print-iframe';
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = 'none';
+  iframe.style.visibility = 'hidden';
+  iframe.style.zIndex = '-9999';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (!doc) return;
+
+  // Collect active stylesheets
+  const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+    .map((el) => el.outerHTML)
+    .join('\n');
+
+  doc.open();
+  doc.write(`
+    <!DOCTYPE html>
+    <html lang="id">
+      <head>
+        <meta charset="utf-8" />
+        <title>${title}</title>
+        ${styles}
+        <style>
+          @page {
+            size: A4 ${orientation};
+            margin: 6mm 10mm;
+          }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body {
+            margin: 0;
+            padding: 0;
+            background: white !important;
+            color: #0f172a !important;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+          }
+          .print-a4-sheet {
+            width: 100%;
+            max-width: 190mm;
+            margin: 0 auto;
+            background: white;
+            box-sizing: border-box;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-a4-sheet">
+          ${element.innerHTML}
+        </div>
+      </body>
+    </html>
+  `);
+  doc.close();
+
+  iframe.onload = () => {
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      } catch (err) {
+        console.error('Direct print error:', err);
+      } finally {
+        setTimeout(() => {
+          iframe.remove();
+        }, 10000);
+      }
+    }, 300);
+  };
 }
 
 /**

@@ -12,7 +12,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { terbilang } from '../../utils/terbilang';
 import { formatCurrency, formatDateIndo, formatDateTimeIndo } from '../../utils/formatters';
-import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { downloadElementAsPdf, printElementDirectly } from '../../utils/pdfGenerator';
 
 interface PaymentsPageProps {
   initialInvoiceId?: string;
@@ -107,14 +107,21 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
   const receiptPrintRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const handleDownloadReceiptPdf = async (openInNewTab = false) => {
+  const handleDirectPrint = () => {
+    if (!receiptPrintRef.current || !selectedPayment) return;
+    printElementDirectly(receiptPrintRef.current, selectedPayment.receipt_no);
+    toast.info('Menyiapkan Cetak', 'Dialog cetak dibuka langsung tanpa tab baru.');
+  };
+
+  const handleDownloadReceiptPdf = async () => {
     if (!receiptPrintRef.current || !selectedPayment) return;
     setIsGeneratingPdf(true);
     const filename = `Kwitansi_${selectedPayment.receipt_no.replace(/[\/\\:]/g, '_')}`;
     try {
       await downloadElementAsPdf(receiptPrintRef.current, filename, {
         orientation: 'portrait',
-        openInNewTab: openInNewTab,
+        openInNewTab: false,
+        fitToSinglePage: true,
         scale: 2.5,
       });
       toast.success('Kwitansi PDF Berhasil Dibuat', `File ${filename}.pdf telah siap.`);
@@ -361,16 +368,16 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleDownloadReceiptPdf(true)}
-                  disabled={isGeneratingPdf}
+                  onClick={handleDirectPrint}
                   icon={<Printer className="w-4 h-4 text-emerald-800" />}
+                  title="Cetak langsung kwitansi tanpa tab baru"
                 >
-                  Pratinjau PDF
+                  Cetak Langsung
                 </Button>
                 <Button
                   size="sm"
                   variant="primary"
-                  onClick={() => handleDownloadReceiptPdf(false)}
+                  onClick={handleDownloadReceiptPdf}
                   disabled={isGeneratingPdf}
                   icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 >

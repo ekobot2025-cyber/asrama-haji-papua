@@ -7,7 +7,7 @@ import { db } from '../../db/database';
 import { Reservation, Guest, Room, Payment, Facility, Building, AppSettings } from '../../types';
 import { Button } from '../../components/common/Button';
 import { formatCurrency, formatDateIndo, calculateNights, maskNik } from '../../utils/formatters';
-import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { downloadElementAsPdf, printElementDirectly } from '../../utils/pdfGenerator';
 import { useToast } from '../../context/ToastContext';
 
 export const ReportsPage: React.FC = () => {
@@ -42,7 +42,14 @@ export const ReportsPage: React.FC = () => {
     setSettings(db.getSettings());
   }, []);
 
-  const handleDownloadReportPdf = async (openInNewTab = false) => {
+  const handleDirectPrint = () => {
+    if (!reportPrintRef.current) return;
+    const dateStr = new Date().toISOString().split('T')[0];
+    printElementDirectly(reportPrintRef.current, `Laporan_${reportType.toUpperCase()}_${dateStr}`);
+    toast.info('Menyiapkan Cetak', 'Dialog cetak dibuka langsung tanpa tab baru.');
+  };
+
+  const handleDownloadReportPdf = async () => {
     if (!reportPrintRef.current) return;
     setIsGeneratingPdf(true);
     const dateStr = new Date().toISOString().split('T')[0];
@@ -50,7 +57,7 @@ export const ReportsPage: React.FC = () => {
     try {
       await downloadElementAsPdf(reportPrintRef.current, filename, {
         orientation: 'portrait',
-        openInNewTab: openInNewTab,
+        openInNewTab: false,
         scale: 2.5,
       });
       toast.success('Laporan PDF Berhasil Dibuat', `File ${filename}.pdf telah siap.`);
@@ -117,17 +124,17 @@ export const ReportsPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleDownloadReportPdf(true)}
-            disabled={isGeneratingPdf}
+            onClick={handleDirectPrint}
             icon={<Printer className="w-4 h-4 text-emerald-800" />}
             className="bg-white"
+            title="Cetak langsung laporan tanpa membuka tab baru"
           >
-            Pratinjau PDF
+            Cetak Langsung
           </Button>
           <Button
             variant="primary"
             size="sm"
-            onClick={() => handleDownloadReportPdf(false)}
+            onClick={handleDownloadReportPdf}
             disabled={isGeneratingPdf}
             icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
           >

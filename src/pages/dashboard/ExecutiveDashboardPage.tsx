@@ -7,7 +7,7 @@ import {
 import { db } from '../../db/database';
 import { formatCurrency } from '../../utils/formatters';
 import { Button } from '../../components/common/Button';
-import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { downloadElementAsPdf, printElementDirectly } from '../../utils/pdfGenerator';
 import { useToast } from '../../context/ToastContext';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
@@ -50,14 +50,21 @@ export const ExecutiveDashboardPage: React.FC = () => {
     { room: 'Kamar A205 (VIP Suite)', bld: 'Gedung Nabire', daysOccupied: 20, occupancy: 67 },
   ];
 
-  const handleDownloadDashboardPdf = async (openInNewTab = false) => {
+  const handleDirectPrint = () => {
+    if (!dashboardRef.current) return;
+    const filename = `Dashboard_Eksekutif_SIMAHA_${timeFilter}_${new Date().toISOString().split('T')[0]}`;
+    printElementDirectly(dashboardRef.current, filename, { orientation: 'landscape' });
+    toast.info('Menyiapkan Cetak', 'Dialog cetak dibuka langsung tanpa tab baru.');
+  };
+
+  const handleDownloadDashboardPdf = async () => {
     if (!dashboardRef.current) return;
     setIsGeneratingPdf(true);
     const filename = `Dashboard_Eksekutif_SIMAHA_${timeFilter}_${new Date().toISOString().split('T')[0]}`;
     try {
       await downloadElementAsPdf(dashboardRef.current, filename, {
         orientation: 'landscape',
-        openInNewTab: openInNewTab,
+        openInNewTab: false,
         scale: 2,
       });
       toast.success('Ringkasan Eksekutif PDF Berhasil Dibuat', `File ${filename}.pdf telah siap.`);
@@ -116,17 +123,17 @@ export const ExecutiveDashboardPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleDownloadDashboardPdf(true)}
-            disabled={isGeneratingPdf}
+            onClick={handleDirectPrint}
             icon={<Printer className="w-4 h-4 text-emerald-800" />}
             className="hidden sm:inline-flex bg-white"
+            title="Cetak langsung ringkasan eksekutif tanpa membuka tab baru"
           >
-            Pratinjau PDF
+            Cetak Langsung
           </Button>
           <Button
             variant="primary"
             size="sm"
-            onClick={() => handleDownloadDashboardPdf(false)}
+            onClick={handleDownloadDashboardPdf}
             disabled={isGeneratingPdf}
             icon={isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             className="inline-flex"

@@ -4,7 +4,7 @@ import { Reservation, Guest, Room, Bed, Building as BuildingType } from '../../t
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { formatDateIndo, maskNik } from '../../utils/formatters';
-import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { downloadElementAsPdf, printElementDirectly } from '../../utils/pdfGenerator';
 import { useToast } from '../../context/ToastContext';
 
 interface SpmaModalProps {
@@ -34,18 +34,27 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
   const spmaNo = reservation.spma_no || `SPMA/AHP/2026/${reservation.id.slice(-4)}`;
   const cleanFilename = `${activeTab === 'SPMA' ? 'Dokumen_SPMA' : 'Label_Bagasi'}_${spmaNo.replace(/[\/\\:]/g, '_')}`;
 
-  const handleDownloadPdf = async (openInNewTab = false) => {
+  const handleDirectPrint = () => {
+    if (!printRef.current) return;
+    printElementDirectly(printRef.current, cleanFilename, {
+      orientation: activeTab === 'SPMA' ? 'portrait' : 'landscape',
+    });
+    toast.info('Menyiapkan Cetak', 'Dialog cetak dibuka langsung tanpa tab baru.');
+  };
+
+  const handleDownloadPdf = async () => {
     if (!printRef.current) return;
     setIsGenerating(true);
     try {
       await downloadElementAsPdf(printRef.current, cleanFilename, {
         orientation: activeTab === 'SPMA' ? 'portrait' : 'landscape',
-        openInNewTab: openInNewTab,
+        openInNewTab: false,
+        fitToSinglePage: true,
         scale: 2.5,
       });
       toast.success(
         'Dokumen PDF Berhasil Dibuat',
-        `File PDF ${cleanFilename}.pdf telah berhasil diekspor langsung.`
+        `File PDF 1 halaman ${cleanFilename}.pdf telah berhasil diekspor langsung.`
       );
     } catch (err) {
       console.error('PDF export error:', err);
@@ -93,16 +102,15 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleDownloadPdf(true)}
-              disabled={isGenerating}
+              onClick={handleDirectPrint}
               icon={<Printer className="w-4 h-4 text-emerald-800" />}
-              title="Buka dokumen PDF di tab baru untuk dicetak"
+              title="Cetak langsung tanpa membuka tab baru"
             >
-              Pratinjau PDF
+              Cetak Langsung
             </Button>
             <Button
               variant="primary"
-              onClick={() => handleDownloadPdf(false)}
+              onClick={handleDownloadPdf}
               disabled={isGenerating}
               icon={isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             >

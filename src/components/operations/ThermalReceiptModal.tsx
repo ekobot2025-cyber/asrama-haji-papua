@@ -3,7 +3,7 @@ import { Printer, CheckCircle2, QrCode, FileText, Plus, ShieldCheck, ArrowRight,
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { formatCurrency, formatDateTimeIndo, formatDateIndo } from '../../utils/formatters';
-import { downloadElementAsPdf } from '../../utils/pdfGenerator';
+import { downloadElementAsPdf, printElementDirectly } from '../../utils/pdfGenerator';
 import { useToast } from '../../context/ToastContext';
 
 export interface PosReceiptData {
@@ -59,18 +59,25 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
 
   const cleanFilename = `Struk_Kasir_${data.receiptNo.replace(/[\/\\:]/g, '_')}`;
 
-  const handleDownloadPdf = async (openInNewTab = false) => {
+  const handleDirectPrint = () => {
+    if (!receiptRef.current) return;
+    printElementDirectly(receiptRef.current, cleanFilename);
+    toast.info('Menyiapkan Cetak', 'Dialog cetak dibuka langsung tanpa tab baru.');
+  };
+
+  const handleDownloadPdf = async () => {
     if (!receiptRef.current) return;
     setIsGenerating(true);
     try {
       await downloadElementAsPdf(receiptRef.current, cleanFilename, {
         orientation: 'portrait',
-        openInNewTab: openInNewTab,
+        openInNewTab: false,
+        fitToSinglePage: true,
         scale: 2.5,
       });
       toast.success(
         'Struk PDF Berhasil Dibuat',
-        `File PDF ${cleanFilename}.pdf telah berhasil diunduh.`
+        `File PDF 1 halaman ${cleanFilename}.pdf telah berhasil diunduh.`
       );
     } catch (err) {
       console.error('PDF export error:', err);
@@ -125,17 +132,16 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleDownloadPdf(true)}
-              disabled={isGenerating}
+              onClick={handleDirectPrint}
               icon={<Printer className="w-4 h-4 text-emerald-800" />}
-              title="Pratinjau struk di tab baru"
+              title="Cetak struk langsung tanpa tab baru"
             >
-              Pratinjau
+              Cetak Struk
             </Button>
             <Button
               variant="primary"
               size="sm"
-              onClick={() => handleDownloadPdf(false)}
+              onClick={handleDownloadPdf}
               disabled={isGenerating}
               icon={isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               className="shadow-md"
