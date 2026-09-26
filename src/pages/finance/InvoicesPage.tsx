@@ -8,6 +8,7 @@ import { Invoice, InvoiceItem, AppSettings, Reservation } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
+import { ExtraChargeModal } from '../../components/finance/ExtraChargeModal';
 import { formatCurrency, formatDateIndo } from '../../utils/formatters';
 
 interface InvoicesPageProps {
@@ -25,6 +26,10 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
   // Preview invoice modal
   const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Extra Charge modal
+  const [extraChargeInvoice, setExtraChargeInvoice] = useState<Invoice | null>(null);
+  const [isExtraChargeOpen, setIsExtraChargeOpen] = useState(false);
 
   const loadData = () => {
     setInvoices(db.getInvoices());
@@ -177,6 +182,17 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => {
+                            setExtraChargeInvoice(inv);
+                            setIsExtraChargeOpen(true);
+                          }}
+                          className="p-1.5 rounded-lg bg-blue-50 text-blue-800 hover:bg-blue-100 transition-colors inline-flex items-center gap-1 font-semibold text-[11px]"
+                          title="Posting Layanan / Extra Charge"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Layanan</span>
+                        </button>
+                        <button
+                          onClick={() => {
                             setPreviewInvoice(inv);
                             setIsPreviewOpen(true);
                           }}
@@ -209,13 +225,26 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
         <Modal
           isOpen={isPreviewOpen}
           onClose={() => setIsPreviewOpen(false)}
-          title={`Faktur Tagihan — ${previewInvoice.invoice_no}`}
+          title={`Faktur Tagihan & Folio Tamu — ${previewInvoice.invoice_no}`}
           maxWidth="4xl"
           footer={
             <div className="flex items-center justify-between w-full">
-              <Button size="sm" variant="secondary" onClick={() => setIsPreviewOpen(false)}>
-                Tutup
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="secondary" onClick={() => setIsPreviewOpen(false)}>
+                  Tutup
+                </Button>
+                <Button
+                  size="sm"
+                  variant="amber"
+                  onClick={() => {
+                    setExtraChargeInvoice(previewInvoice);
+                    setIsExtraChargeOpen(true);
+                  }}
+                  icon={<Plus className="w-4 h-4" />}
+                >
+                  + Tambah Layanan Folio
+                </Button>
+              </div>
               <Button size="sm" variant="primary" onClick={handlePrint} icon={<Printer className="w-4 h-4" />}>
                 Cetak Invoice (A4)
               </Button>
@@ -332,6 +361,25 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Extra Charge / Guest Folio Modal */}
+      {extraChargeInvoice && (
+        <ExtraChargeModal
+          isOpen={isExtraChargeOpen}
+          onClose={() => {
+            setIsExtraChargeOpen(false);
+            setExtraChargeInvoice(null);
+          }}
+          invoice={extraChargeInvoice}
+          onSuccess={() => {
+            loadData();
+            if (previewInvoice) {
+              const updated = db.getInvoices().find((i) => i.id === previewInvoice.id);
+              if (updated) setPreviewInvoice(updated);
+            }
+          }}
+        />
       )}
     </div>
   );

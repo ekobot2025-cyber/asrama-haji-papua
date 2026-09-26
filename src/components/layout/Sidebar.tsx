@@ -95,11 +95,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!collapsed && (
               <div className="leading-tight truncate">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold tracking-wider text-base text-white">SIPAH</span>
+                  <span className="font-extrabold tracking-wider text-base text-white">SIMAHA</span>
                   <span className="font-bold text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/30">PAPUA</span>
                 </div>
-                <p className="text-[10px] text-emerald-200/90 font-medium truncate mt-0.5">Sistem Pengelolaan Penginapan</p>
-                <p className="text-[9px] text-amber-300/80 font-medium truncate">Asrama Haji Provinsi Papua</p>
+                <p className="text-[10px] text-emerald-200/90 font-medium truncate mt-0.5">Sistem Informasi Manajemen Asrama Haji</p>
+                <p className="text-[9px] text-amber-300/80 font-medium truncate">Provinsi Papua</p>
               </div>
             )}
           </div>
@@ -155,9 +155,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                 </li>
                 <li>
-                  <div onClick={() => handleNav('reservation-calendar')} className={navItemClass('reservation-calendar')} title="Kalender Reservasi">
+                  <div onClick={() => handleNav('reservation-calendar')} className={navItemClass('reservation-calendar')} title="Bagan Jadwal / Tape Chart (Room Rack)">
                     <CalendarDays className="w-4 h-4 shrink-0 text-emerald-300" />
-                    {!collapsed && <span>Kalender Reservasi</span>}
+                    {!collapsed && <span>Tape Chart & Kalender</span>}
                   </div>
                 </li>
                 <li>

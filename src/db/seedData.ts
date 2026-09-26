@@ -6,9 +6,9 @@ import {
 } from '../types';
 
 export const initialSettings: AppSettings = {
-  app_name: 'SIPAH PAPUA',
-  app_title: 'Sistem Informasi Penginapan Asrama Haji Papua',
-  app_subtitle: 'Sistem Pengelolaan Penginapan Asrama Haji Provinsi Papua',
+  app_name: 'SIMAHA PAPUA',
+  app_title: 'SIMAHA — Sistem Informasi Manajemen Asrama Haji',
+  app_subtitle: 'Sistem Informasi Manajemen Asrama Haji Provinsi Papua',
   organization_name: 'Unit Pelaksana Teknis Asrama Haji Provinsi Papua',
   address: 'Jl. Raya Sentani - Padang Bulan, Kotaraja, Distrik Abepura',
   city: 'Kota Jayapura',

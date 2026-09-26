@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
   LogIn, Search, CheckCircle2, UserCheck, Key, 
-  CreditCard, Clock, Building, Users, Calendar, ArrowRight 
+  CreditCard, Clock, Building, Users, Calendar, ArrowRight, Hotel
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { Reservation, Guest, Group, Institution, RoomAssignment, Room } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
+import { WalkInModal } from '../../components/operations/WalkInModal';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDateIndo, formatDateTimeIndo } from '../../utils/formatters';
@@ -35,6 +36,7 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
   const [depositAmount, setDepositAmount] = useState<number>(100000);
   const [checkinNotes, setCheckinNotes] = useState<string>('');
   const [isCheckinModalOpen, setIsCheckinModalOpen] = useState(false);
+  const [isWalkInOpen, setIsWalkInOpen] = useState(false);
 
   const loadData = () => {
     setReservations(db.getReservations());
@@ -144,15 +146,26 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
           </p>
         </div>
 
-        <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-          <input
-            type="text"
-            placeholder="Cari reservasi / tamu..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
-          />
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Button
+            variant="amber"
+            size="md"
+            onClick={() => setIsWalkInOpen(true)}
+            icon={<Hotel className="w-4 h-4" />}
+          >
+            + Tamu Walk-In (Check-in Kilat)
+          </Button>
+
+          <div className="relative w-full sm:w-64">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <input
+              type="text"
+              placeholder="Cari reservasi / tamu..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            />
+          </div>
         </div>
       </div>
 
@@ -339,6 +352,13 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
           </form>
         </Modal>
       )}
+
+      {/* Hotel Walk-In Guest Modal */}
+      <WalkInModal
+        isOpen={isWalkInOpen}
+        onClose={() => setIsWalkInOpen(false)}
+        onSuccess={loadData}
+      />
     </div>
   );
 };

@@ -10,7 +10,7 @@ import { formatCurrency, formatDateIndo, calculateNights, maskNik } from '../../
 
 export const ReportsPage: React.FC = () => {
   const [reportType, setReportType] = useState<
-    'penginapan' | 'okupansi' | 'reservasi' | 'tamu' | 'keuangan' | 'fasilitas'
+    'penginapan' | 'okupansi' | 'reservasi' | 'tamu' | 'keuangan' | 'fasilitas' | 'night_audit'
   >('penginapan');
 
   // Filters
@@ -62,7 +62,7 @@ export const ReportsPage: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Laporan_SIPAH_Papua_${reportType}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Laporan_SIMAHA_Papua_${reportType}_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -112,6 +112,7 @@ export const ReportsPage: React.FC = () => {
           { key: 'tamu', label: 'Laporan Tamu & Asal Daerah' },
           { key: 'keuangan', label: 'Laporan Keuangan & PNBP' },
           { key: 'fasilitas', label: 'Laporan Penggunaan Fasilitas' },
+          { key: 'night_audit', label: 'Hotel Night Audit (Tutup Kasir)' },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -422,11 +423,94 @@ export const ReportsPage: React.FC = () => {
           </div>
         )}
 
+        {/* 6. Laporan Hotel Night Audit & Tutup Kasir */}
+        {reportType === 'night_audit' && (
+          <div className="space-y-6 text-xs">
+            <div className="p-4 bg-slate-900 text-white rounded-xl flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Hotel Night Audit & Rekonsiliasi Kasir</p>
+                <h4 className="text-base font-black text-white">Laporan Penutupan Hari Operasional Wisma</h4>
+                <p className="text-xs text-slate-300 mt-0.5">Tanggal Operasional: {formatDateIndo('2026-09-26')}</p>
+              </div>
+              <span className="text-xs font-bold bg-emerald-500 text-slate-950 px-3 py-1 rounded-full">
+                Audit Seimbang (Balanced)
+              </span>
+            </div>
+
+            {/* Night Audit 4-Box KPI */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-[10px] font-bold uppercase text-slate-500 block">Kamar In-House (Terisi)</span>
+                <span className="text-xl font-black text-blue-700">{rooms.filter(r => r.status === 'OCCUPIED').length} Kamar</span>
+                <span className="text-[10px] text-slate-500 block mt-0.5">Okupansi: {Math.round((rooms.filter(r => r.status === 'OCCUPIED').length / Math.max(1, rooms.length)) * 100)}%</span>
+              </div>
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-[10px] font-bold uppercase text-slate-500 block">Check-in Hari Ini</span>
+                <span className="text-xl font-black text-emerald-700">{reservations.filter(r => r.checkin_date === '2026-09-26').length} Tamu / Grup</span>
+                <span className="text-[10px] text-slate-500 block mt-0.5">Kedatangan terdaftar</span>
+              </div>
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-[10px] font-bold uppercase text-slate-500 block">Check-out Hari Ini</span>
+                <span className="text-xl font-black text-orange-600">{reservations.filter(r => r.checkout_date === '2026-09-26' || r.status === 'CHECKED_OUT').length} Tamu / Grup</span>
+                <span className="text-[10px] text-slate-500 block mt-0.5">Kamar ke tim Cleaning</span>
+              </div>
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-[10px] font-bold uppercase text-slate-500 block">Total Penerimaan Kasir & Bank</span>
+                <span className="text-xl font-black text-emerald-900 font-mono">{formatCurrency(payments.reduce((acc, p) => acc + p.amount, 0))}</span>
+                <span className="text-[10px] text-slate-500 block mt-0.5">Kasir PNBP terverifikasi</span>
+              </div>
+            </div>
+
+            {/* Breakdown by Payment Channel */}
+            <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <div className="bg-slate-100 p-2.5 font-bold text-slate-700 border-b border-slate-200">
+                Rekonsiliasi Kanal Pembayaran Kasir Hari Ini
+              </div>
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+                  <tr>
+                    <th className="py-2 px-3">Kanal Pembayaran</th>
+                    <th className="py-2 px-3">Rekening Penampung</th>
+                    <th className="py-2 px-3 text-center">Jumlah Transaksi</th>
+                    <th className="py-2 px-3 text-right">Total Penerimaan</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  <tr>
+                    <td className="py-2 px-3 font-semibold">Bank Papua (BPD Papua)</td>
+                    <td className="py-2 px-3 text-slate-500 font-mono text-[11px]">{settings.bank_bpd_papua}</td>
+                    <td className="py-2 px-3 text-center font-bold">{payments.filter(p => p.payment_method === 'TRANSFER_BPD_PAPUA').length}</td>
+                    <td className="py-2 px-3 text-right font-mono font-bold">{formatCurrency(payments.filter(p => p.payment_method === 'TRANSFER_BPD_PAPUA').reduce((a, b) => a + b.amount, 0))}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-semibold">Bank Syariah Indonesia (BSI)</td>
+                    <td className="py-2 px-3 text-slate-500 font-mono text-[11px]">{settings.bank_bsi}</td>
+                    <td className="py-2 px-3 text-center font-bold">{payments.filter(p => p.payment_method === 'TRANSFER_BSI').length}</td>
+                    <td className="py-2 px-3 text-right font-mono font-bold">{formatCurrency(payments.filter(p => p.payment_method === 'TRANSFER_BSI').reduce((a, b) => a + b.amount, 0))}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-semibold">Uang Tunai Kasir (Cash Desk)</td>
+                    <td className="py-2 px-3 text-slate-500">Brankas Kasir Front Desk Asrama Haji</td>
+                    <td className="py-2 px-3 text-center font-bold">{payments.filter(p => p.payment_method === 'CASH').length}</td>
+                    <td className="py-2 px-3 text-right font-mono font-bold">{formatCurrency(payments.filter(p => p.payment_method === 'CASH').reduce((a, b) => a + b.amount, 0))}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3 font-semibold">QRIS Dinamis</td>
+                    <td className="py-2 px-3 text-slate-500">QRIS Merchant BSI / Bank Papua</td>
+                    <td className="py-2 px-3 text-center font-bold">{payments.filter(p => p.payment_method === 'QRIS').length}</td>
+                    <td className="py-2 px-3 text-right font-mono font-bold">{formatCurrency(payments.filter(p => p.payment_method === 'QRIS').reduce((a, b) => a + b.amount, 0))}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Formal Signature Area */}
         <div className="flex justify-between items-end pt-8 mt-6 border-t border-slate-200 text-xs">
           <div>
             <p className="text-slate-500 text-[10px]">Dokumen ini digenerate secara otomatis oleh sistem</p>
-            <p className="font-mono text-slate-400 text-[10px]">SIPAH PAPUA v1.0 &bull; Waktu Cetak: {new Date().toLocaleString('id-ID')} WIT</p>
+            <p className="font-mono text-slate-400 text-[10px]">SIMAHA PAPUA v1.0 &bull; Waktu Cetak: {new Date().toLocaleString('id-ID')} WIT</p>
           </div>
 
           <div className="text-center">

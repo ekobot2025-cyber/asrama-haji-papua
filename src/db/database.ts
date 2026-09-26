@@ -878,6 +878,258 @@ class DatabaseService {
     return newPayment;
   }
 
+  // --- Hospitality / Hotel PMS: Extra Folio Charges ---
+  public addExtraChargeToInvoice(
+    invoiceId: string, 
+    description: string, 
+    category: 'SERVICE' | 'FACILITY' | 'OTHER', 
+    quantity: number, 
+    unitPrice: number, 
+    user: User
+  ): { success: boolean; item?: InvoiceItem; invoice?: Invoice } {
+    const invoice = this.invoices.find(i => i.id === invoiceId);
+    if (!invoice) return { success: false };
+
+    const totalPrice = quantity * unitPrice;
+    const newItem: InvoiceItem = {
+      id: `inv-item-${Date.now()}`,
+      invoice_id: invoiceId,
+      description,
+      category,
+      quantity,
+      unit: 'ITEM',
+      unit_price: unitPrice,
+      total_price: totalPrice,
+    };
+
+    this.invoiceItems.push(newItem);
+    invoice.extra_charges = (invoice.extra_charges || 0) + totalPrice;
+    invoice.subtotal += totalPrice;
+    invoice.total_amount += totalPrice;
+    invoice.balance_due = Math.max(0, invoice.total_amount - invoice.paid_amount);
+    if (invoice.balance_due > 0 && invoice.paid_amount > 0) {
+      invoice.status = 'PARTIAL';
+    } else if (invoice.balance_due > 0 && invoice.paid_amount === 0) {
+      invoice.status = 'UNPAID';
+    }
+
+    // Sync reservation remaining amount
+    const rsv = this.reservations.find(r => r.id === invoice.reservation_id);
+    if (rsv) {
+      rsv.total_amount += totalPrice;
+      rsv.remaining_amount = Math.max(0, rsv.total_amount - rsv.paid_amount);
+      if (rsv.remaining_amount > 0 && rsv.paid_amount > 0) {
+        rsv.payment_status = 'PARTIAL';
+      } else if (rsv.remaining_amount > 0 && rsv.paid_amount === 0) {
+        rsv.payment_status = 'UNPAID';
+      }
+      rsv.updated_at = new Date().toISOString();
+    }
+
+    localStorage.setItem(`${STORAGE_PREFIX}invoiceItems`, JSON.stringify(this.invoiceItems));
+    localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
+    localStorage.setItem(`${STORAGE_PREFIX}reservations`, JSON.stringify(this.reservations));
+
+    this.logAudit(user.name, user.role, 'POST_FOLIO_CHARGE', 'Keuangan', `Posting biaya layanan hotel "${description}" sebesar Rp ${totalPrice.toLocaleString('id-ID')} pada invoice ${invoice.invoice_no}`, invoice.id);
+    return { success: true, item: newItem, invoice };
+  }
+
+  // --- Hospitality / Hotel PMS: Walk-In Checkin ---
+  public createWalkInCheckin(params: {
+    guest: {
+      fullName: string;
+      nik: string;
+      phone: string;
+      gender: 'L' | 'P';
+      guestType: Guest['guest_type'];
+      regencyCity: string;
+      institutionName?: string;
+    };
+    roomId: string;
+    bedId: string;
+    nights: number;
+    depositAmount: number;
+    cardKeys: number;
+    initialPaymentAmount: number;
+    paymentMethod: Payment['payment_method'];
+    notes?: string;
+    user: User;
+  }): {
+    success: boolean;
+    message: string;
+    reservation?: Reservation;
+    guest?: Guest;
+    invoice?: Invoice;
+    payment?: Payment;
+    checkin?: Checkin;
+  } {
+    const { guest: gData, roomId, bedId, nights, depositAmount, cardKeys, initialPaymentAmount, paymentMethod, notes, user } = params;
+
+    const room = this.rooms.find(r => r.id === roomId);
+    const bed = this.beds.find(b => b.id === bedId);
+    if (!room || !bed) {
+      return { success: false, message: 'Kamar atau tempat tidur tidak ditemukan.' };
+    }
+
+    // 1. Create or find Guest
+    const newGuest = this.saveGuest({
+      full_name: gData.fullName,
+      nik: gData.nik,
+      phone: gData.phone,
+      gender: gData.gender,
+      guest_type: gData.guestType,
+      regency_city: gData.regencyCity,
+      address: `${gData.regencyCity}, Papua`,
+    });
+
+    // 2. Dates
+    const checkinDate = '2026-09-26';
+    const checkoutDateObj = new Date(2026, 8, 26 + nights);
+    const y = checkoutDateObj.getFullYear();
+    const m = String(checkoutDateObj.getMonth() + 1).padStart(2, '0');
+    const d = String(checkoutDateObj.getDate()).padStart(2, '0');
+    const checkoutDate = `${y}-${m}-${d}`;
+
+    const totalRate = room.rate_per_night * nights;
+
+    // 3. Create Reservation (auto CHECKED_IN)
+    const reservationNo = this.generateReservationNo();
+    const newRsv: Reservation = {
+      id: `rsv-${Date.now()}`,
+      reservation_no: reservationNo,
+      reservation_date: new Date().toISOString(),
+      reservation_type: 'INDIVIDUAL',
+      guest_id: newGuest.id,
+      activity_type: gData.guestType,
+      activity_name: gData.institutionName ? `Tamu Kedinasan ${gData.institutionName}` : 'Tamu Walk-In Asrama Haji',
+      checkin_date: checkinDate,
+      checkout_date: checkoutDate,
+      total_guests: 1,
+      male_count: gData.gender === 'L' ? 1 : 0,
+      female_count: gData.gender === 'P' ? 1 : 0,
+      total_rooms_requested: 1,
+      status: 'CHECKED_IN',
+      payment_status: initialPaymentAmount >= totalRate ? 'PAID' : (initialPaymentAmount > 0 ? 'PARTIAL' : 'UNPAID'),
+      total_amount: totalRate,
+      paid_amount: Math.min(totalRate, initialPaymentAmount),
+      remaining_amount: Math.max(0, totalRate - initialPaymentAmount),
+      notes: notes || 'Registrasi Langsung (Walk-In Guest)',
+      created_by: user.name,
+      verified_by: user.name,
+      verified_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    this.reservations.unshift(newRsv);
+
+    // 4. Create Room Assignment
+    const newAssignment: RoomAssignment = {
+      id: `ra-${Date.now()}`,
+      reservation_id: newRsv.id,
+      guest_id: newGuest.id,
+      room_id: roomId,
+      bed_id: bedId,
+      assigned_at: new Date().toISOString(),
+      assigned_by: user.name,
+      status: 'CHECKED_IN',
+    };
+    this.roomAssignments.push(newAssignment);
+
+    // 5. Update Room & Bed status to OCCUPIED
+    room.status = 'OCCUPIED';
+    bed.status = 'OCCUPIED';
+    bed.current_guest_id = newGuest.id;
+    const roomBeds = this.beds.filter(b => b.room_id === room.id);
+    room.occupied_beds = roomBeds.filter(b => b.status === 'OCCUPIED').length;
+
+    // 6. Create Checkin Record
+    const checkinNo = `CIN/${new Date().getFullYear()}/${(this.checkins.length + 1).toString().padStart(4, '0')}`;
+    const newCheckin: Checkin = {
+      id: `chk-${Date.now()}`,
+      reservation_id: newRsv.id,
+      checkin_no: checkinNo,
+      checkin_time: new Date().toISOString(),
+      checkin_by: user.name,
+      card_keys_issued: cardKeys,
+      deposit_amount: depositAmount,
+      notes: notes || 'Walk-in Registration',
+    };
+    this.checkins.unshift(newCheckin);
+
+    // 7. Create Invoice
+    const invoiceNo = `INV/AHP/${new Date().getFullYear()}/${(this.invoices.length + 1).toString().padStart(4, '0')}`;
+    const newInvoice: Invoice = {
+      id: `inv-${Date.now()}`,
+      invoice_no: invoiceNo,
+      reservation_id: newRsv.id,
+      bill_to_name: gData.fullName,
+      institution_name: gData.institutionName,
+      issue_date: checkinDate,
+      due_date: checkoutDate,
+      subtotal: totalRate,
+      discount_amount: 0,
+      tax_amount: 0,
+      extra_charges: 0,
+      total_amount: totalRate,
+      paid_amount: Math.min(totalRate, initialPaymentAmount),
+      balance_due: Math.max(0, totalRate - initialPaymentAmount),
+      status: initialPaymentAmount >= totalRate ? 'PAID' : (initialPaymentAmount > 0 ? 'PARTIAL' : 'UNPAID'),
+      notes: `Faktur sewa kamar Walk-In ${room.room_number} (${nights} malam)`,
+      created_at: new Date().toISOString(),
+    };
+    this.invoices.unshift(newInvoice);
+
+    // 8. Create Invoice Item
+    const newInvItem: InvoiceItem = {
+      id: `item-${Date.now()}`,
+      invoice_id: newInvoice.id,
+      description: `Sewa Kamar ${room.room_number} (${nights} malam)`,
+      category: 'ROOM',
+      quantity: nights,
+      unit: 'MALAM',
+      unit_price: room.rate_per_night,
+      total_price: totalRate,
+    };
+    this.invoiceItems.push(newInvItem);
+
+    // 9. Process initial payment if provided
+    let newPayment: Payment | undefined;
+    if (initialPaymentAmount > 0) {
+      newPayment = this.createPayment(
+        newInvoice.id,
+        newRsv.id,
+        initialPaymentAmount,
+        paymentMethod,
+        gData.fullName,
+        `Pembayaran Sewa Kamar Walk-in ${room.room_number}`,
+        user,
+        'Pembayaran langsung saat check-in'
+      );
+    }
+
+    // Persist all
+    localStorage.setItem(`${STORAGE_PREFIX}reservations`, JSON.stringify(this.reservations));
+    localStorage.setItem(`${STORAGE_PREFIX}roomAssignments`, JSON.stringify(this.roomAssignments));
+    localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
+    localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+    localStorage.setItem(`${STORAGE_PREFIX}checkins`, JSON.stringify(this.checkins));
+    localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
+    localStorage.setItem(`${STORAGE_PREFIX}invoiceItems`, JSON.stringify(this.invoiceItems));
+
+    this.logAudit(user.name, user.role, 'WALK_IN_CHECKIN', 'Front Desk', `Check-in langsung tamu walk-in ${gData.fullName} di kamar ${room.room_number} (${nights} malam)`, newRsv.id);
+    this.addNotification('Tamu Walk-In Berhasil Check-in', `Tamu ${gData.fullName} berhasil check-in di Kamar ${room.room_number}.`, 'CHECKIN', 'checkin', newRsv.id);
+
+    return {
+      success: true,
+      message: `Tamu Walk-in ${gData.fullName} berhasil check-in di Kamar ${room.room_number}.`,
+      reservation: newRsv,
+      guest: newGuest,
+      invoice: newInvoice,
+      payment: newPayment,
+      checkin: newCheckin,
+    };
+  }
+
   // --- Settings Update ---
   public updateSettings(newSettings: Partial<AppSettings>, user: User): AppSettings {
     this.settings = { ...this.settings, ...newSettings };

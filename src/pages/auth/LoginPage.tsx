@@ -20,7 +20,7 @@ export const LoginPage: React.FC = () => {
       const success = login(username, password);
       setLoading(false);
       if (success) {
-        toast.success('Selamat Datang', 'Login berhasil. Selamat bertugas di SIPAH PAPUA.');
+        toast.success('Selamat Datang', 'Login berhasil. Selamat bertugas di SIMAHA PAPUA.');
       } else {
         toast.error('Login Gagal', 'Username atau kata sandi tidak valid.');
       }
@@ -59,16 +59,16 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <h2 className="text-2xl font-black tracking-wider text-slate-900">SIPAH</h2>
+              <h2 className="text-2xl font-black tracking-wider text-slate-900">SIMAHA</h2>
               <span className="text-xs font-bold bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded border border-amber-400/40">
                 PAPUA
               </span>
             </div>
             <p className="text-xs font-semibold text-emerald-800">
-              Sistem Informasi Penginapan Asrama Haji Papua
+              Sistem Informasi Manajemen Asrama Haji
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Unit Pelaksana Teknis Asrama Haji Provinsi Papua
+              Provinsi Papua
             </p>
           </div>
 
