@@ -11,6 +11,7 @@ interface KpiCardProps {
     isPositive: boolean;
   };
   colorScheme?: 'emerald' | 'amber' | 'blue' | 'purple' | 'rose' | 'slate';
+  badge?: string;
   onClick?: () => void;
 }
 
@@ -21,38 +22,45 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   icon: Icon,
   trend,
   colorScheme = 'emerald',
+  badge,
   onClick,
 }) => {
   const schemes = {
     emerald: {
-      bg: 'bg-emerald-50 text-emerald-800 border-emerald-100',
-      iconBg: 'bg-emerald-800 text-white',
-      accent: 'border-l-emerald-700',
+      borderHover: 'hover:border-emerald-300',
+      topLine: 'bg-emerald-600',
+      iconBox: 'bg-emerald-50 text-emerald-800 border-emerald-200/80',
+      badge: 'bg-emerald-50 text-emerald-800 border-emerald-200',
     },
     amber: {
-      bg: 'bg-amber-50 text-amber-900 border-amber-100',
-      iconBg: 'bg-amber-600 text-white',
-      accent: 'border-l-amber-500',
+      borderHover: 'hover:border-amber-300',
+      topLine: 'bg-amber-500',
+      iconBox: 'bg-amber-50 text-amber-800 border-amber-200/80',
+      badge: 'bg-amber-50 text-amber-800 border-amber-200',
     },
     blue: {
-      bg: 'bg-blue-50 text-blue-900 border-blue-100',
-      iconBg: 'bg-blue-600 text-white',
-      accent: 'border-l-blue-600',
+      borderHover: 'hover:border-blue-300',
+      topLine: 'bg-blue-600',
+      iconBox: 'bg-blue-50 text-blue-800 border-blue-200/80',
+      badge: 'bg-blue-50 text-blue-800 border-blue-200',
     },
     purple: {
-      bg: 'bg-purple-50 text-purple-900 border-purple-100',
-      iconBg: 'bg-purple-600 text-white',
-      accent: 'border-l-purple-600',
+      borderHover: 'hover:border-purple-300',
+      topLine: 'bg-purple-600',
+      iconBox: 'bg-purple-50 text-purple-800 border-purple-200/80',
+      badge: 'bg-purple-50 text-purple-800 border-purple-200',
     },
     rose: {
-      bg: 'bg-rose-50 text-rose-900 border-rose-100',
-      iconBg: 'bg-rose-600 text-white',
-      accent: 'border-l-rose-600',
+      borderHover: 'hover:border-rose-300',
+      topLine: 'bg-rose-600',
+      iconBox: 'bg-rose-50 text-rose-800 border-rose-200/80',
+      badge: 'bg-rose-50 text-rose-800 border-rose-200',
     },
     slate: {
-      bg: 'bg-slate-50 text-slate-900 border-slate-200',
-      iconBg: 'bg-slate-700 text-white',
-      accent: 'border-l-slate-600',
+      borderHover: 'hover:border-slate-400',
+      topLine: 'bg-slate-700',
+      iconBox: 'bg-slate-100 text-slate-800 border-slate-200',
+      badge: 'bg-slate-100 text-slate-700 border-slate-200',
     },
   };
 
@@ -61,28 +69,46 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`relative overflow-hidden rounded-2xl bg-white p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 border-l-4 ${scheme.accent} ${
-        onClick ? 'cursor-pointer hover:border-slate-300' : ''
-      }`}
+      className={`relative overflow-hidden rounded-2xl bg-white p-4 sm:p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group ${
+        scheme.borderHover
+      } ${onClick ? 'cursor-pointer hover:-translate-y-0.5' : ''}`}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{title}</p>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">{value}</h3>
-          {subtitle && <p className="text-[11px] text-slate-500 mt-1 font-medium">{subtitle}</p>}
+      {/* Top subtle color indicator line */}
+      <div className={`absolute top-0 left-0 right-0 h-1 ${scheme.topLine} opacity-80 group-hover:opacity-100 transition-opacity`} />
+
+      <div>
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider truncate">
+            {title}
+          </p>
+          <div className={`p-2 rounded-xl border shadow-2xs shrink-0 ${scheme.iconBox}`}>
+            <Icon className="w-4 h-4 stroke-[2.2]" />
+          </div>
         </div>
-        <div className={`p-3 rounded-xl shadow-xs ${scheme.iconBg}`}>
-          <Icon className="w-5 h-5 stroke-[2]" />
+
+        <div className="mt-2 flex items-baseline gap-2">
+          <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            {value}
+          </h3>
+          {trend && (
+            <span className={`inline-flex items-center text-[10px] font-black px-1.5 py-0.5 rounded-full border ${
+              trend.isPositive ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'
+            }`}>
+              {trend.isPositive ? '↑' : '↓'} {trend.value}
+            </span>
+          )}
+          {badge && (
+            <span className={`inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${scheme.badge}`}>
+              {badge}
+            </span>
+          )}
         </div>
       </div>
 
-      {trend && (
-        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-1.5 text-xs">
-          <span className={`font-semibold ${trend.isPositive ? 'text-emerald-700' : 'text-rose-600'}`}>
-            {trend.value}
-          </span>
-          <span className="text-slate-400 text-[11px]">dibandingkan bulan lalu</span>
-        </div>
+      {subtitle && (
+        <p className="text-[11px] text-slate-500 mt-2 font-medium truncate">
+          {subtitle}
+        </p>
       )}
     </div>
   );

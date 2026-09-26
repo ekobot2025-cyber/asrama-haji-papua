@@ -102,89 +102,121 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <KpiCard
-          title="Total Gedung"
-          value={totalBuildings}
-          subtitle="Gedung A, B, dan C"
-          icon={Building2}
-          colorScheme="slate"
-          onClick={() => onNavigate('buildings')}
-        />
-        <KpiCard
-          title="Total Kamar"
-          value={totalRooms}
-          subtitle="Standard, VIP, Rombongan"
-          icon={BedDouble}
-          colorScheme="emerald"
-          onClick={() => onNavigate('rooms')}
-        />
-        <KpiCard
-          title="Total Bed"
-          value={totalBeds}
-          subtitle="Tempat tidur terdaftar"
-          icon={Layers}
-          colorScheme="blue"
-          onClick={() => onNavigate('beds')}
-        />
-        <KpiCard
-          title="Bed Terisi"
-          value={occupiedBeds}
-          subtitle={`Dari ${totalBeds} kapasitas bed`}
-          icon={Users}
-          colorScheme="purple"
-          onClick={() => onNavigate('room-status-board')}
-        />
-        <KpiCard
-          title="Bed Tersedia"
-          value={availableBeds}
-          subtitle="Siap ditempati tamu"
-          icon={CheckCircle}
-          colorScheme="emerald"
-          onClick={() => onNavigate('room-status-board')}
-        />
-        <KpiCard
-          title="Tingkat Okupansi"
-          value={`${occupancyRate}%`}
-          subtitle="Rasio keterisian saat ini"
-          icon={Percent}
-          colorScheme="amber"
-          trend={{ value: '+8.4%', isPositive: true }}
-          onClick={() => onNavigate('room-status-board')}
-        />
-        <KpiCard
-          title="Check-in Hari Ini"
-          value={todayCheckins.length}
-          subtitle="Jadwal masuk hari ini"
-          icon={CalendarCheck}
-          colorScheme="emerald"
-          onClick={() => onNavigate('checkin')}
-        />
-        <KpiCard
-          title="Check-out Hari Ini"
-          value={todayCheckouts.length}
-          subtitle="Jadwal keluar hari ini"
-          icon={Clock}
-          colorScheme="blue"
-          onClick={() => onNavigate('checkout')}
-        />
-        <KpiCard
-          title="Reservasi Mendatang"
-          value={upcomingReservations.length}
-          subtitle="Terkonfirmasi & aktif"
-          icon={CalendarCheck}
-          colorScheme="purple"
-          onClick={() => onNavigate('reservations')}
-        />
-        <KpiCard
-          title="Menunggu Verifikasi"
-          value={pendingReservations.length}
-          subtitle="Perlu persetujuan"
-          icon={AlertTriangle}
-          colorScheme="rose"
-          onClick={() => onNavigate('reservations')}
-        />
+      {/* KPI Section 1: Kapasitas & Inventaris Fisik */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block shadow-2xs" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              Kapasitas & Fasilitas Fisik Akomodasi
+            </h2>
+          </div>
+          <span className="text-[11px] font-semibold text-slate-400">
+            Total {totalBeds} Bed Terdaftar
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+          <KpiCard
+            title="Total Gedung"
+            value={totalBuildings}
+            subtitle={buildings.length > 0 ? buildings.map(b => b.name).slice(0, 3).join(', ') : 'Gedung Akomodasi'}
+            icon={Building2}
+            colorScheme="slate"
+            onClick={() => onNavigate('buildings')}
+          />
+          <KpiCard
+            title="Total Kamar"
+            value={totalRooms}
+            subtitle="Suite, VIP, Deluxe, Superior"
+            icon={BedDouble}
+            colorScheme="emerald"
+            onClick={() => onNavigate('rooms')}
+          />
+          <KpiCard
+            title="Total Bed"
+            value={totalBeds}
+            subtitle="Tempat tidur terdata"
+            icon={Layers}
+            colorScheme="blue"
+            onClick={() => onNavigate('beds')}
+          />
+          <KpiCard
+            title="Bed Terisi"
+            value={occupiedBeds}
+            subtitle={`Dari ${totalBeds} kapasitas`}
+            icon={Users}
+            colorScheme="purple"
+            onClick={() => onNavigate('room-status-board')}
+          />
+          <KpiCard
+            title="Bed Tersedia"
+            value={availableBeds}
+            subtitle="Siap ditempati tamu"
+            icon={CheckCircle}
+            colorScheme="emerald"
+            onClick={() => onNavigate('room-status-board')}
+          />
+        </div>
+      </div>
+
+      {/* KPI Section 2: Pergerakan Tamu & Operasional Hari Ini */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-2xs" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              Pergerakan Tamu & Operasional Hari Ini
+            </h2>
+          </div>
+          <span className="text-[11px] font-semibold text-slate-400">
+            Update Real-time WIT
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+          <KpiCard
+            title="Tingkat Okupansi"
+            value={`${occupancyRate}%`}
+            subtitle="Rasio keterisian saat ini"
+            icon={Percent}
+            colorScheme="amber"
+            trend={{ value: '8.4%', isPositive: true }}
+            onClick={() => onNavigate('room-status-board')}
+          />
+          <KpiCard
+            title="Check-in Hari Ini"
+            value={todayCheckins.length}
+            subtitle="Jadwal masuk hari ini"
+            icon={CalendarCheck}
+            colorScheme="emerald"
+            onClick={() => onNavigate('checkin')}
+          />
+          <KpiCard
+            title="Check-out Hari Ini"
+            value={todayCheckouts.length}
+            subtitle="Jadwal keluar hari ini"
+            icon={Clock}
+            colorScheme="blue"
+            onClick={() => onNavigate('checkout')}
+          />
+          <KpiCard
+            title="Reservasi Mendatang"
+            value={upcomingReservations.length}
+            subtitle="Terkonfirmasi & aktif"
+            icon={CalendarCheck}
+            colorScheme="purple"
+            onClick={() => onNavigate('reservations')}
+          />
+          <KpiCard
+            title="Menunggu Verifikasi"
+            value={pendingReservations.length}
+            subtitle="Perlu persetujuan"
+            icon={AlertTriangle}
+            colorScheme="rose"
+            onClick={() => onNavigate('reservations')}
+          />
+        </div>
       </div>
 
       {/* Operational Center: Today's Checkins, Checkouts, and Pending Verification */}
