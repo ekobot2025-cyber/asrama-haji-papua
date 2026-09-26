@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { useToast } from '../../context/ToastContext';
 import { db } from '../../db/database';
+import { SelfServiceLookupModal } from '../operations/SelfServiceLookupModal';
 
 interface HeaderProps {
   onOpenMobileMenu: () => void;
@@ -30,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [currentTime, setCurrentTime] = useState('');
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isMunakosahOpen, setIsMunakosahOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
@@ -129,6 +131,16 @@ export const Header: React.FC<HeaderProps> = ({
           <Clock className="w-3.5 h-3.5 text-emerald-800" />
           <span>{currentTime}</span>
         </div>
+
+        {/* Cek Kamar Mandiri Munakosah Papua */}
+        <button
+          onClick={() => setIsMunakosahOpen(true)}
+          title="Anjungan Cek Kamar Mandiri Jemaah & Tamu (Munakosah Papua)"
+          className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-2xs group"
+        >
+          <span className="text-sm">🕋</span>
+          <span className="hidden sm:inline">Cek Kamar Jemaah</span>
+        </button>
 
         {/* Help Guide SOP Button */}
         <button
@@ -290,6 +302,11 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </div>
+      {/* Modal Anjungan Cek Kamar Mandiri Munakosah */}
+      <SelfServiceLookupModal
+        isOpen={isMunakosahOpen}
+        onClose={() => setIsMunakosahOpen(false)}
+      />
     </header>
   );
 };

@@ -796,15 +796,33 @@ class DatabaseService {
     }
   }
 
-  // --- Reservations Operations ---
+  // --- Reservations & Munakosah Operations ---
   public generateReservationNo(): string {
     const count = this.reservations.length + 1;
     const year = 2026;
     return `RSV/AHP/${year}/${count.toString().padStart(5, '0')}`;
   }
 
+  public generateSpmaNo(): string {
+    const count = this.reservations.length + 1;
+    const year = 2026;
+    return `SPMA/AHP/${year}/${count.toString().padStart(5, '0')}`;
+  }
+
+  public generateSimponiBillingCode(): string {
+    // 15-digit Kode Billing Simponi MPN-G3 Kemenkeu
+    const seq = Math.floor(100000 + Math.random() * 900000).toString();
+    return `820260926${seq}`;
+  }
+
+  public generateSpkNo(): string {
+    const count = (this.invoices.filter(i => i.spk_contract_no).length + 1).toString().padStart(3, '0');
+    return `SPK/AHP/KS/2026/${count}`;
+  }
+
   public createReservation(data: Partial<Reservation>, user: User): { success: boolean; message: string; reservation?: Reservation } {
     const reservationNo = this.generateReservationNo();
+    const spmaNo = data.spma_no || this.generateSpmaNo();
     const newReservation: Reservation = {
       id: `rsv-${Date.now()}`,
       reservation_no: reservationNo,
@@ -828,6 +846,8 @@ class DatabaseService {
       paid_amount: 0,
       remaining_amount: data.total_amount || 0,
       notes: data.notes,
+      spma_no: spmaNo,
+      package_type: data.package_type || 'REGULER',
       created_by: user.name,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -836,8 +856,8 @@ class DatabaseService {
     this.reservations.unshift(newReservation);
     localStorage.setItem(`${STORAGE_PREFIX}reservations`, JSON.stringify(this.reservations));
 
-    this.logAudit(user.name, user.role, 'CREATE_RESERVATION', 'Reservasi', `Membuat reservasi baru no ${reservationNo} untuk ${newReservation.total_guests} orang.`, newReservation.id);
-    this.addNotification('Reservasi Baru Dibuat', `Reservasi ${reservationNo} telah didaftarkan dan menunggu verifikasi.`, 'RESERVATION', 'reservations', newReservation.id);
+    this.logAudit(user.name, user.role, 'CREATE_RESERVATION', 'Reservasi', `Membuat reservasi baru no ${reservationNo} (SPMA: ${spmaNo}) untuk ${newReservation.total_guests} orang.`, newReservation.id);
+    this.addNotification('Reservasi Baru Dibuat', `Reservasi ${reservationNo} (${spmaNo}) telah didaftarkan dan menunggu verifikasi.`, 'RESERVATION', 'reservations', newReservation.id);
 
     return { success: true, message: `Reservasi ${reservationNo} berhasil dibuat.`, reservation: newReservation };
   }
@@ -1389,6 +1409,8 @@ class DatabaseService {
       paid_amount: Math.min(totalRate, initialPaymentAmount),
       remaining_amount: Math.max(0, totalRate - initialPaymentAmount),
       notes: notes || 'Registrasi Langsung (Walk-In Guest)',
+      spma_no: this.generateSpmaNo(),
+      package_type: 'REGULER',
       created_by: user.name,
       verified_by: user.name,
       verified_at: new Date().toISOString(),
@@ -1449,6 +1471,10 @@ class DatabaseService {
       paid_amount: Math.min(totalRate, initialPaymentAmount),
       balance_due: Math.max(0, totalRate - initialPaymentAmount),
       status: initialPaymentAmount >= totalRate ? 'PAID' : (initialPaymentAmount > 0 ? 'PARTIAL' : 'UNPAID'),
+      pnbp_account_code: '425112',
+      pnbp_account_name: 'Pendapatan Sewa Kamar Asrama Haji / Wisma',
+      simponi_billing_code: this.generateSimponiBillingCode(),
+      billing_expired_at: checkoutDate,
       notes: `Faktur sewa kamar Walk-In ${room.room_number} (${nights} malam)`,
       created_at: new Date().toISOString(),
     };
@@ -1502,6 +1528,77 @@ class DatabaseService {
       invoice: newInvoice,
       payment: newPayment,
       checkin: newCheckin,
+    };
+  }
+
+  // --- Munakosah Papua: Self-Service Room & Bed Lookup ---
+  public lookupAccommodation(query: string): {
+    found: boolean;
+    guest?: Guest;
+    reservation?: Reservation;
+    room?: Room;
+    bed?: Bed;
+    building?: Building;
+    message?: string;
+  } {
+    const q = query.trim().toLowerCase();
+    if (!q) return { found: false, message: 'Harap masukkan kata kunci pencarian (NIK, Nama, No. HP, No. Porsi, atau No. Reservasi).' };
+
+    // Find guest by NIK, phone, or name
+    const guest = this.guests.find(g => 
+      g.nik.toLowerCase().includes(q) || 
+      g.phone.replace(/[^0-9]/g, '').includes(q.replace(/[^0-9]/g, '')) || 
+      g.full_name.toLowerCase().includes(q)
+    );
+
+    // Or find reservation directly by reservation_no or spma_no
+    let rsv = this.reservations.find(r => 
+      r.reservation_no.toLowerCase().includes(q) || 
+      (r.spma_no && r.spma_no.toLowerCase().includes(q))
+    );
+
+    if (!rsv && guest) {
+      rsv = this.reservations.find(r => r.guest_id === guest.id);
+    }
+
+    if (!rsv && !guest) {
+      return { found: false, message: `Data akomodasi untuk "${query}" tidak ditemukan dalam sistem.` };
+    }
+
+    const matchedGuest = guest || (rsv?.guest_id ? this.guests.find(g => g.id === rsv!.guest_id) : undefined);
+    
+    // Find room assignment
+    let assignment = this.roomAssignments.find(a => 
+      (rsv && a.reservation_id === rsv.id) || 
+      (matchedGuest && a.guest_id === matchedGuest.id)
+    );
+
+    let room: Room | undefined;
+    let bed: Bed | undefined;
+    let building: Building | undefined;
+
+    if (assignment) {
+      room = this.rooms.find(r => r.id === assignment!.room_id);
+      bed = this.beds.find(b => b.id === assignment!.bed_id);
+      if (room) {
+        building = this.buildings.find(b => b.id === room!.building_id);
+      }
+    } else if (rsv) {
+      const reservedBed = this.beds.find(b => b.current_guest_id === matchedGuest?.id);
+      if (reservedBed) {
+        bed = reservedBed;
+        room = this.rooms.find(r => r.id === reservedBed.room_id);
+        if (room) building = this.buildings.find(b => b.id === room!.building_id);
+      }
+    }
+
+    return {
+      found: true,
+      guest: matchedGuest,
+      reservation: rsv,
+      room,
+      bed,
+      building,
     };
   }
 

@@ -177,6 +177,8 @@ export interface Reservation {
   paid_amount: number;
   remaining_amount: number;
   notes?: string;
+  spma_no?: string; // SPMA/AHP/2026/00123
+  package_type?: 'REGULER' | 'FULLBOARD_DIKLAT' | 'MANASIK_AKBAR' | 'HALFDAY_MEETING';
   created_by: string;
   verified_by?: string;
   verified_at?: string;
@@ -282,6 +284,11 @@ export interface Invoice {
   paid_amount: number;
   balance_due: number;
   status: 'UNPAID' | 'PARTIAL' | 'PAID' | 'CANCELLED';
+  pnbp_account_code?: string; // 425111, 425112, 425113
+  pnbp_account_name?: string; // e.g. Pendapatan Sewa Kamar Asrama Haji
+  simponi_billing_code?: string; // 15-digit Kode Billing MPN-G3 SIMPONI Kemenkeu
+  billing_expired_at?: string;
+  spk_contract_no?: string; // SPK/AHP/KS/2026/042
   notes?: string;
   created_at: string;
 }

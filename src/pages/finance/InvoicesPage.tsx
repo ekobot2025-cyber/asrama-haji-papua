@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FileText, Search, Printer, Plus, CreditCard, 
-  Download, Eye, CheckCircle2, AlertCircle, Building2 
+  Download, Eye, CheckCircle2, AlertCircle, Building2, ScrollText, QrCode
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { Invoice, InvoiceItem, AppSettings, Reservation } from '../../types';
@@ -9,6 +9,7 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { ExtraChargeModal } from '../../components/finance/ExtraChargeModal';
+import { SpkContractModal } from '../../components/finance/SpkContractModal';
 import { formatCurrency, formatDateIndo } from '../../utils/formatters';
 
 interface InvoicesPageProps {
@@ -30,6 +31,9 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
   // Extra Charge modal
   const [extraChargeInvoice, setExtraChargeInvoice] = useState<Invoice | null>(null);
   const [isExtraChargeOpen, setIsExtraChargeOpen] = useState(false);
+
+  // SPK Contract modal (SIASAH Kemenag)
+  const [spkTarget, setSpkTarget] = useState<Invoice | null>(null);
 
   const loadData = () => {
     setInvoices(db.getInvoices());
@@ -144,8 +148,20 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
               ) : (
                 filtered.map((inv) => (
                   <tr key={inv.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900">
-                      {inv.invoice_no}
+                    <td className="py-3 px-4">
+                      <p className="font-mono font-bold text-slate-900">{inv.invoice_no}</p>
+                      {inv.pnbp_account_code && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800" title={inv.pnbp_account_name}>
+                            Akun {inv.pnbp_account_code}
+                          </span>
+                          {inv.simponi_billing_code && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-blue-100 text-blue-800" title={`Billing SIMPONI: ${inv.simponi_billing_code}`}>
+                              SIMPONI
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </td>
 
                     <td className="py-3 px-4">
@@ -180,6 +196,17 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
 
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
+                        {/* SPK Sewa Button for Facility / MICE / Event */}
+                        {(inv.spk_contract_no || inv.pnbp_account_code === '425111') && (
+                          <button
+                            onClick={() => setSpkTarget(inv)}
+                            className="p-1.5 rounded-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 transition-colors inline-flex items-center gap-1 font-semibold text-[11px]"
+                            title="Cetak Surat Perjanjian Sewa (SPK Kemenag)"
+                          >
+                            <ScrollText className="w-3.5 h-3.5" />
+                            <span>SPK</span>
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             setExtraChargeInvoice(inv);
@@ -233,6 +260,16 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                 <Button size="sm" variant="secondary" onClick={() => setIsPreviewOpen(false)}>
                   Tutup
                 </Button>
+                {(previewInvoice.spk_contract_no || previewInvoice.pnbp_account_code === '425111') && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSpkTarget(previewInvoice)}
+                    icon={<ScrollText className="w-4 h-4 text-indigo-700" />}
+                  >
+                    Cetak SPK Sewa
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   variant="amber"
@@ -274,6 +311,39 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                 </div>
               </div>
             </div>
+
+            {/* PNBP & SIMPONI Billing Header (SIASAH Kemenkeu Integration) */}
+            {previewInvoice.pnbp_account_code && (
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-800 text-white tracking-wide uppercase">
+                      PNBP Kemenag
+                    </span>
+                    <span className="font-mono font-bold text-slate-800">
+                      Mata Anggaran Akun {previewInvoice.pnbp_account_code}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 font-medium">
+                    {previewInvoice.pnbp_account_name || 'Pendapatan Sewa Sarana & Prasarana UPT Asrama Haji'}
+                  </p>
+                </div>
+
+                {previewInvoice.simponi_billing_code && (
+                  <div className="bg-white p-2 rounded-lg border border-slate-200 sm:text-right">
+                    <p className="text-[10px] text-slate-500 font-semibold uppercase">Kode Billing SIMPONI (MPN-G3)</p>
+                    <p className="font-mono text-sm font-black text-emerald-900 tracking-wider">
+                      {previewInvoice.simponi_billing_code}
+                    </p>
+                    {previewInvoice.billing_expired_at && (
+                      <p className="text-[10px] text-rose-600 font-medium">
+                        Batas Setor: {formatDateIndo(previewInvoice.billing_expired_at.slice(0, 10))}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Bill To & Date Grid */}
             <div className="grid grid-cols-2 gap-6 text-xs">
@@ -379,6 +449,16 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
               if (updated) setPreviewInvoice(updated);
             }
           }}
+        />
+      )}
+
+      {/* Surat Perjanjian Sewa SPK Modal (SIASAH Kemenag) */}
+      {spkTarget && (
+        <SpkContractModal
+          isOpen={!!spkTarget}
+          onClose={() => setSpkTarget(null)}
+          invoice={spkTarget}
+          reservation={db.getReservations().find((r) => r.id === spkTarget.reservation_id)}
         />
       )}
     </div>

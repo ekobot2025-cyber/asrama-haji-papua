@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
   LogIn, Search, CheckCircle2, UserCheck, Key, 
-  CreditCard, Clock, Building, Users, Calendar, ArrowRight, Hotel
+  CreditCard, Clock, Building, Users, Calendar, ArrowRight, Hotel, Printer
 } from 'lucide-react';
 import { db } from '../../db/database';
-import { Reservation, Guest, Group, Institution, RoomAssignment, Room } from '../../types';
+import { Reservation, Guest, Group, Institution, RoomAssignment, Room, Bed, Building as BuildingType } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { WalkInModal } from '../../components/operations/WalkInModal';
+import { SpmaModal } from '../../components/operations/SpmaModal';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDateIndo, formatDateTimeIndo } from '../../utils/formatters';
@@ -28,10 +29,13 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [assignments, setAssignments] = useState<RoomAssignment[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [beds, setBeds] = useState<Bed[]>([]);
+  const [buildings, setBuildings] = useState<BuildingType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Check-in modal
   const [selectedRsv, setSelectedRsv] = useState<Reservation | null>(null);
+  const [spmaTarget, setSpmaTarget] = useState<Reservation | null>(null);
   const [cardKeys, setCardKeys] = useState<number>(1);
   const [depositAmount, setDepositAmount] = useState<number>(100000);
   const [checkinNotes, setCheckinNotes] = useState<string>('');
@@ -45,6 +49,8 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
     setInstitutions(db.getInstitutions());
     setAssignments(db.getRoomAssignments());
     setRooms(db.getRooms());
+    setBeds(db.getBeds());
+    setBuildings(db.getBuildings());
   };
 
   useEffect(() => {
@@ -229,6 +235,15 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
 
                 {/* Bottom Actions */}
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSpmaTarget(rsv)}
+                    className="p-2 border border-slate-200 rounded-xl hover:bg-slate-100 text-slate-600 hover:text-emerald-800 transition-colors flex-shrink-0"
+                    title="Cetak SPMA Digital & Label Koper (Munakosah)"
+                  >
+                    <Printer className="w-4 h-4" />
+                  </button>
+
                   {!assignedRoomsStr ? (
                     <Button
                       size="sm"
@@ -359,6 +374,29 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
         onClose={() => setIsWalkInOpen(false)}
         onSuccess={loadData}
       />
+
+      {/* SPMA & Tag Bagasi Modal Munakosah */}
+      {spmaTarget && (
+        <SpmaModal
+          isOpen={!!spmaTarget}
+          onClose={() => setSpmaTarget(null)}
+          reservation={spmaTarget}
+          guest={guests.find((g) => g.id === spmaTarget.guest_id)}
+          room={(() => {
+            const assign = assignments.find((a) => a.reservation_id === spmaTarget.id);
+            return rooms.find((r) => r.id === assign?.room_id) || rooms[0];
+          })()}
+          bed={(() => {
+            const assign = assignments.find((a) => a.reservation_id === spmaTarget.id);
+            return beds.find((b) => b.id === assign?.bed_id) || beds[0];
+          })()}
+          building={(() => {
+            const assign = assignments.find((a) => a.reservation_id === spmaTarget.id);
+            const r = rooms.find((rm) => rm.id === assign?.room_id) || rooms[0];
+            return buildings.find((b) => b.id === r?.building_id) || buildings[0];
+          })()}
+        />
+      )}
     </div>
   );
 };

@@ -5,12 +5,13 @@ import {
   Briefcase, Landmark, FileText, ChevronRight 
 } from 'lucide-react';
 import { db } from '../../db/database';
-import { Reservation, Guest, Group, Institution, ReservationStatus } from '../../types';
+import { Reservation, Guest, Group, Institution, ReservationStatus, Building, Room, Bed, RoomAssignment } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Pagination } from '../../components/common/Pagination';
+import { SpmaModal } from '../../components/operations/SpmaModal';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDateIndo, calculateNights } from '../../utils/formatters';
@@ -28,6 +29,13 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
   const [guests, setGuests] = useState<Guest[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [beds, setBeds] = useState<Bed[]>([]);
+  const [buildings, setBuildings] = useState<Building[]>([]);
+  const [roomAssignments, setRoomAssignments] = useState<RoomAssignment[]>([]);
+
+  // SPMA Modal state
+  const [spmaTarget, setSpmaTarget] = useState<Reservation | null>(null);
 
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,6 +48,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [newFormData, setNewFormData] = useState({
     reservation_type: 'INDIVIDUAL' as 'INDIVIDUAL' | 'ROMBONGAN' | 'INSTANSI' | 'KEGIATAN',
+    package_type: 'REGULER' as 'REGULER' | 'FULLBOARD_DIKLAT' | 'MANASIK_AKBAR' | 'HALFDAY_MEETING',
     pic_name: '',
     pic_phone: '',
     pic_email: '',
@@ -69,6 +78,10 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
     setGuests(db.getGuests());
     setGroups(db.getGroups());
     setInstitutions(db.getInstitutions());
+    setRooms(db.getRooms());
+    setBeds(db.getBeds());
+    setBuildings(db.getBuildings());
+    setRoomAssignments(db.getRoomAssignments());
   };
 
   useEffect(() => {
@@ -167,6 +180,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
         facility_requirements: newFormData.facility_requirements,
         total_amount: Number(newFormData.total_amount),
         notes: newFormData.notes,
+        package_type: newFormData.package_type,
       },
       currentUser
     );
@@ -389,6 +403,15 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                           </button>
                         )}
 
+                        {/* Cetak SPMA & Tag Bagasi (Munakosah) */}
+                        <button
+                          onClick={() => setSpmaTarget(rsv)}
+                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors"
+                          title="Cetak SPMA & Label Bagasi Koper (Munakosah)"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </button>
+
                         {/* Invoice & Kwitansi */}
                         <button
                           onClick={() => onNavigate('invoices', rsv.id)}
@@ -455,6 +478,67 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                 <option value="UMUM">Umum / Lainnya</option>
               </select>
             </div>
+          </div>
+
+          {/* Paket Terpadu (MICE / Manasik / Fullboard) */}
+          <div className="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200/80 space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="block font-bold text-emerald-950 text-xs flex items-center gap-1.5">
+                <Briefcase className="w-4 h-4 text-emerald-800" />
+                Pilihan Paket Terpadu (MICE & Manasik Asrama Haji)
+              </label>
+              <span className="text-[10px] font-semibold text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-200">
+                Hitung Otomatis
+              </span>
+            </div>
+            <select
+              value={newFormData.package_type}
+              onChange={(e) => {
+                const pkg = e.target.value as any;
+                let amt = newFormData.total_amount;
+                let notes = newFormData.notes;
+                let facReq = newFormData.facility_requirements;
+                let actType = newFormData.activity_type;
+
+                const nights = Math.max(1, calculateNights(newFormData.checkin_date, newFormData.checkout_date));
+
+                if (pkg === 'FULLBOARD_DIKLAT') {
+                  amt = 450000 * newFormData.total_guests * nights;
+                  notes = 'Paket Fullboard Diklat: Termasuk sewa kamar, Aula Pertemuan, 3x Makan, dan 2x Coffee Break';
+                  facReq = 'Aula Utama Cenderawasih + Sound System Wireless + Proyektor LCD';
+                  actType = 'BIMTEK';
+                } else if (pkg === 'MANASIK_AKBAR') {
+                  amt = 3500000;
+                  notes = 'Paket Manasik Akbar: Penggunaan Lapangan Manasik Haji, Replika Ka\'bah, Lintasan Sa\'i, Sound System, dan Tenda Transit';
+                  facReq = 'Lapangan Manasik Haji & Replika Ka\'bah';
+                  actType = 'MANASIK';
+                } else if (pkg === 'HALFDAY_MEETING') {
+                  amt = 2000000;
+                  notes = 'Paket Halfday Meeting: Penggunaan Ruang Rapat VIP Asmat, Proyektor LCD, dan 1x Snack Box VIP';
+                  facReq = 'Ruang Rapat VIP Asmat';
+                  actType = 'KEDINASAN';
+                } else {
+                  amt = 350000 * newFormData.total_rooms_requested * nights;
+                  notes = '';
+                  facReq = '';
+                }
+
+                setNewFormData({
+                  ...newFormData,
+                  package_type: pkg,
+                  total_amount: amt,
+                  notes,
+                  facility_requirements: facReq,
+                  activity_type: actType,
+                });
+              }}
+              className="w-full px-3 py-2 border border-emerald-300 rounded-xl bg-white font-bold text-slate-800 text-xs focus:ring-2 focus:ring-emerald-700"
+            >
+              <option value="REGULER">Paket Standar / Reguler (Sewa Kamar Saja)</option>
+              <option value="FULLBOARD_DIKLAT">Paket Fullboard Diklat & Bimtek (Kamar + Aula + 3x Makan + 2x Snack - Rp 450.000/org/hari)</option>
+              <option value="MANASIK_AKBAR">Paket Manasik Haji Akbar KBIHU (Lapangan + Replika Ka'bah + Sound - Rp 3.500.000/hari)</option>
+              <option value="HALFDAY_MEETING">Paket Halfday Meeting VIP (Ruang Rapat VIP + Proyektor + Snack - Rp 2.000.000/hari)</option>
+            </select>
           </div>
 
           {/* Activity / Event Name */}
@@ -621,6 +705,29 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
         confirmText={verifyModal.isApprove ? 'Setujui Reservasi' : 'Tolak Permohonan'}
         variant={verifyModal.isApprove ? 'primary' : 'danger'}
       />
+
+      {/* SPMA & Tag Bagasi Modal Munakosah */}
+      {spmaTarget && (
+        <SpmaModal
+          isOpen={!!spmaTarget}
+          onClose={() => setSpmaTarget(null)}
+          reservation={spmaTarget}
+          guest={guests.find((g) => g.id === spmaTarget.guest_id)}
+          room={(() => {
+            const assign = roomAssignments.find((a) => a.reservation_id === spmaTarget.id);
+            return rooms.find((r) => r.id === assign?.room_id) || rooms[0];
+          })()}
+          bed={(() => {
+            const assign = roomAssignments.find((a) => a.reservation_id === spmaTarget.id);
+            return beds.find((b) => b.id === assign?.bed_id) || beds[0];
+          })()}
+          building={(() => {
+            const assign = roomAssignments.find((a) => a.reservation_id === spmaTarget.id);
+            const r = rooms.find((rm) => rm.id === assign?.room_id) || rooms[0];
+            return buildings.find((b) => b.id === r?.building_id) || buildings[0];
+          })()}
+        />
+      )}
     </div>
   );
 };
