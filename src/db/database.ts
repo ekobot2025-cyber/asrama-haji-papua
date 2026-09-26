@@ -318,26 +318,158 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
   }
 
-  public saveRoom(roomData: Partial<Room>): Room {
+  // --- Master Data: Users Operations ---
+  public saveUser(userData: Partial<User>, currentUser?: User): User {
+    if (userData.id) {
+      this.users = this.users.map(u => u.id === userData.id ? { ...u, ...userData } as User : u);
+      localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(this.users));
+      if (currentUser) this.logAudit(currentUser.name, currentUser.role, 'UPDATE_USER', 'Manajemen Pengguna', `Mengubah akun pengguna ${userData.name || userData.username}`, userData.id);
+      return this.users.find(u => u.id === userData.id)!;
+    } else {
+      const newUser: User = {
+        id: `usr-${Date.now()}`,
+        username: userData.username || `user${Date.now() % 1000}`,
+        name: userData.name || 'Pengguna Baru',
+        email: userData.email || 'user@kemenag.go.id',
+        role: userData.role || 'PETUGAS',
+        status: userData.status || 'ACTIVE',
+        department: userData.department || 'Operasional Asrama Haji Papua',
+        phone: userData.phone || '0812-0000-0000',
+        created_at: new Date().toISOString(),
+      };
+      this.users.push(newUser);
+      localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(this.users));
+      if (currentUser) this.logAudit(currentUser.name, currentUser.role, 'CREATE_USER', 'Manajemen Pengguna', `Menambahkan pengguna baru ${newUser.name} (${newUser.username})`, newUser.id);
+      return newUser;
+    }
+  }
+
+  public deleteUser(id: string, currentUser?: User): { success: boolean; message: string } {
+    const userToDelete = this.users.find(u => u.id === id);
+    if (!userToDelete) return { success: false, message: 'Pengguna tidak ditemukan' };
+
+    if (userToDelete.role === 'SUPER_ADMIN') {
+      return { success: false, message: 'Akun Super Admin sistem tidak dapat dihapus demi keamanan.' };
+    }
+
+    this.users = this.users.filter(u => u.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(this.users));
+    if (currentUser) this.logAudit(currentUser.name, currentUser.role, 'DELETE_USER', 'Manajemen Pengguna', `Menghapus akun ${userToDelete.name} (${userToDelete.username})`, id);
+    return { success: true, message: `Pengguna ${userToDelete.name} berhasil dihapus.` };
+  }
+
+  // --- Master Data: Buildings Operations ---
+  public saveBuilding(buildingData: Partial<Building>, user?: User): Building {
+    if (buildingData.id) {
+      this.buildings = this.buildings.map(b => b.id === buildingData.id ? { ...b, ...buildingData } as Building : b);
+      localStorage.setItem(`${STORAGE_PREFIX}buildings`, JSON.stringify(this.buildings));
+      if (user) this.logAudit(user.name, user.role, 'UPDATE_BUILDING', 'Master Gedung', `Mengubah data gedung ${buildingData.name || buildingData.id}`, buildingData.id);
+      return this.buildings.find(b => b.id === buildingData.id)!;
+    } else {
+      const newBuilding: Building = {
+        id: `bld-${Date.now()}`,
+        code: (buildingData.code || 'BLD').toUpperCase(),
+        name: buildingData.name || 'Gedung Baru',
+        total_floors: Number(buildingData.total_floors) || 3,
+        description: buildingData.description || '',
+        status: buildingData.status || 'ACTIVE',
+        created_at: new Date().toISOString(),
+      };
+      this.buildings.push(newBuilding);
+      localStorage.setItem(`${STORAGE_PREFIX}buildings`, JSON.stringify(this.buildings));
+      if (user) this.logAudit(user.name, user.role, 'CREATE_BUILDING', 'Master Gedung', `Menambahkan gedung baru ${newBuilding.name} (${newBuilding.code})`, newBuilding.id);
+      return newBuilding;
+    }
+  }
+
+  public deleteBuilding(id: string, user?: User): { success: boolean; message: string } {
+    const bld = this.buildings.find(b => b.id === id);
+    if (!bld) return { success: false, message: 'Gedung tidak ditemukan' };
+
+    const roomsInBuilding = this.rooms.filter(r => r.building_id === id);
+    if (roomsInBuilding.length > 0) {
+      return { 
+        success: false, 
+        message: `Gedung ${bld.name} tidak dapat dihapus karena masih memiliki ${roomsInBuilding.length} kamar terdaftar. Harap pindahkan atau hapus kamar terkait terlebih dahulu.` 
+      };
+    }
+
+    this.buildings = this.buildings.filter(b => b.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}buildings`, JSON.stringify(this.buildings));
+    if (user) this.logAudit(user.name, user.role, 'DELETE_BUILDING', 'Master Gedung', `Menghapus gedung ${bld.name} (${bld.code})`, id);
+    return { success: true, message: `Gedung ${bld.name} berhasil dihapus.` };
+  }
+
+  // --- Master Data: Rooms Operations ---
+  public saveRoom(roomData: Partial<Room>, user?: User): Room {
     if (roomData.id) {
-      this.rooms = this.rooms.map(r => r.id === roomData.id ? { ...r, ...roomData, updated_at: new Date().toISOString() } as Room : r);
+      const oldRoom = this.rooms.find(r => r.id === roomData.id);
+      const updatedCapacity = roomData.capacity !== undefined ? Number(roomData.capacity) : (oldRoom?.capacity || 4);
+      const updatedRoomNumber = roomData.room_number || oldRoom?.room_number || 'A100';
+
+      this.rooms = this.rooms.map(r => r.id === roomData.id ? { 
+        ...r, 
+        ...roomData, 
+        capacity: updatedCapacity,
+        total_beds: updatedCapacity,
+        updated_at: new Date().toISOString() 
+      } as Room : r);
+
+      // Adjust beds if capacity or room number changed
+      const currentBeds = this.beds.filter(b => b.room_id === roomData.id);
+      if (currentBeds.length < updatedCapacity) {
+        for (let b = currentBeds.length + 1; b <= updatedCapacity; b++) {
+          const bedCode = `${updatedRoomNumber}-B0${b}`;
+          this.beds.push({
+            id: `bed-${roomData.id}-${Date.now()}-${b}`,
+            bed_code: bedCode,
+            room_id: roomData.id,
+            status: 'AVAILABLE',
+          });
+        }
+      } else if (currentBeds.length > updatedCapacity) {
+        // Remove excess beds if they are AVAILABLE (not occupied)
+        let bedsToRemove = currentBeds.length - updatedCapacity;
+        this.beds = this.beds.filter(b => {
+          if (b.room_id === roomData.id && b.status === 'AVAILABLE' && bedsToRemove > 0) {
+            bedsToRemove--;
+            return false;
+          }
+          return true;
+        });
+      }
+
+      // Update bed codes if room_number changed
+      if (oldRoom && oldRoom.room_number !== updatedRoomNumber) {
+        this.beds = this.beds.map((b, idx) => {
+          if (b.room_id === roomData.id) {
+            const bedIdx = String(idx + 1).padStart(2, '0');
+            return { ...b, bed_code: `${updatedRoomNumber}-B${bedIdx}` };
+          }
+          return b;
+        });
+      }
+
       localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
+      localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+      if (user) this.logAudit(user.name, user.role, 'UPDATE_ROOM', 'Master Kamar', `Mengubah data kamar ${updatedRoomNumber}`, roomData.id);
       return this.rooms.find(r => r.id === roomData.id)!;
     } else {
       const newId = `room-${(this.rooms.length + 1).toString().padStart(3, '0')}`;
+      const newCapacity = Number(roomData.capacity) || 4;
       const newRoom: Room = {
         id: newId,
         room_number: roomData.room_number || 'A100',
         building_id: roomData.building_id || this.buildings[0]?.id || 'bld-01',
         floor_id: roomData.floor_id || this.floors[0]?.id || 'flr-01',
         room_type_id: roomData.room_type_id || this.roomTypes[0]?.id || 'rt-std',
-        capacity: roomData.capacity || 4,
-        total_beds: roomData.total_beds || roomData.capacity || 4,
+        capacity: newCapacity,
+        total_beds: newCapacity,
         occupied_beds: 0,
-        rate_per_night: roomData.rate_per_night || 350000,
+        rate_per_night: Number(roomData.rate_per_night) || 350000,
         status: (roomData.status as RoomStatus) || 'AVAILABLE',
         housekeeping_status: (roomData.housekeeping_status as HousekeepingStatus) || 'READY',
-        amenities: roomData.amenities || ['AC', 'Kamar Mandi Dalam'],
+        amenities: roomData.amenities || ['AC', 'Kamar Mandi Dalam', 'Sajadah & Arah Kiblat'],
         notes: roomData.notes,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -357,8 +489,251 @@ class DatabaseService {
 
       localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
       localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+      if (user) this.logAudit(user.name, user.role, 'CREATE_ROOM', 'Master Kamar', `Menambahkan kamar ${newRoom.room_number} (${newRoom.capacity} Bed)`, newRoom.id);
       return newRoom;
     }
+  }
+
+  public deleteRoom(id: string, user?: User): { success: boolean; message: string } {
+    const room = this.rooms.find(r => r.id === id);
+    if (!room) return { success: false, message: 'Kamar tidak ditemukan' };
+
+    if (room.status === 'OCCUPIED' || room.status === 'RESERVED') {
+      return { 
+        success: false, 
+        message: `Kamar ${room.room_number} tidak dapat dihapus karena berstatus ${room.status} (sedang terisi atau dipesan tamu).` 
+      };
+    }
+
+    const occupiedBed = this.beds.find(b => b.room_id === id && (b.status === 'OCCUPIED' || b.status === 'RESERVED'));
+    if (occupiedBed) {
+      return { 
+        success: false, 
+        message: `Kamar ${room.room_number} memiliki tempat tidur ${occupiedBed.bed_code} yang masih aktif digunakan.` 
+      };
+    }
+
+    this.rooms = this.rooms.filter(r => r.id !== id);
+    this.beds = this.beds.filter(b => b.room_id !== id);
+
+    localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
+    localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+    if (user) this.logAudit(user.name, user.role, 'DELETE_ROOM', 'Master Kamar', `Menghapus kamar ${room.room_number} beserta tempat tidurnya`, id);
+    return { success: true, message: `Kamar ${room.room_number} beserta tempat tidurnya berhasil dihapus.` };
+  }
+
+  // --- Master Data: Bed Operations ---
+  public saveBed(bedData: Partial<Bed>, user?: User): Bed {
+    if (bedData.id) {
+      this.beds = this.beds.map(b => b.id === bedData.id ? { ...b, ...bedData } as Bed : b);
+      localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+      if (user) this.logAudit(user.name, user.role, 'UPDATE_BED', 'Master Bed', `Mengubah data tempat tidur ${bedData.bed_code || bedData.id}`, bedData.id);
+      return this.beds.find(b => b.id === bedData.id)!;
+    } else {
+      const newBed: Bed = {
+        id: `bed-${Date.now()}`,
+        bed_code: bedData.bed_code || 'BED-NEW',
+        room_id: bedData.room_id || this.rooms[0]?.id || 'room-001',
+        status: bedData.status || 'AVAILABLE',
+        notes: bedData.notes,
+      };
+      this.beds.push(newBed);
+      
+      // Update room total_beds
+      const room = this.rooms.find(r => r.id === newBed.room_id);
+      if (room) {
+        room.total_beds = this.beds.filter(b => b.room_id === room.id).length;
+        room.capacity = room.total_beds;
+        localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
+      }
+
+      localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+      if (user) this.logAudit(user.name, user.role, 'CREATE_BED', 'Master Bed', `Menambahkan tempat tidur ${newBed.bed_code}`, newBed.id);
+      return newBed;
+    }
+  }
+
+  public deleteBed(id: string, user?: User): { success: boolean; message: string } {
+    const bed = this.beds.find(b => b.id === id);
+    if (!bed) return { success: false, message: 'Tempat tidur tidak ditemukan' };
+
+    if (bed.status === 'OCCUPIED' || bed.status === 'RESERVED') {
+      return { success: false, message: `Tempat tidur ${bed.bed_code} sedang berstatus ${bed.status} dan tidak dapat dihapus.` };
+    }
+
+    const roomId = bed.room_id;
+    this.beds = this.beds.filter(b => b.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+
+    // Update room total_beds
+    const room = this.rooms.find(r => r.id === roomId);
+    if (room) {
+      room.total_beds = this.beds.filter(b => b.room_id === room.id).length;
+      room.capacity = room.total_beds;
+      localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
+    }
+
+    if (user) this.logAudit(user.name, user.role, 'DELETE_BED', 'Master Bed', `Menghapus tempat tidur ${bed.bed_code}`, id);
+    return { success: true, message: `Tempat tidur ${bed.bed_code} berhasil dihapus.` };
+  }
+
+  // --- Master Data: Room Types Operations ---
+  public saveRoomType(typeData: Partial<RoomType>, user?: User): RoomType {
+    if (typeData.id) {
+      this.roomTypes = this.roomTypes.map(t => t.id === typeData.id ? { ...t, ...typeData } as RoomType : t);
+      localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
+      if (user) this.logAudit(user.name, user.role, 'UPDATE_ROOM_TYPE', 'Master Tipe Kamar', `Mengubah tipe kamar ${typeData.name || typeData.id}`, typeData.id);
+      return this.roomTypes.find(t => t.id === typeData.id)!;
+    } else {
+      const newType: RoomType = {
+        id: `rt-${Date.now()}`,
+        code: (typeData.code || 'TYPE').toUpperCase(),
+        name: typeData.name || 'Tipe Kamar Baru',
+        description: typeData.description || '',
+        default_capacity: Number(typeData.default_capacity) || 4,
+        base_rate_per_night: Number(typeData.base_rate_per_night) || 350000,
+        amenities: typeData.amenities || ['AC', 'Kamar Mandi Dalam', 'Air Panas'],
+      };
+      this.roomTypes.push(newType);
+      localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
+      if (user) this.logAudit(user.name, user.role, 'CREATE_ROOM_TYPE', 'Master Tipe Kamar', `Menambahkan tipe kamar baru ${newType.name}`, newType.id);
+      return newType;
+    }
+  }
+
+  public deleteRoomType(id: string, user?: User): { success: boolean; message: string } {
+    const rType = this.roomTypes.find(t => t.id === id);
+    if (!rType) return { success: false, message: 'Tipe kamar tidak ditemukan' };
+
+    const roomsUsingType = this.rooms.filter(r => r.room_type_id === id);
+    if (roomsUsingType.length > 0) {
+      return { 
+        success: false, 
+        message: `Tipe kamar ${rType.name} masih digunakan oleh ${roomsUsingType.length} kamar aktif. Ubah tipe kamar terkait sebelum menghapus.` 
+      };
+    }
+
+    this.roomTypes = this.roomTypes.filter(t => t.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
+    if (user) this.logAudit(user.name, user.role, 'DELETE_ROOM_TYPE', 'Master Tipe Kamar', `Menghapus tipe kamar ${rType.name}`, id);
+    return { success: true, message: `Tipe kamar ${rType.name} berhasil dihapus.` };
+  }
+
+  // --- Master Data: Facilities Operations ---
+  public saveFacility(facData: Partial<Facility>, user?: User): Facility {
+    if (facData.id) {
+      this.facilities = this.facilities.map(f => f.id === facData.id ? { ...f, ...facData } as Facility : f);
+      localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
+      if (user) this.logAudit(user.name, user.role, 'UPDATE_FACILITY', 'Master Fasilitas', `Mengubah data fasilitas/aula ${facData.name || facData.id}`, facData.id);
+      return this.facilities.find(f => f.id === facData.id)!;
+    } else {
+      const newFac: Facility = {
+        id: `fac-${Date.now()}`,
+        name: facData.name || 'Fasilitas Baru',
+        type: facData.type || 'AULA',
+        location: facData.location || 'Kompleks Asrama Haji Papua',
+        capacity: Number(facData.capacity) || 50,
+        daily_rate: Number(facData.daily_rate) || 0,
+        hourly_rate: facData.hourly_rate ? Number(facData.hourly_rate) : undefined,
+        status: facData.status || 'AVAILABLE',
+        description: facData.description || '',
+        amenities: facData.amenities || ['AC / Kipas Angin', 'Sound System', 'Kursi & Meja'],
+      };
+      this.facilities.push(newFac);
+      localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
+      if (user) this.logAudit(user.name, user.role, 'CREATE_FACILITY', 'Master Fasilitas', `Menambahkan fasilitas baru ${newFac.name}`, newFac.id);
+      return newFac;
+    }
+  }
+
+  public deleteFacility(id: string, user?: User): { success: boolean; message: string } {
+    const fac = this.facilities.find(f => f.id === id);
+    if (!fac) return { success: false, message: 'Fasilitas tidak ditemukan' };
+
+    this.facilities = this.facilities.filter(f => f.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
+    if (user) this.logAudit(user.name, user.role, 'DELETE_FACILITY', 'Master Fasilitas', `Menghapus fasilitas ${fac.name}`, id);
+    return { success: true, message: `Fasilitas ${fac.name} berhasil dihapus.` };
+  }
+
+  // --- Master Data: Institutions Operations ---
+  public saveInstitution(instData: Partial<Institution>, user?: User): Institution {
+    if (instData.id) {
+      this.institutions = this.institutions.map(i => i.id === instData.id ? { ...i, ...instData } as Institution : i);
+      localStorage.setItem(`${STORAGE_PREFIX}institutions`, JSON.stringify(this.institutions));
+      if (user) this.logAudit(user.name, user.role, 'UPDATE_INSTITUTION', 'Master Instansi', `Mengubah instansi ${instData.name || instData.id}`, instData.id);
+      return this.institutions.find(i => i.id === instData.id)!;
+    } else {
+      const newInst: Institution = {
+        id: `inst-${Date.now()}`,
+        name: instData.name || 'Instansi Baru',
+        type: instData.type || 'KEMENAG',
+        address: instData.address || 'Jayapura, Papua',
+        phone: instData.phone || '0812-0000-0000',
+        contact_person: instData.contact_person || 'PIC Instansi',
+        email: instData.email,
+      };
+      this.institutions.push(newInst);
+      localStorage.setItem(`${STORAGE_PREFIX}institutions`, JSON.stringify(this.institutions));
+      if (user) this.logAudit(user.name, user.role, 'CREATE_INSTITUTION', 'Master Instansi', `Menambahkan instansi ${newInst.name}`, newInst.id);
+      return newInst;
+    }
+  }
+
+  public deleteInstitution(id: string, user?: User): { success: boolean; message: string } {
+    const inst = this.institutions.find(i => i.id === id);
+    if (!inst) return { success: false, message: 'Instansi tidak ditemukan' };
+
+    this.institutions = this.institutions.filter(i => i.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}institutions`, JSON.stringify(this.institutions));
+    if (user) this.logAudit(user.name, user.role, 'DELETE_INSTITUTION', 'Master Instansi', `Menghapus instansi ${inst.name}`, id);
+    return { success: true, message: `Instansi ${inst.name} berhasil dihapus.` };
+  }
+
+  // --- Master Data: Rates Operations ---
+  public saveRate(rateData: Partial<RateItem>, user?: User): RateItem {
+    if (rateData.id) {
+      this.rates = this.rates.map(r => r.id === rateData.id ? { ...r, ...rateData } as RateItem : r);
+      localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
+      if (user) this.logAudit(user.name, user.role, 'UPDATE_RATE', 'Master Tarif', `Mengubah tarif ${rateData.name || rateData.id}`, rateData.id);
+      return this.rates.find(r => r.id === rateData.id)!;
+    } else {
+      const newRate: RateItem = {
+        id: `rate-${Date.now()}`,
+        name: rateData.name || 'Tarif Baru',
+        category: rateData.category || 'KAMAR',
+        user_type: rateData.user_type || 'Umum / Instansi',
+        unit: rateData.unit || 'PER_ROOM',
+        rate: Number(rateData.rate) || 350000,
+        description: rateData.description || '',
+        is_active: rateData.is_active !== undefined ? rateData.is_active : true,
+        effective_date: rateData.effective_date || new Date().toISOString().split('T')[0],
+      };
+      this.rates.unshift(newRate);
+      localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
+      if (user) this.logAudit(user.name, user.role, 'CREATE_RATE', 'Master Tarif', `Menambahkan tarif baru ${newRate.name} (Rp ${newRate.rate.toLocaleString('id-ID')})`, newRate.id);
+      return newRate;
+    }
+  }
+
+  public deleteRate(id: string, user?: User): { success: boolean; message: string } {
+    const rateItem = this.rates.find(r => r.id === id);
+    if (!rateItem) return { success: false, message: 'Item tarif tidak ditemukan' };
+
+    this.rates = this.rates.filter(r => r.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
+    if (user) this.logAudit(user.name, user.role, 'DELETE_RATE', 'Master Tarif', `Menghapus tarif ${rateItem.name}`, id);
+    return { success: true, message: `Tarif ${rateItem.name} berhasil dihapus.` };
+  }
+
+  public deleteGuest(id: string, user?: User): { success: boolean; message: string } {
+    const guest = this.guests.find(g => g.id === id);
+    if (!guest) return { success: false, message: 'Tamu tidak ditemukan' };
+
+    this.guests = this.guests.filter(g => g.id !== id);
+    localStorage.setItem(`${STORAGE_PREFIX}guests`, JSON.stringify(this.guests));
+    if (user) this.logAudit(user.name, user.role, 'DELETE_GUEST', 'Buku Tamu', `Menghapus tamu ${guest.full_name}`, id);
+    return { success: true, message: `Data tamu ${guest.full_name} berhasil dihapus.` };
   }
 
   // --- Guests Operations ---

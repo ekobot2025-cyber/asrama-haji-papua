@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Users, Plus, Search, Filter, Phone, Mail, 
-  MapPin, Building, ShieldCheck, Eye, Edit 
+  MapPin, Building, ShieldCheck, Eye, Edit, Trash2 
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { Guest, Institution, GuestType } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
+import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { maskNik, formatDateIndo } from '../../utils/formatters';
@@ -24,6 +25,7 @@ export const GuestsPage: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Guest | null>(null);
   const [formData, setFormData] = useState({
     nik: '',
     full_name: '',
@@ -107,6 +109,20 @@ export const GuestsPage: React.FC = () => {
     toast.success('Tamu Tersimpan', `Data tamu ${saved.full_name} berhasil disimpan.`);
     setIsModalOpen(false);
     loadData();
+  };
+
+  const handleDeleteGuest = () => {
+    if (!deleteTarget) return;
+
+    const res = db.deleteGuest(deleteTarget.id, currentUser || undefined);
+    if (res.success) {
+      toast.success('Tamu Dihapus', res.message);
+      setDeleteTarget(null);
+      loadData();
+    } else {
+      toast.error('Gagal Menghapus', res.message);
+      setDeleteTarget(null);
+    }
   };
 
   const getInstitutionName = (instId?: string) => {
@@ -241,13 +257,22 @@ export const GuestsPage: React.FC = () => {
                   </td>
 
                   <td className="py-3 px-4 text-right">
-                    <button
-                      onClick={() => handleOpenModal(g)}
-                      className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
-                      title="Edit Data Tamu"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        onClick={() => handleOpenModal(g)}
+                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                        title="Edit Data Tamu"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(g)}
+                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                        title="Hapus Data Tamu"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -394,6 +419,17 @@ export const GuestsPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Confirmation Dialog Delete */}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteGuest}
+        title="Hapus Data Tamu"
+        message={`Apakah Anda yakin ingin menghapus data tamu "${deleteTarget?.full_name}"? Riwayat dan catatan terkait tamu ini akan dihapus dari buku tamu.`}
+        confirmText="Hapus Tamu"
+        variant="danger"
+      />
     </div>
   );
 };
