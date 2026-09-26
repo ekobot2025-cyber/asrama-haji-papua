@@ -424,7 +424,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                 <p className="text-slate-500 text-[10px]">Bendahara Penerimaan Pembantu</p>
                 <div className="h-12" />
                 <div>
-                  <p className="font-bold text-slate-900 underline">Nurlaila Hasibuan, S.E.</p>
+                  <p className="font-bold text-slate-900 underline">Bendahara Penerimaan</p>
                   <p className="text-[10px] text-slate-500">NIP. 19840212 200801 2 007</p>
                 </div>
               </div>

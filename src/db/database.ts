@@ -13,7 +13,7 @@ import {
 } from './seedData';
 import { terbilang } from '../utils/terbilang';
 
-const DB_VERSION = 'simaha_papua_v2.5_munakosah_siasah';
+const DB_VERSION = 'simaha_papua_v3.0_clean_users';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -89,7 +89,7 @@ class DatabaseService {
         room_id: 'room-009', // A201
         bed_id: 'bed-room-009-1',
         assigned_at: '2026-09-25T14:00:00Z',
-        assigned_by: 'Yusuf Wonda, S.Pd.',
+        assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
       {
@@ -99,7 +99,7 @@ class DatabaseService {
         room_id: 'room-010', // A202
         bed_id: 'bed-room-010-1',
         assigned_at: '2026-09-25T14:15:00Z',
-        assigned_by: 'Yusuf Wonda, S.Pd.',
+        assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
       {
@@ -109,7 +109,7 @@ class DatabaseService {
         room_id: 'room-015', // B101
         bed_id: 'bed-room-015-1',
         assigned_at: '2026-09-25T14:30:00Z',
-        assigned_by: 'Yusuf Wonda, S.Pd.',
+        assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
       {
@@ -119,7 +119,7 @@ class DatabaseService {
         room_id: 'room-016', // B102
         bed_id: 'bed-room-016-1',
         assigned_at: '2026-09-25T14:30:00Z',
-        assigned_by: 'Yusuf Wonda, S.Pd.',
+        assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
     ];
@@ -130,7 +130,7 @@ class DatabaseService {
         reservation_id: 'rsv-001',
         checkin_no: 'CIN/2026/0001',
         checkin_time: '2026-09-25T14:30:00Z',
-        checkin_by: 'Yusuf Wonda, S.Pd.',
+        checkin_by: 'Resepsionis',
         card_keys_issued: 8,
         deposit_amount: 500000,
         notes: 'Check-in rombongan Jamaah Haji Kloter 1 Kab. Jayapura',
@@ -140,7 +140,7 @@ class DatabaseService {
         reservation_id: 'rsv-003',
         checkin_no: 'CIN/2026/0002',
         checkin_time: '2026-09-25T15:00:00Z',
-        checkin_by: 'Yusuf Wonda, S.Pd.',
+        checkin_by: 'Resepsionis',
         card_keys_issued: 1,
         deposit_amount: 100000,
         notes: 'Tamu VIP Kemenag Papua',
@@ -153,7 +153,7 @@ class DatabaseService {
         reservation_id: 'rsv-007',
         checkout_no: 'COUT/2026/0001',
         checkout_time: '2026-09-26T11:45:00Z',
-        checkout_by: 'Yusuf Wonda, S.Pd.',
+        checkout_by: 'Resepsionis',
         room_condition_notes: 'Kamar A104 rapi, kunci kartu lengkap dikembalikan',
         deposit_returned: true,
         notes: 'Selesai menginap',
@@ -221,6 +221,18 @@ class DatabaseService {
       } else {
         // Fallback migration to ensure all reservations have SPMA & package_type
         let needsSave = false;
+
+        // Clean any existing dummy personal names from stored user accounts
+        this.users.forEach(u => {
+          if (u.username === 'superadmin') { u.name = 'Super Admin'; u.email = 'superadmin@asramahaji.id'; }
+          else if (u.username === 'admin') { u.name = 'Admin Penginapan'; u.email = 'admin@asramahaji.id'; }
+          else if (u.username === 'resepsionis') { u.name = 'Resepsionis'; u.role = 'RESEPSIONIS'; u.email = 'resepsionis@asramahaji.id'; }
+          else if (u.username === 'keuangan') { u.name = 'Bendahara Keuangan'; u.email = 'keuangan@asramahaji.id'; }
+          else if (u.username === 'housekeeping') { u.name = 'Housekeeping'; u.email = 'housekeeping@asramahaji.id'; }
+          else if (u.username === 'pimpinan') { u.name = 'Pimpinan (Ka. UPT)'; u.email = 'pimpinan@asramahaji.id'; }
+        });
+        needsSave = true;
+
         this.reservations.forEach((r, idx) => {
           if (!r.spma_no) {
             r.spma_no = `SPMA/AHP/2026/09/${String(idx + 1).padStart(4, '0')}`;

@@ -374,7 +374,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
 
     const currentUserObj: any = currentUser || {
       id: 'usr-003',
-      name: 'Yusuf Wonda, S.Pd.',
+      name: 'Resepsionis',
       role: 'RESEPSIONIS',
       username: 'resepsionis',
       email: 'frontdesk@asramahaji-papua.go.id',
@@ -425,7 +425,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
       const receiptData: PosReceiptData = {
         receiptNo,
         dateTime: formatDateTimeIndo(new Date().toISOString()),
-        cashierName: currentUserObj.name || 'Yusuf Wonda, S.Pd.',
+        cashierName: currentUserObj.name || 'Resepsionis',
         guestName: guestName,
         institutionName: guestInstitution,
         phone: guestPhone,
@@ -519,7 +519,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
               </h1>
             </div>
             <p className="text-xs text-emerald-200/90 mt-1">
-              Petugas Kasir: <strong className="text-white">{currentUser?.name || 'Yusuf Wonda, S.Pd.'}</strong> &bull; Peran: <strong className="text-amber-300">Front Desk / Resepsionis</strong> &bull; Waktu: {formatDateIndo(todayStr)}
+              Petugas Kasir: <strong className="text-white">{currentUser?.name || 'Resepsionis'}</strong> &bull; Peran: <strong className="text-amber-300">Front Desk / Resepsionis</strong> &bull; Waktu: {formatDateIndo(todayStr)}
             </p>
           </div>
 
