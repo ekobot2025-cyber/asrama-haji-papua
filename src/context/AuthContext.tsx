@@ -16,24 +16,38 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>(() => {
+    try {
+      return db.getUsers();
+    } catch {
+      return [];
+    }
+  });
+
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      const allUsers = db.getUsers();
+      const savedUserId = localStorage.getItem('sipah_auth_user_id');
+      if (savedUserId) {
+        const found = allUsers.find(u => u.id === savedUserId);
+        if (found) return found;
+      }
+      return allUsers[0] || null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     const allUsers = db.getUsers();
     setUsers(allUsers);
-    
-    // Check saved user session
     const savedUserId = localStorage.getItem('sipah_auth_user_id');
     if (savedUserId) {
       const found = allUsers.find(u => u.id === savedUserId);
       if (found) {
         setCurrentUser(found);
-        return;
       }
     }
-    // Default to Super Admin for seamless testing experience
-    setCurrentUser(allUsers[0] || null);
   }, []);
 
   const login = (username: string): boolean => {
