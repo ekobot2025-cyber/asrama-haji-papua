@@ -4,7 +4,7 @@ import {
   Calendar, CheckCircle2, ShieldCheck, MapPin, Phone, Mail, Clock, 
   CreditCard, Sparkles, Users, FileText, ChevronRight, HelpCircle, 
   BookOpen, Star, Award, Coffee, Wifi, Tv, Utensils, Info, Check, 
-  Calculator, Tag, Printer, ExternalLink
+  Calculator, Tag, Printer, ExternalLink, Menu, X
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { SelfServiceLookupModal } from '../../components/operations/SelfServiceLookupModal';
@@ -22,6 +22,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Quick Mini Lookup on Hero
   const [quickQuery, setQuickQuery] = useState('');
@@ -88,71 +89,148 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Main Glassmorphic Navigation Header */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
           {/* Logo & Identity */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 via-emerald-700 to-emerald-800 p-0.5 shadow-md flex items-center justify-center">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-amber-600 via-emerald-700 to-emerald-800 p-0.5 shadow-md flex items-center justify-center shrink-0">
               <div className="w-full h-full bg-emerald-950 rounded-[14px] flex items-center justify-center text-amber-400">
-                <Compass className="w-6 h-6 animate-pulse" />
+                <Compass className="w-5 h-5 animate-pulse" />
               </div>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-black text-xl tracking-tight text-emerald-950">SIMAHA</span>
+            <div className="whitespace-nowrap">
+              <div className="flex items-center gap-1.5">
+                <span className="font-black text-lg sm:text-xl tracking-tight text-emerald-950">SIMAHA</span>
                 <span className="text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.5 rounded">
                   PAPUA
                 </span>
               </div>
-              <p className="text-[11px] font-bold text-emerald-800 leading-tight">
+              <p className="text-[10px] sm:text-[11px] font-bold text-emerald-800 leading-tight">
                 Sistem Informasi Manajemen Asrama Haji
               </p>
-              <p className="text-[10px] text-slate-500 font-medium">
+              <p className="text-[9px] sm:text-[10px] text-slate-500 font-medium">
                 Provinsi Papua &bull; Layanan Perhotelan & Haji
               </p>
             </div>
           </div>
 
           {/* Nav Links Desktop */}
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-bold text-slate-600">
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-emerald-800 hover:text-emerald-950 transition-colors">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-xs font-bold text-slate-600 shrink-0">
+            <button 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
+              className="px-2.5 py-1.5 rounded-lg whitespace-nowrap text-emerald-800 hover:text-emerald-950 hover:bg-emerald-50 transition-colors"
+            >
               Beranda
             </button>
-            <button onClick={() => scrollToSection('kamar-tarif')} className="hover:text-emerald-800 transition-colors">
-              Kamar & Tarif PNBP
+            <button 
+              onClick={() => scrollToSection('kamar-tarif')} 
+              className="px-2.5 py-1.5 rounded-lg whitespace-nowrap hover:text-emerald-800 hover:bg-slate-100 transition-colors"
+            >
+              Kamar & Tarif
             </button>
-            <button onClick={() => scrollToSection('kalkulator')} className="hover:text-emerald-800 transition-colors">
+            <button 
+              onClick={() => scrollToSection('kalkulator')} 
+              className="px-2.5 py-1.5 rounded-lg whitespace-nowrap hover:text-emerald-800 hover:bg-slate-100 transition-colors"
+            >
               Simulasi Biaya
             </button>
-            <button onClick={() => scrollToSection('fasilitas')} className="hover:text-emerald-800 transition-colors">
-              Fasilitas & MICE
+            <button 
+              onClick={() => scrollToSection('fasilitas')} 
+              className="px-2.5 py-1.5 rounded-lg whitespace-nowrap hover:text-emerald-800 hover:bg-slate-100 transition-colors"
+            >
+              Fasilitas MICE
             </button>
-            <button onClick={() => scrollToSection('layanan-haji')} className="hover:text-emerald-800 transition-colors">
+            <button 
+              onClick={() => scrollToSection('layanan-haji')} 
+              className="px-2.5 py-1.5 rounded-lg whitespace-nowrap hover:text-emerald-800 hover:bg-slate-100 transition-colors"
+            >
               Layanan Haji
             </button>
-            <button onClick={() => scrollToSection('kontak')} className="hover:text-emerald-800 transition-colors">
+            <button 
+              onClick={() => scrollToSection('kontak')} 
+              className="px-2.5 py-1.5 rounded-lg whitespace-nowrap hover:text-emerald-800 hover:bg-slate-100 transition-colors"
+            >
               Kontak
             </button>
           </nav>
 
-          {/* Action Button: Login / Dashboard */}
-          <div className="flex items-center gap-2.5">
+          {/* Action Button: Cek Kamar & Login */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setIsLookupOpen(true)}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors shadow-2xs"
+              className="hidden md:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors shadow-2xs whitespace-nowrap cursor-pointer"
             >
-              <Search className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Cek Kamar Jemaah</span>
+              <Search className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+              <span>Cek Kamar</span>
             </button>
 
             <button
               onClick={onGoToLogin}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-emerald-800 to-emerald-900 hover:from-emerald-700 hover:to-emerald-800 border border-emerald-700/60 shadow-md hover:shadow-lg transition-all cursor-pointer group"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-emerald-800 to-emerald-900 hover:from-emerald-700 hover:to-emerald-800 border border-emerald-700/60 shadow-md hover:shadow-lg transition-all cursor-pointer group whitespace-nowrap"
             >
-              <LogIn className="w-4 h-4 text-amber-300 group-hover:translate-x-0.5 transition-transform" />
-              <span>{currentUser ? 'Buka Dashboard Sistem' : 'Masuk ke Sistem (Login)'}</span>
+              <LogIn className="w-3.5 h-3.5 text-amber-300 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <span>{currentUser ? 'Dashboard' : 'Login'}</span>
+            </button>
+
+            {/* Mobile Hamburger Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+              aria-label="Toggle Menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-white border-t border-slate-200 px-4 py-3 space-y-1 shadow-lg animate-in slide-in-from-top-2">
+            <button 
+              onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }} 
+              className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-emerald-800 hover:bg-emerald-50"
+            >
+              Beranda
+            </button>
+            <button 
+              onClick={() => { scrollToSection('kamar-tarif'); setMobileMenuOpen(false); }} 
+              className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              Kamar & Tarif
+            </button>
+            <button 
+              onClick={() => { scrollToSection('kalkulator'); setMobileMenuOpen(false); }} 
+              className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              Simulasi Biaya
+            </button>
+            <button 
+              onClick={() => { scrollToSection('fasilitas'); setMobileMenuOpen(false); }} 
+              className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              Fasilitas MICE
+            </button>
+            <button 
+              onClick={() => { scrollToSection('layanan-haji'); setMobileMenuOpen(false); }} 
+              className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              Layanan Haji
+            </button>
+            <button 
+              onClick={() => { scrollToSection('kontak'); setMobileMenuOpen(false); }} 
+              className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              Kontak & Lokasi
+            </button>
+            <div className="pt-2 border-t border-slate-100 flex gap-2">
+              <button
+                onClick={() => { setIsLookupOpen(true); setMobileMenuOpen(false); }}
+                className="flex-1 py-2 rounded-xl text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-200 text-center"
+              >
+                Cek Kamar
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -824,7 +902,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Cek Kamar Jemaah
             </button>
             <button onClick={onGoToLogin} className="hover:text-amber-400 font-bold transition-colors">
-              Login Petugas &rarr;
+              Login &rarr;
             </button>
           </div>
         </div>
