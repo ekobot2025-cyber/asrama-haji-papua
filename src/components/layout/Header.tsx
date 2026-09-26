@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, Search, Bell, Clock, ChevronDown, CheckCircle, 
-  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield, BookOpen
+  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield, BookOpen, Receipt
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
@@ -85,7 +85,8 @@ export const Header: React.FC<HeaderProps> = ({
   const roleLabels: Record<string, string> = {
     SUPER_ADMIN: 'Super Admin (IT)',
     ADMIN_PENGINAPAN: 'Admin Penginapan',
-    PETUGAS: 'Petugas / Resepsionis',
+    RESEPSIONIS: 'Front Desk / Resepsionis',
+    PETUGAS: 'Petugas Pelayanan',
     KEUANGAN: 'Bendahara Keuangan',
     HOUSEKEEPING: 'Housekeeping',
     PIMPINAN: 'Pimpinan (Ka. UPT)',
@@ -131,6 +132,16 @@ export const Header: React.FC<HeaderProps> = ({
           <Clock className="w-3.5 h-3.5 text-emerald-800" />
           <span>{currentTime}</span>
         </div>
+
+        {/* Kasir Resepsionis POS Quick Button */}
+        <button
+          onClick={() => onNavigate('frontdesk-pos')}
+          title="Buka Kasir & Transaksi Resepsionis 1-Klik (Front Desk POS)"
+          className="flex items-center gap-1.5 text-[11px] font-black text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500/50 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all shadow-xs group"
+        >
+          <Receipt className="w-3.5 h-3.5 text-slate-900 group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline">Kasir Resepsionis</span>
+        </button>
 
         {/* Cek Kamar Mandiri Munakosah Papua */}
         <button

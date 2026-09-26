@@ -83,14 +83,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentUser.role === 'SUPER_ADMIN') return true;
 
     switch (permission) {
+      case 'frontdesk.pos':
       case 'reservation.manage':
-        return ['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'PETUGAS'].includes(currentUser.role);
+        return ['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'RESEPSIONIS', 'PETUGAS'].includes(currentUser.role);
       case 'reservation.verify':
         return ['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'PIMPINAN'].includes(currentUser.role);
       case 'checkin.manage':
       case 'checkout.manage':
       case 'room.assign':
-        return ['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'PETUGAS'].includes(currentUser.role);
+        return ['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'RESEPSIONIS', 'PETUGAS'].includes(currentUser.role);
       case 'room.manage':
         return ['SUPER_ADMIN', 'ADMIN_PENGINAPAN'].includes(currentUser.role);
       case 'housekeeping.manage':

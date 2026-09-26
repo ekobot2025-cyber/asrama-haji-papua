@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ToastProvider } from './context/ToastContext';
 import { AppLayout } from './components/layout/AppLayout';
+import { db } from './db/database';
 
 // Pages
 import { LoginPage } from './pages/auth/LoginPage';
@@ -31,10 +32,17 @@ import { RoomTypesPage } from './pages/master/RoomTypesPage';
 import { UsersPage } from './pages/system/UsersPage';
 import { AuditLogPage } from './pages/system/AuditLogPage';
 import { SettingsPage } from './pages/system/SettingsPage';
+import { FrontDeskPosPage } from './pages/operations/FrontDeskPosPage';
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const [currentPage, setCurrentPage] = useState<string>('dashboard');
+  const { isAuthenticated, currentUser } = useAuth();
+  const [currentPage, setCurrentPage] = useState<string>(() => {
+    try {
+      const savedUser = db.getUsers().find(u => u.id === localStorage.getItem('sipah_auth_user_id'));
+      if (savedUser?.role === 'RESEPSIONIS') return 'frontdesk-pos';
+    } catch {}
+    return 'dashboard';
+  });
   const [targetId, setTargetId] = useState<string | undefined>(undefined);
 
   const handleNavigate = (page: string, id?: string) => {
@@ -49,6 +57,8 @@ const AppContent: React.FC = () => {
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'frontdesk-pos':
+        return <FrontDeskPosPage onNavigate={handleNavigate} />;
       case 'dashboard':
         return <DashboardPage onNavigate={handleNavigate} />;
       case 'executive-dashboard':

@@ -149,6 +149,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {(collapsed || openSections.operasional) && (
               <ul className="space-y-1 mt-1">
                 <li>
+                  <div 
+                    onClick={() => handleNav('frontdesk-pos')} 
+                    className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+                      currentPage === 'frontdesk-pos'
+                        ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
+                        : 'bg-emerald-900/60 text-amber-300 hover:bg-emerald-800 hover:text-white border border-amber-400/30'
+                    }`} 
+                    title="Kasir & Transaksi Resepsionis (Front Desk POS)"
+                  >
+                    <Receipt className="w-4 h-4 shrink-0 text-amber-400 animate-pulse" />
+                    {!collapsed && (
+                      <div className="flex items-center justify-between w-full">
+                        <span className="font-bold">Kasir Resepsionis (POS)</span>
+                        <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.2 rounded">KASIR</span>
+                      </div>
+                    )}
+                  </div>
+                </li>
+                <li>
                   <div onClick={() => handleNav('reservations')} className={navItemClass('reservations')} title="Reservasi">
                     <CalendarCheck className="w-4 h-4 shrink-0 text-emerald-300" />
                     {!collapsed && <span>Reservasi</span>}

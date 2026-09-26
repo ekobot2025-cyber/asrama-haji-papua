@@ -107,6 +107,7 @@ export const UsersPage: React.FC = () => {
   const roleDescriptions: Record<UserRole, string> = {
     SUPER_ADMIN: 'Akses penuh ke seluruh konfigurasi sistem, database, audit log, dan master data.',
     ADMIN_PENGINAPAN: 'Kelola reservasi, alokasi kamar, verifikasi tamu, dan monitoring operasional.',
+    RESEPSIONIS: 'Front desk kasir: transaksi 1-layar kilat, check-in walk-in, pembayaran kasir, dan serah terima kunci.',
     PETUGAS: 'Front desk: proses reservasi harian, check-in, check-out, serah terima kunci kartu.',
     KEUANGAN: 'Penerbitan invoice tagihan, penerimaan pembayaran kasir, pencetakan kwitansi & laporan PNBP.',
     HOUSEKEEPING: 'Pembaruan status kebersihan kamar (Dirty, Cleaning, Inspected, Ready).',
