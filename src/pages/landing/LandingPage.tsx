@@ -41,12 +41,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     aula: { name: 'Aula Serbaguna Arafah (Harian)', price: 5000000, desc: 'Kapasitas s.d 1.000 Peserta, Sound System, AC Central, Videotron', capacity: 1000, pnbpCode: '425112' }
   };
 
-  const handleQuickSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quickQuery.trim()) return;
+  const handleQuickSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const queryToSearch = quickQuery.trim() || 'Siti Rahma';
+    if (!quickQuery.trim()) {
+      setQuickQuery(queryToSearch);
+    }
     setHasSearched(true);
-    const res = db.lookupAccommodation(quickQuery.trim());
+    const res = db.lookupAccommodation(queryToSearch);
     setQuickResult(res);
+    setIsLookupOpen(true);
   };
 
   const calculateTotal = () => {
@@ -338,7 +342,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-800 hover:bg-emerald-900 text-white shadow-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    onClick={handleQuickSearch}
+                    onMouseDown={(e) => e.preventDefault()}
+                    className="w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Search className="w-3.5 h-3.5" />
                     <span>Periksa Penempatan Sekarang</span>
@@ -349,16 +355,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="flex gap-2">
                       <button 
                         type="button" 
-                        onClick={() => { setQuickQuery('Siti Rahma'); setHasSearched(true); setQuickResult(db.lookupAccommodation('Siti Rahma')); }}
-                        className="text-emerald-700 hover:underline font-semibold"
+                        onClick={() => { 
+                          setQuickQuery('Siti Rahma'); 
+                          setHasSearched(true); 
+                          setQuickResult(db.lookupAccommodation('Siti Rahma')); 
+                          setIsLookupOpen(true);
+                        }}
+                        className="text-emerald-700 hover:underline font-semibold cursor-pointer"
                       >
                         Siti Rahma
                       </button>
                       <span>&bull;</span>
                       <button 
                         type="button" 
-                        onClick={() => { setQuickQuery('Ahmad Dahlan'); setHasSearched(true); setQuickResult(db.lookupAccommodation('Ahmad Dahlan')); }}
-                        className="text-emerald-700 hover:underline font-semibold"
+                        onClick={() => { 
+                          setQuickQuery('Ahmad Dahlan'); 
+                          setHasSearched(true); 
+                          setQuickResult(db.lookupAccommodation('Ahmad Dahlan')); 
+                          setIsLookupOpen(true);
+                        }}
+                        className="text-emerald-700 hover:underline font-semibold cursor-pointer"
                       >
                         Ahmad Dahlan
                       </button>
@@ -913,6 +929,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <SelfServiceLookupModal
         isOpen={isLookupOpen}
         onClose={() => setIsLookupOpen(false)}
+        initialQuery={quickQuery}
       />
 
       {/* SOP & Help Guide Modal */}

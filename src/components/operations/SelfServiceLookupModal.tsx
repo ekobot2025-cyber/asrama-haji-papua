@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, BedDouble, Building, QrCode, CheckCircle2, AlertCircle, Printer, Tag, Sparkles, User, MapPin } from 'lucide-react';
 import { db } from '../../db/database';
 import { Modal } from '../common/Modal';
@@ -9,16 +9,30 @@ import { maskNik, formatDateIndo } from '../../utils/formatters';
 interface SelfServiceLookupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialQuery?: string;
 }
 
 export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
   isOpen,
   onClose,
+  initialQuery = '',
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [searchResult, setSearchResult] = useState<any>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [isSpmaOpen, setIsSpmaOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const q = (initialQuery || searchQuery).trim();
+      if (q) {
+        setSearchQuery(q);
+        setHasSearched(true);
+        const result = db.lookupAccommodation(q);
+        setSearchResult(result);
+      }
+    }
+  }, [isOpen, initialQuery]);
 
   const handleSearch = (queryOverride?: string) => {
     const q = queryOverride !== undefined ? queryOverride : searchQuery;
