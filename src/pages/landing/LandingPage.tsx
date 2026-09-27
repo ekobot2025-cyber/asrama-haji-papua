@@ -255,7 +255,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h1>
 
               <p className="text-sm sm:text-base text-emerald-100/90 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                Selamat datang di <strong>SIMAHA Papua</strong>. Terpadu melayani embarkasi haji antara, akomodasi kedinasan, kegiatan MICE, dan penginapan umum berstandar perhotelan syariah dengan kode billing PNBP SIMPONI resmi Kementerian Agama RI.
+                Selamat datang di <strong>SIMAHA Papua</strong>. Terpadu melayani embarkasi haji antara, akomodasi kedinasan, kegiatan <strong>MICE</strong> (<em>Meeting, Incentive, Convention & Exhibition</em> — rapat kerja dinas, diklat, bimtek & sewa aula pertemuan), serta penginapan umum berstandar perhotelan syariah dengan kode billing PNBP SIMPONI resmi Kementerian Agama RI.
               </p>
 
               {/* Action Buttons */}
