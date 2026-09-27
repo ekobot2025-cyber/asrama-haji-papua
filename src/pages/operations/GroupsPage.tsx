@@ -95,7 +95,7 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ onNavigate }) => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Briefcase className="w-6 h-6 text-emerald-800" />
+            <Briefcase className="w-6 h-6 text-[#8a6d2b]" />
             Manajemen Rombongan & Jamaah Haji (Groups)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -122,7 +122,7 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ onNavigate }) => {
             placeholder="Cari nama rombongan, nama agenda, PIC..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
           />
         </div>
       </div>
@@ -145,7 +145,7 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ onNavigate }) => {
               </div>
 
               <h3 className="text-sm font-bold text-slate-900 leading-snug mb-1">{grp.group_name}</h3>
-              <p className="text-xs text-emerald-800 font-medium truncate mb-3">{grp.activity_name}</p>
+              <p className="text-xs text-[#8a6d2b] font-medium truncate mb-3">{grp.activity_name}</p>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5 text-xs text-slate-600">
                 <p><span className="text-slate-400">Instansi:</span> <span className="font-semibold text-slate-800">{getInstitutionName(grp.institution_id)}</span></p>

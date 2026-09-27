@@ -216,7 +216,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <CalendarCheck className="w-6 h-6 text-emerald-800" />
+            <CalendarCheck className="w-6 h-6 text-[#8a6d2b]" />
             Pengelolaan Reservasi & Pendaftaran Tamu
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -245,7 +245,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
               placeholder="Cari nomor reservasi, nama pemesan, rombongan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3.5 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-10 pr-3.5 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -255,7 +255,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Status</option>
             <option value="PENDING">PENDING</option>
@@ -272,7 +272,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Jenis Reservasi</option>
             <option value="INDIVIDUAL">Individu</option>
@@ -310,7 +310,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                   <tr key={rsv.id} className="hover:bg-slate-50/70 transition-colors">
                     {/* No Reservasi */}
                     <td className="py-3 px-4 font-bold text-slate-900">
-                      <span className="font-mono text-emerald-900">{rsv.reservation_no}</span>
+                      <span className="font-mono text-[#8a6d2b]">{rsv.reservation_no}</span>
                       <p className="text-[10px] text-slate-400 font-normal mt-0.5">{formatDateIndo(rsv.reservation_date)}</p>
                     </td>
 
@@ -350,7 +350,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                     <td className="py-3 px-4">
                       <div className="flex flex-col gap-1">
                         <Badge status={rsv.status} size="sm" />
-                        <span className={`text-[10px] font-semibold ${rsv.payment_status === 'PAID' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                        <span className={`text-[10px] font-semibold ${rsv.payment_status === 'PAID' ? 'text-[#8a6d2b]' : 'text-amber-700'}`}>
                           {rsv.payment_status === 'PAID' ? 'Lunas' : `Sisa: ${formatCurrency(rsv.remaining_amount)}`}
                         </span>
                       </div>
@@ -363,7 +363,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                         {rsv.status === 'PENDING' && (
                           <button
                             onClick={() => setVerifyModal({ isOpen: true, reservation: rsv, isApprove: true })}
-                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors"
+                            className="p-1.5 rounded-lg bg-[#fbf8ee] text-[#8a6d2b] hover:bg-[#f4ebd0] transition-colors"
                             title="Verifikasi & Setujui"
                           >
                             <CheckCircle2 className="w-4 h-4" />
@@ -385,7 +385,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                         {rsv.status === 'CONFIRMED' && (
                           <button
                             onClick={() => onNavigate('checkin', rsv.id)}
-                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors"
+                            className="p-1.5 rounded-lg bg-[#fbf8ee] text-[#8a6d2b] hover:bg-[#f4ebd0] transition-colors"
                             title="Proses Check-in"
                           >
                             <LogIn className="w-4 h-4" />
@@ -406,7 +406,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                         {/* Cetak SPMA & Tag Bagasi (Munakosah) */}
                         <button
                           onClick={() => setSpmaTarget(rsv)}
-                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors"
+                          className="p-1.5 rounded-lg bg-[#fbf8ee] text-[#8a6d2b] hover:bg-[#f4ebd0] transition-colors"
                           title="Cetak SPMA & Label Bagasi Koper (Munakosah)"
                         >
                           <Printer className="w-4 h-4" />
@@ -455,7 +455,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
               <select
                 value={newFormData.reservation_type}
                 onChange={(e) => setNewFormData({ ...newFormData, reservation_type: e.target.value as any })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="INDIVIDUAL">Tamu Individu / Mandiri</option>
                 <option value="ROMBONGAN">Rombongan Jamaah Haji</option>
@@ -469,7 +469,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
               <select
                 value={newFormData.activity_type}
                 onChange={(e) => setNewFormData({ ...newFormData, activity_type: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="HAJI_UMRAH">Jamaah Haji & Umrah</option>
                 <option value="MANASIK">Bimbingan Manasik Haji</option>
@@ -481,13 +481,13 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
           </div>
 
           {/* Paket Terpadu (MICE / Manasik / Fullboard) */}
-          <div className="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200/80 space-y-1.5">
+          <div className="bg-[#fbf8ee] p-3.5 rounded-xl border border-[#e8dfc8] space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block font-bold text-emerald-950 text-xs flex items-center gap-1.5">
-                <Briefcase className="w-4 h-4 text-emerald-800" />
+              <label className="block font-bold text-[#1A1410] text-xs flex items-center gap-1.5">
+                <Briefcase className="w-4 h-4 text-[#8a6d2b]" />
                 Pilihan Paket Terpadu (MICE & Manasik Asrama Haji)
               </label>
-              <span className="text-[10px] font-semibold text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-200">
+              <span className="text-[10px] font-semibold text-[#8a6d2b] bg-white px-2 py-0.5 rounded-full border border-[#e8dfc8]">
                 Hitung Otomatis
               </span>
             </div>
@@ -532,7 +532,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                   activity_type: actType,
                 });
               }}
-              className="w-full px-3 py-2 border border-emerald-300 rounded-xl bg-white font-bold text-slate-800 text-xs focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-[#c9a961] rounded-xl bg-white font-bold text-slate-800 text-xs focus:ring-2 focus:ring-[#c9a961]"
             >
               <option value="REGULER">Paket Standar / Reguler (Sewa Kamar Saja)</option>
               <option value="FULLBOARD_DIKLAT">Paket Fullboard Diklat & Bimtek (Kamar + Aula + 3x Makan + 2x Snack - Rp 450.000/org/hari)</option>
@@ -549,7 +549,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
               placeholder="Contoh: Rombongan Jamaah Haji Kloter 2 / Bimtek Sertifikasi Pembimbing"
               value={newFormData.activity_name}
               onChange={(e) => setNewFormData({ ...newFormData, activity_name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -563,7 +563,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                 required
                 value={newFormData.pic_name}
                 onChange={(e) => setNewFormData({ ...newFormData, pic_name: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -574,7 +574,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                 required
                 value={newFormData.pic_phone}
                 onChange={(e) => setNewFormData({ ...newFormData, pic_phone: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -582,7 +582,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
               <select
                 value={newFormData.institution_id}
                 onChange={(e) => setNewFormData({ ...newFormData, institution_id: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="">Pribadi / Umum</option>
                 {institutions.map((inst) => (
@@ -601,7 +601,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                 required
                 value={newFormData.checkin_date}
                 onChange={(e) => setNewFormData({ ...newFormData, checkin_date: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -611,7 +611,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                 required
                 value={newFormData.checkout_date}
                 onChange={(e) => setNewFormData({ ...newFormData, checkout_date: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
           </div>
@@ -676,7 +676,7 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
               placeholder="Contoh: Butuh Aula Cenderawasih untuk pembekalan dan Lapangan Manasik..."
               value={newFormData.notes}
               onChange={(e) => setNewFormData({ ...newFormData, notes: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 

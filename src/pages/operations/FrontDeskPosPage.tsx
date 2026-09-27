@@ -527,7 +527,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
   return (
     <div className="space-y-4">
       {/* Top Banner: Shift & Cash Drawer Tracker */}
-      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-800/60">
+      <div className="bg-gradient-to-r from-[#1A1410] via-[#2A2018] to-[#1A1410] text-white p-4 sm:p-5 rounded-2xl shadow-md border border-[#c9a961]/60">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -539,7 +539,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 Kasir & Transaksi Resepsionis
               </h1>
             </div>
-            <p className="text-xs text-emerald-200/90 mt-1">
+            <p className="text-xs text-[#c9a961]/90 mt-1">
               Petugas Kasir: <strong className="text-white">{currentUser?.name || 'Resepsionis'}</strong> &bull; Peran: <strong className="text-amber-300">Front Desk / Resepsionis</strong> &bull; Waktu: {formatDateIndo(todayStr)}
             </p>
           </div>
@@ -547,22 +547,22 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
           {/* Quick Shift Metrik Chips */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full lg:w-auto text-xs">
             <div className="bg-white/10 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10">
-              <p className="text-[10px] text-emerald-200 font-medium">Kas Tunai di Laci</p>
+              <p className="text-[10px] text-[#c9a961] font-medium">Kas Tunai di Laci</p>
               <p className="text-sm font-black text-amber-300 font-mono">{formatCurrency(shiftStats.cashTotal)}</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10">
-              <p className="text-[10px] text-emerald-200 font-medium">Non-Tunai / Bank</p>
+              <p className="text-[10px] text-[#c9a961] font-medium">Non-Tunai / Bank</p>
               <p className="text-sm font-black text-white font-mono">{formatCurrency(shiftStats.nonCashTotal)}</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10">
-              <p className="text-[10px] text-emerald-200 font-medium">Kamar Siap Huni</p>
-              <p className="text-sm font-black text-emerald-400 font-mono">{shiftStats.availableCount} Kamar</p>
+              <p className="text-[10px] text-[#c9a961] font-medium">Kamar Siap Huni</p>
+              <p className="text-sm font-black text-[#c9a961] font-mono">{shiftStats.availableCount} Kamar</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10">
-              <p className="text-[10px] text-emerald-200 font-medium">Tamu Menginap</p>
+              <p className="text-[10px] text-[#c9a961] font-medium">Tamu Menginap</p>
               <p className="text-sm font-black text-blue-300 font-mono">{shiftStats.occupiedCount} Kamar</p>
             </div>
           </div>
@@ -582,7 +582,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 <button
                   onClick={() => setActiveTab('ALL')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                    activeTab === 'ALL' ? 'bg-emerald-800 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    activeTab === 'ALL' ? 'bg-[#c9a961] text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   Semua
@@ -590,7 +590,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 <button
                   onClick={() => setActiveTab('ROOMS')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 ${
-                    activeTab === 'ROOMS' ? 'bg-emerald-800 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    activeTab === 'ROOMS' ? 'bg-[#c9a961] text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <BedDouble className="w-3.5 h-3.5" />
@@ -599,7 +599,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 <button
                   onClick={() => setActiveTab('FNB')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 ${
-                    activeTab === 'FNB' ? 'bg-emerald-800 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    activeTab === 'FNB' ? 'bg-[#c9a961] text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <Utensils className="w-3.5 h-3.5" />
@@ -608,7 +608,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 <button
                   onClick={() => setActiveTab('SERVICES')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 ${
-                    activeTab === 'SERVICES' ? 'bg-emerald-800 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    activeTab === 'SERVICES' ? 'bg-[#c9a961] text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -617,7 +617,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 <button
                   onClick={() => setActiveTab('FACILITY')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 ${
-                    activeTab === 'FACILITY' ? 'bg-emerald-800 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    activeTab === 'FACILITY' ? 'bg-[#c9a961] text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <Building className="w-3.5 h-3.5" />
@@ -642,7 +642,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   placeholder="Cari kamar / item..."
                   value={catalogSearch}
                   onChange={(e) => setCatalogSearch(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-700"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#c9a961]"
                 />
               </div>
             </div>
@@ -654,7 +654,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 <button
                   onClick={() => setSelectedBuildingId('all')}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors shrink-0 ${
-                    selectedBuildingId === 'all' ? 'bg-emerald-100 text-emerald-900 font-bold' : 'hover:bg-slate-100'
+                    selectedBuildingId === 'all' ? 'bg-[#f4ebd0] text-[#8a6d2b] font-bold' : 'hover:bg-slate-100'
                   }`}
                 >
                   Semua Gedung
@@ -664,7 +664,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     key={b.id}
                     onClick={() => setSelectedBuildingId(b.id)}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors shrink-0 ${
-                      selectedBuildingId === b.id ? 'bg-emerald-100 text-emerald-900 font-bold' : 'hover:bg-slate-100'
+                      selectedBuildingId === b.id ? 'bg-[#f4ebd0] text-[#8a6d2b] font-bold' : 'hover:bg-slate-100'
                     }`}
                   >
                     {b.name}
@@ -736,14 +736,14 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 <div id="catalog-room-rack" className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 scroll-mt-24">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
-                      <BedDouble className="w-4 h-4 text-emerald-800" />
+                      <BedDouble className="w-4 h-4 text-[#8a6d2b]" />
                       Kamar Siap Huni ({filteredRooms.length} Kamar)
                     </h3>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md hidden sm:inline font-medium">
+                      <span className="text-[10px] text-[#8a6d2b] bg-[#fbf8ee] border border-[#e8dfc8] px-2 py-0.5 rounded-md hidden sm:inline font-medium">
                         💡 Klik kartu kamar untuk memilih
                       </span>
-                      <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+                      <span className="text-[11px] text-[#8a6d2b] font-semibold bg-[#fbf8ee] px-2 py-0.5 rounded-full">
                         Durasi: {stayNights} Malam
                       </span>
                     </div>
@@ -766,14 +766,14 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                             onClick={() => handleAddRoomToCart(room)}
                             className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between ${
                               isSelected
-                                ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600'
-                                : 'border-slate-200 bg-white hover:border-emerald-400 hover:shadow-xs'
+                                ? 'border-[#c9a961] bg-[#fbf8ee] shadow-xs ring-2 ring-[#c9a961]'
+                                : 'border-slate-200 bg-white hover:border-[#c9a961] hover:shadow-xs'
                             }`}
                           >
                             <div>
                               <div className="flex items-center justify-between mb-1">
                                 <span className="font-mono text-sm font-black text-slate-900">{room.room_number}</span>
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${isSelected ? 'bg-emerald-700 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${isSelected ? 'bg-[#c9a961] text-white' : 'bg-[#f4ebd0] text-[#8a6d2b]'}`}>
                                   {isSelected ? '✓ DIPILIH' : 'SIAP'}
                                 </span>
                               </div>
@@ -782,7 +782,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                             </div>
 
                             <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                              <span className="font-bold text-emerald-900 font-mono">{formatCurrency(room.rate_per_night)}</span>
+                              <span className="font-bold text-[#8a6d2b] font-mono">{formatCurrency(room.rate_per_night)}</span>
                               <span className="text-[10px] text-slate-400">/mlm</span>
                             </div>
                           </div>
@@ -844,7 +844,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
             {/* Header Kasir Keranjang */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-emerald-800" />
+                <Receipt className="w-5 h-5 text-[#8a6d2b]" />
                 <h2 className="font-black text-sm text-slate-900 tracking-tight">Terminal Kasir Resepsionis</h2>
               </div>
               {cart.length > 0 && (
@@ -867,7 +867,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     type="button"
                     onClick={() => setGuestMode('NEW')}
                     className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      guestMode === 'NEW' ? 'bg-emerald-800 text-white' : 'bg-slate-200 text-slate-700'
+                      guestMode === 'NEW' ? 'bg-[#c9a961] text-white' : 'bg-slate-200 text-slate-700'
                     }`}
                   >
                     Tamu Baru
@@ -876,7 +876,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     type="button"
                     onClick={() => setGuestMode('EXISTING')}
                     className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      guestMode === 'EXISTING' ? 'bg-emerald-800 text-white' : 'bg-slate-200 text-slate-700'
+                      guestMode === 'EXISTING' ? 'bg-[#c9a961] text-white' : 'bg-slate-200 text-slate-700'
                     }`}
                   >
                     Pilih Terdaftar
@@ -977,12 +977,12 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
               <div className="pt-2.5 border-t border-slate-200/70 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
-                    <BedDouble className="w-3.5 h-3.5 text-emerald-800" />
+                    <BedDouble className="w-3.5 h-3.5 text-[#8a6d2b]" />
                     <span>Pilih Kamar Menginap (Siap Huni) *</span>
                   </label>
                   {selectedRoomInCart ? (
-                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                    <span className="text-[10px] font-bold bg-[#f4ebd0] text-[#8a6d2b] px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-[#8a6d2b]" />
                       Kamar Terpilih
                     </span>
                   ) : (
@@ -998,8 +998,8 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   onChange={(e) => handleSelectRoomFromDropdown(e.target.value)}
                   className={`w-full px-2.5 py-2 border rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     selectedRoomInCart
-                      ? 'border-emerald-500 bg-emerald-50/70 text-emerald-950 ring-1 ring-emerald-500 font-bold'
-                      : 'border-amber-400 bg-amber-50/70 text-slate-800 focus:ring-2 focus:ring-emerald-700 shadow-xs'
+                      ? 'border-[#c9a961] bg-[#fbf8ee] text-[#1A1410] ring-1 ring-[#c9a961] font-bold'
+                      : 'border-amber-400 bg-amber-50/70 text-slate-800 focus:ring-2 focus:ring-[#c9a961] shadow-xs'
                   }`}
                 >
                   <option value="">-- Klik untuk Pilih Kamar Siap Huni ({availableRooms.length} Kamar) --</option>
@@ -1016,10 +1016,10 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
 
                 {/* Info Status Kamar Terpilih atau Ajakan Pintasan ke Rak Kamar */}
                 {selectedRoomInCart ? (
-                  <div className="flex items-center justify-between text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900 px-2.5 py-1.5 rounded-lg">
+                  <div className="flex items-center justify-between text-[11px] bg-[#fbf8ee] border border-[#e8dfc8] text-[#8a6d2b] px-2.5 py-1.5 rounded-lg">
                     <div className="truncate">
                       <span className="font-bold">{selectedRoomInCart.name}</span>
-                      <span className="text-[10px] text-emerald-700 ml-1.5 font-medium">
+                      <span className="text-[10px] text-[#8a6d2b] ml-1.5 font-medium">
                         ({stayNights} Malam &bull; {formatCurrency(selectedRoomInCart.unitPrice * stayNights)})
                       </span>
                     </div>
@@ -1041,7 +1041,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                         const el = document.getElementById('catalog-room-rack');
                         if (el) el.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="text-[10px] font-bold text-emerald-800 hover:text-emerald-950 underline shrink-0 cursor-pointer flex items-center gap-1"
+                      className="text-[10px] font-bold text-[#8a6d2b] hover:text-[#1A1410] underline shrink-0 cursor-pointer flex items-center gap-1"
                     >
                       <span>Buka Rak Kamar</span>
                       <ChevronRight className="w-3 h-3" />
@@ -1094,7 +1094,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-semibold text-[#8a6d2b] bg-[#f4ebd0] px-2 py-0.5 rounded">
                             {item.qty} Malam
                           </span>
                         )}
@@ -1125,7 +1125,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     type="checkbox"
                     checked={hasDeposit}
                     onChange={(e) => setHasDeposit(e.target.checked)}
-                    className="w-4 h-4 text-emerald-700 rounded border-slate-300 focus:ring-emerald-700"
+                    className="w-4 h-4 text-[#8a6d2b] rounded border-slate-300 focus:ring-[#c9a961]"
                   />
                   <span>Ambil Deposit Jaminan Kunci</span>
                 </label>
@@ -1166,7 +1166,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 </div>
               )}
               {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-[#8a6d2b]">
                   <span>Diskon:</span>
                   <span className="font-mono">-{formatCurrency(discountAmount)}</span>
                 </div>
@@ -1174,7 +1174,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
 
               <div className="flex justify-between items-baseline pt-2 border-t border-slate-200">
                 <span className="font-black text-sm text-slate-900">TOTAL BAYAR:</span>
-                <span className="font-mono text-xl font-black text-emerald-900">
+                <span className="font-mono text-xl font-black text-[#8a6d2b]">
                   {formatCurrency(grandTotal)}
                 </span>
               </div>
@@ -1190,7 +1190,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   onClick={() => setPaymentMethod('CASH')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
                     paymentMethod === 'CASH'
-                      ? 'bg-emerald-800 text-white shadow-xs'
+                      ? 'bg-[#c9a961] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
@@ -1203,7 +1203,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   onClick={() => setPaymentMethod('QRIS')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
                     paymentMethod === 'QRIS'
-                      ? 'bg-emerald-800 text-white shadow-xs'
+                      ? 'bg-[#c9a961] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
@@ -1216,7 +1216,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   onClick={() => setPaymentMethod('TRANSFER')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
                     paymentMethod === 'TRANSFER'
-                      ? 'bg-emerald-800 text-white shadow-xs'
+                      ? 'bg-[#c9a961] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
@@ -1229,7 +1229,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   onClick={() => setPaymentMethod('SIMPONI')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
                     paymentMethod === 'SIMPONI'
-                      ? 'bg-emerald-800 text-white shadow-xs'
+                      ? 'bg-[#c9a961] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
@@ -1240,14 +1240,14 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
 
               {/* Cash Calculator Box if CASH selected */}
               {paymentMethod === 'CASH' && (
-                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 space-y-2 text-xs">
+                <div className="p-3 bg-[#fbf8ee] rounded-xl border border-[#e8dfc8] space-y-2 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-emerald-950">Uang Diterima (Rp):</span>
+                    <span className="font-bold text-[#1A1410]">Uang Diterima (Rp):</span>
                     <input
                       type="number"
                       value={cashTendered}
                       onChange={(e) => setCashTendered(Number(e.target.value) || 0)}
-                      className="w-36 px-2.5 py-1.5 border border-emerald-300 rounded-lg text-sm font-mono font-black text-right bg-white"
+                      className="w-36 px-2.5 py-1.5 border border-[#c9a961] rounded-lg text-sm font-mono font-black text-right bg-white"
                     />
                   </div>
 
@@ -1256,7 +1256,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     <button
                       type="button"
                       onClick={() => setCashTendered(grandTotal)}
-                      className="px-2 py-0.5 bg-white text-emerald-900 border border-emerald-300 rounded text-[10px] font-bold hover:bg-emerald-100"
+                      className="px-2 py-0.5 bg-white text-[#8a6d2b] border border-[#c9a961] rounded text-[10px] font-bold hover:bg-[#f4ebd0]"
                     >
                       Uang Pas
                     </button>
@@ -1265,16 +1265,16 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                         key={amt}
                         type="button"
                         onClick={() => setCashTendered(amt)}
-                        className="px-2 py-0.5 bg-white text-emerald-900 border border-emerald-300 rounded text-[10px] font-bold hover:bg-emerald-100"
+                        className="px-2 py-0.5 bg-white text-[#8a6d2b] border border-[#c9a961] rounded text-[10px] font-bold hover:bg-[#f4ebd0]"
                       >
                         {formatCurrency(amt)}
                       </button>
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1 border-t border-emerald-200 font-bold">
-                    <span className="text-emerald-900">Uang Kembalian:</span>
-                    <span className="font-mono text-sm text-emerald-950 font-black">
+                  <div className="flex items-center justify-between pt-1 border-t border-[#e8dfc8] font-bold">
+                    <span className="text-[#8a6d2b]">Uang Kembalian:</span>
+                    <span className="font-mono text-sm text-[#1A1410] font-black">
                       {formatCurrency(changeAmount)}
                     </span>
                   </div>
@@ -1287,7 +1287,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full py-3.5 text-sm font-black shadow-lg bg-emerald-700 hover:bg-emerald-800 tracking-wide uppercase"
+              className="w-full py-3.5 text-sm font-black shadow-lg bg-[#c9a961] hover:bg-[#c9a961] tracking-wide uppercase"
               icon={<Receipt className="w-5 h-5 text-amber-300" />}
               disabled={cart.length === 0 || !guestName.trim()}
             >

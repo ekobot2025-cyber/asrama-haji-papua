@@ -116,7 +116,7 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
             <span className="font-mono text-xs text-slate-500 font-semibold">
               No: {spkNo}
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#f4ebd0] text-[#8a6d2b]">
               Format 1 Halaman (A4)
             </span>
           </div>
@@ -129,7 +129,7 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
               variant="outline"
               size="sm"
               onClick={handleDirectPrint}
-              icon={<Printer className="w-4 h-4 text-emerald-800" />}
+              icon={<Printer className="w-4 h-4 text-[#8a6d2b]" />}
               title="Cetak langsung dokumen tanpa membuka tab baru"
             >
               Cetak Langsung
@@ -154,11 +154,11 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
             onClick={() => setViewMode('document')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
               viewMode === 'document'
-                ? 'bg-white text-emerald-900 shadow-xs font-bold'
+                ? 'bg-white text-[#8a6d2b] shadow-xs font-bold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <FileText className="w-3.5 h-3.5 text-emerald-700" />
+            <FileText className="w-3.5 h-3.5 text-[#8a6d2b]" />
             <span>Lembar Dokumen (1 Hal)</span>
           </button>
 
@@ -173,21 +173,21 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
             disabled={isGenerating}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
               viewMode === 'pdf'
-                ? 'bg-white text-emerald-900 shadow-xs font-bold'
+                ? 'bg-white text-[#8a6d2b] shadow-xs font-bold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             {isGenerating ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-700" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#8a6d2b]" />
             ) : (
-              <Eye className="w-3.5 h-3.5 text-emerald-700" />
+              <Eye className="w-3.5 h-3.5 text-[#8a6d2b]" />
             )}
             <span>Pratinjau PDF Asli (1 Hal)</span>
           </button>
         </div>
 
         <div className="text-[11px] text-slate-500 hidden sm:flex items-center gap-1 font-medium">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+          <ShieldCheck className="w-3.5 h-3.5 text-[#8a6d2b]" />
           <span>Tanpa Tab Baru &bull; Pas 1 Lembar A4</span>
         </div>
       </div>
@@ -201,7 +201,7 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
               <span className="font-semibold">Pratinjau File PDF Resmi (1 Halaman):</span>
               <button
                 onClick={handleGeneratePdfBlob}
-                className="text-emerald-700 hover:underline inline-flex items-center gap-1 text-[11px] font-bold"
+                className="text-[#8a6d2b] hover:underline inline-flex items-center gap-1 text-[11px] font-bold"
               >
                 <RefreshCw className="w-3 h-3" /> Segarkan Pratinjau
               </button>
@@ -222,16 +222,16 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
             style={{ minHeight: '920px' }}
           >
             {/* Kop Surat Kemenag Papua */}
-            <div className="border-b-2 border-emerald-950 pb-2.5 mb-2.5 text-center">
+            <div className="border-b-2 border-[#c9a961] pb-2.5 mb-2.5 text-center">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-800 text-amber-300 flex items-center justify-center font-serif font-black text-lg shadow-xs flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#c9a961] text-amber-300 flex items-center justify-center font-serif font-black text-lg shadow-xs flex-shrink-0">
                   K
                 </div>
                 <div>
                   <h2 className="text-xs font-black uppercase tracking-wide text-slate-900 leading-tight">
                     KEMENTERIAN AGAMA REPUBLIK INDONESIA
                   </h2>
-                  <h3 className="text-[11px] font-bold uppercase text-emerald-900 leading-tight mt-0.5">
+                  <h3 className="text-[11px] font-bold uppercase text-[#8a6d2b] leading-tight mt-0.5">
                     KANTOR WILAYAH KEMENTERIAN AGAMA PROVINSI PAPUA
                   </h3>
                   <p className="text-[9.5px] text-slate-700 font-semibold mt-0.5">
@@ -249,7 +249,7 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
               <h1 className="text-xs font-black text-slate-900 uppercase tracking-wider underline">
                 SURAT PERJANJIAN PEMAKAIAN SARANA DAN PRASARANA
               </h1>
-              <p className="font-mono text-[10px] font-bold text-emerald-900 mt-0.5">
+              <p className="font-mono text-[10px] font-bold text-[#8a6d2b] mt-0.5">
                 NOMOR: {spkNo}
               </p>
             </div>

@@ -35,7 +35,7 @@ export const ExecutiveDashboardPage: React.FC = () => {
 
   // Revenue by Category
   const revenueByCategory = [
-    { name: 'Sewa Kamar', amount: 38500000, color: '#0F5132' },
+    { name: 'Sewa Kamar', amount: 38500000, color: '#c9a961' },
     { name: 'Sewa Aula & Ruang Rapat', amount: 12500000, color: '#C59B27' },
     { name: 'Lapangan Manasik', amount: 4000000, color: '#2563eb' },
     { name: 'Layanan & Kebersihan', amount: 2400000, color: '#7c3aed' },
@@ -110,7 +110,7 @@ export const ExecutiveDashboardPage: React.FC = () => {
                   onClick={() => setTimeFilter(filter)}
                   className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                     timeFilter === filter
-                      ? 'bg-white text-emerald-900 shadow-xs'
+                      ? 'bg-white text-[#8a6d2b] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -124,7 +124,7 @@ export const ExecutiveDashboardPage: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={handleDirectPrint}
-            icon={<Printer className="w-4 h-4 text-emerald-800" />}
+            icon={<Printer className="w-4 h-4 text-[#8a6d2b]" />}
             className="hidden sm:inline-flex bg-white"
             title="Cetak langsung ringkasan eksekutif tanpa membuka tab baru"
           >
@@ -151,11 +151,11 @@ export const ExecutiveDashboardPage: React.FC = () => {
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
             <span>OKUPANSI RATA-RATA</span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
+            <TrendingUp className="w-4 h-4 text-[#c9a961]" />
           </div>
           <div className="text-3xl font-black text-slate-900">{currentOccupancy}%</div>
-          <p className="text-[11px] text-emerald-700 font-semibold mt-1.5 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> +6.2% vs target bulanan
+          <p className="text-[11px] text-[#8a6d2b] font-semibold mt-1.5 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#fbf8ee]0" /> +6.2% vs target bulanan
           </p>
         </div>
 
@@ -190,15 +190,15 @@ export const ExecutiveDashboardPage: React.FC = () => {
         </div>
 
         {/* Pendapatan */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs bg-gradient-to-br from-emerald-50/50 to-amber-50/30">
-          <div className="flex items-center justify-between text-xs text-emerald-800 font-semibold mb-1">
+        <div className="bg-white p-5 rounded-2xl border border-[#e8dfc8] shadow-xs bg-gradient-to-br from-[#fbf8ee] to-[#FAF9F5]">
+          <div className="flex items-center justify-between text-xs text-[#8a6d2b] font-semibold mb-1">
             <span>TOTAL PENERIMAAN (PNBP)</span>
-            <DollarSign className="w-4 h-4 text-emerald-700" />
+            <DollarSign className="w-4 h-4 text-[#8a6d2b]" />
           </div>
-          <div className="text-2xl font-black text-emerald-900 truncate">
+          <div className="text-2xl font-black text-[#8a6d2b] truncate">
             {formatCurrency(totalRevenue)}
           </div>
-          <p className="text-[11px] text-emerald-700 font-semibold mt-1.5">Penerimaan resmi disetor ke kas</p>
+          <p className="text-[11px] text-[#8a6d2b] font-semibold mt-1.5">Penerimaan resmi disetor ke kas</p>
         </div>
       </div>
 
@@ -278,7 +278,7 @@ export const ExecutiveDashboardPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
                           <div
-                            className="bg-emerald-700 h-full rounded-full"
+                            className="bg-[#c9a961] h-full rounded-full"
                             style={{ width: `${r.occupancy}%` }}
                           />
                         </div>

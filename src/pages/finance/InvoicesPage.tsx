@@ -103,7 +103,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <FileText className="w-6 h-6 text-emerald-800" />
+            <FileText className="w-6 h-6 text-[#8a6d2b]" />
             Tagihan & Faktur (Invoices)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -131,7 +131,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
               placeholder="Cari nomor invoice, nama pemesan, instansi..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -140,7 +140,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Status Invoice</option>
             <option value="PAID">PAID (Lunas)</option>
@@ -180,7 +180,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                       <p className="font-mono font-bold text-slate-900">{inv.invoice_no}</p>
                       {inv.pnbp_account_code && (
                         <div className="flex items-center gap-1 mt-1">
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800" title={inv.pnbp_account_name}>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#f4ebd0] text-[#8a6d2b]" title={inv.pnbp_account_name}>
                             Akun {inv.pnbp_account_code}
                           </span>
                           {inv.simponi_billing_code && (
@@ -210,7 +210,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                       {formatCurrency(inv.total_amount)}
                     </td>
 
-                    <td className="py-3 px-4 text-right font-semibold text-emerald-700">
+                    <td className="py-3 px-4 text-right font-semibold text-[#8a6d2b]">
                       {formatCurrency(inv.paid_amount)}
                     </td>
 
@@ -251,7 +251,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                             setPreviewInvoice(inv);
                             setIsPreviewOpen(true);
                           }}
-                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors"
+                          className="p-1.5 rounded-lg bg-[#fbf8ee] text-[#8a6d2b] hover:bg-[#f4ebd0] transition-colors"
                           title="Lihat & Cetak Faktur"
                         >
                           <Eye className="w-4 h-4" />
@@ -315,7 +315,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                   size="sm"
                   variant="outline"
                   onClick={handleDirectPrint}
-                  icon={<Printer className="w-4 h-4 text-emerald-800" />}
+                  icon={<Printer className="w-4 h-4 text-[#8a6d2b]" />}
                   title="Cetak langsung invoice tanpa tab baru"
                 >
                   Cetak Langsung
@@ -353,7 +353,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
               </div>
 
               <div className="text-right">
-                <span className="text-xl font-black text-emerald-900 tracking-wider">INVOICE</span>
+                <span className="text-xl font-black text-[#8a6d2b] tracking-wider">INVOICE</span>
                 <p className="font-mono text-xs font-bold text-slate-800 mt-1">{previewInvoice.invoice_no}</p>
                 <div className="mt-1">
                   <Badge status={previewInvoice.status} size="sm" />
@@ -366,7 +366,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-800 text-white tracking-wide uppercase">
+                    <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-[#c9a961] text-white tracking-wide uppercase">
                       PNBP Kemenag
                     </span>
                     <span className="font-mono font-bold text-slate-800">
@@ -381,7 +381,7 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                 {previewInvoice.simponi_billing_code && (
                   <div className="bg-white p-2 rounded-lg border border-slate-200 sm:text-right">
                     <p className="text-[10px] text-slate-500 font-semibold uppercase">Kode Billing SIMPONI (MPN-G3)</p>
-                    <p className="font-mono text-sm font-black text-emerald-900 tracking-wider">
+                    <p className="font-mono text-sm font-black text-[#8a6d2b] tracking-wider">
                       {previewInvoice.simponi_billing_code}
                     </p>
                     {previewInvoice.billing_expired_at && (
@@ -440,17 +440,17 @@ export const InvoicesPage: React.FC<InvoicesPageProps> = ({ initialInvoiceId, on
                 </tr>
                 {previewInvoice.discount_amount > 0 && (
                   <tr>
-                    <td colSpan={4} className="py-1 px-3 text-right text-emerald-700">Diskon:</td>
-                    <td className="py-1 px-3 text-right font-mono text-emerald-700">-{formatCurrency(previewInvoice.discount_amount)}</td>
+                    <td colSpan={4} className="py-1 px-3 text-right text-[#8a6d2b]">Diskon:</td>
+                    <td className="py-1 px-3 text-right font-mono text-[#8a6d2b]">-{formatCurrency(previewInvoice.discount_amount)}</td>
                   </tr>
                 )}
-                <tr className="text-sm bg-emerald-50/60 text-emerald-950 font-black">
+                <tr className="text-sm bg-[#fbf8ee] text-[#1A1410] font-black">
                   <td colSpan={4} className="py-2.5 px-3 text-right">TOTAL TAGIHAN:</td>
                   <td className="py-2.5 px-3 text-right font-mono">{formatCurrency(previewInvoice.total_amount)}</td>
                 </tr>
                 <tr>
                   <td colSpan={4} className="py-1 px-3 text-right text-slate-600">Telah Dibayar:</td>
-                  <td className="py-1 px-3 text-right font-mono text-emerald-700">{formatCurrency(previewInvoice.paid_amount)}</td>
+                  <td className="py-1 px-3 text-right font-mono text-[#8a6d2b]">{formatCurrency(previewInvoice.paid_amount)}</td>
                 </tr>
                 <tr className="text-rose-700">
                   <td colSpan={4} className="py-1.5 px-3 text-right">Sisa Pembayaran (Balance Due):</td>

@@ -104,7 +104,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         <div className="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200 transition-all">
           {/* Search Input Box */}
           <div className="relative border-b border-slate-200 px-4 py-3 flex items-center gap-3">
-            <Search className="w-5 h-5 text-emerald-800 shrink-0" />
+            <Search className="w-5 h-5 text-[#8a6d2b] shrink-0" />
             <input
               ref={inputRef}
               type="text"
@@ -158,7 +158,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 {/* Reservasi */}
                 {reservations.length > 0 && (
                   <div>
-                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-2 flex items-center gap-1.5">
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#8a6d2b] mb-2 flex items-center gap-1.5">
                       <CalendarCheck className="w-3.5 h-3.5" /> Reservasi ({reservations.length})
                     </h4>
                     <div className="space-y-1.5">
@@ -166,7 +166,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <div
                           key={r.id}
                           onClick={() => handleSelect('reservations', r.id)}
-                          className="p-2.5 rounded-xl hover:bg-emerald-50/60 border border-slate-100 hover:border-emerald-200 cursor-pointer flex items-center justify-between transition-colors text-xs"
+                          className="p-2.5 rounded-xl hover:bg-[#fbf8ee] border border-slate-100 hover:border-[#e8dfc8] cursor-pointer flex items-center justify-between transition-colors text-xs"
                         >
                           <div>
                             <div className="font-bold text-slate-900 flex items-center gap-2">
@@ -177,7 +177,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                             </div>
                             <p className="text-slate-500 text-[11px] mt-0.5">{r.activity_name || r.reservation_type} &bull; {r.total_guests} Tamu</p>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-emerald-700" />
+                          <ArrowRight className="w-4 h-4 text-[#8a6d2b]" />
                         </div>
                       ))}
                     </div>
@@ -187,7 +187,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 {/* Tamu */}
                 {guests.length > 0 && (
                   <div>
-                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-2 flex items-center gap-1.5">
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#8a6d2b] mb-2 flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5" /> Data Tamu ({guests.length})
                     </h4>
                     <div className="space-y-1.5">
@@ -195,7 +195,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <div
                           key={g.id}
                           onClick={() => handleSelect('guests', g.id)}
-                          className="p-2.5 rounded-xl hover:bg-emerald-50/60 border border-slate-100 hover:border-emerald-200 cursor-pointer flex items-center justify-between transition-colors text-xs"
+                          className="p-2.5 rounded-xl hover:bg-[#fbf8ee] border border-slate-100 hover:border-[#e8dfc8] cursor-pointer flex items-center justify-between transition-colors text-xs"
                         >
                           <div>
                             <div className="font-bold text-slate-900">{g.full_name}</div>
@@ -203,7 +203,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                               NIK: {maskNik(g.nik)} &bull; {g.phone} &bull; {g.regency_city}
                             </p>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-emerald-700" />
+                          <ArrowRight className="w-4 h-4 text-[#8a6d2b]" />
                         </div>
                       ))}
                     </div>
@@ -213,7 +213,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 {/* Rombongan */}
                 {groups.length > 0 && (
                   <div>
-                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-2 flex items-center gap-1.5">
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#8a6d2b] mb-2 flex items-center gap-1.5">
                       <Briefcase className="w-3.5 h-3.5" /> Rombongan ({groups.length})
                     </h4>
                     <div className="space-y-1.5">
@@ -221,7 +221,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <div
                           key={grp.id}
                           onClick={() => handleSelect('groups', grp.id)}
-                          className="p-2.5 rounded-xl hover:bg-emerald-50/60 border border-slate-100 hover:border-emerald-200 cursor-pointer flex items-center justify-between transition-colors text-xs"
+                          className="p-2.5 rounded-xl hover:bg-[#fbf8ee] border border-slate-100 hover:border-[#e8dfc8] cursor-pointer flex items-center justify-between transition-colors text-xs"
                         >
                           <div>
                             <div className="font-bold text-slate-900">{grp.group_name}</div>
@@ -229,7 +229,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                               PIC: {grp.pic_name} ({grp.pic_phone}) &bull; {grp.total_members} Peserta
                             </p>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-emerald-700" />
+                          <ArrowRight className="w-4 h-4 text-[#8a6d2b]" />
                         </div>
                       ))}
                     </div>
@@ -239,7 +239,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 {/* Kamar */}
                 {rooms.length > 0 && (
                   <div>
-                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-2 flex items-center gap-1.5">
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#8a6d2b] mb-2 flex items-center gap-1.5">
                       <BedDouble className="w-3.5 h-3.5" /> Kamar ({rooms.length})
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
@@ -247,7 +247,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <div
                           key={rm.id}
                           onClick={() => handleSelect('room-status-board', rm.id)}
-                          className="p-2.5 rounded-xl hover:bg-emerald-50/60 border border-slate-100 hover:border-emerald-200 cursor-pointer flex items-center justify-between transition-colors text-xs"
+                          className="p-2.5 rounded-xl hover:bg-[#fbf8ee] border border-slate-100 hover:border-[#e8dfc8] cursor-pointer flex items-center justify-between transition-colors text-xs"
                         >
                           <div>
                             <div className="font-bold text-slate-900">Kamar {rm.room_number}</div>
@@ -255,7 +255,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                               Status: <span className="font-semibold">{rm.status}</span> ({rm.capacity} Bed)
                             </p>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-emerald-700" />
+                          <ArrowRight className="w-4 h-4 text-[#8a6d2b]" />
                         </div>
                       ))}
                     </div>
@@ -265,7 +265,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 {/* Invoice */}
                 {invoices.length > 0 && (
                   <div>
-                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-2 flex items-center gap-1.5">
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#8a6d2b] mb-2 flex items-center gap-1.5">
                       <FileText className="w-3.5 h-3.5" /> Tagihan & Invoice ({invoices.length})
                     </h4>
                     <div className="space-y-1.5">
@@ -273,7 +273,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <div
                           key={inv.id}
                           onClick={() => handleSelect('invoices', inv.id)}
-                          className="p-2.5 rounded-xl hover:bg-emerald-50/60 border border-slate-100 hover:border-emerald-200 cursor-pointer flex items-center justify-between transition-colors text-xs"
+                          className="p-2.5 rounded-xl hover:bg-[#fbf8ee] border border-slate-100 hover:border-[#e8dfc8] cursor-pointer flex items-center justify-between transition-colors text-xs"
                         >
                           <div>
                             <div className="font-bold text-slate-900 flex items-center gap-2">
@@ -286,7 +286,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                               {inv.bill_to_name} &bull; Total: {formatCurrency(inv.total_amount)}
                             </p>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-emerald-700" />
+                          <ArrowRight className="w-4 h-4 text-[#8a6d2b]" />
                         </div>
                       ))}
                     </div>

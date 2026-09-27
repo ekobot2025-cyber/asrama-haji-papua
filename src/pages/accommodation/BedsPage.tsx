@@ -145,7 +145,7 @@ export const BedsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Layers className="w-6 h-6 text-emerald-800" />
+            <Layers className="w-6 h-6 text-[#8a6d2b]" />
             Manajemen Tempat Tidur Individual (Bed)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -154,7 +154,7 @@ export const BedsPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 text-xs font-bold text-emerald-900">
+          <div className="bg-[#fbf8ee] px-3 py-1.5 rounded-xl border border-[#e8dfc8] text-xs font-bold text-[#8a6d2b]">
             Total Terdaftar: {beds.length} Bed
           </div>
           {isHousekeeping ? (
@@ -184,7 +184,7 @@ export const BedsPage: React.FC = () => {
               placeholder="Cari kode bed, nomor kamar..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -193,7 +193,7 @@ export const BedsPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Status Bed</option>
             <option value="AVAILABLE">AVAILABLE (Kosong)</option>
@@ -208,13 +208,13 @@ export const BedsPage: React.FC = () => {
         {filtered.map((b) => (
           <div
             key={b.id}
-            className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-emerald-400 transition-colors group"
+            className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-[#c9a961] transition-colors group"
           >
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-mono font-bold text-xs text-slate-900">{b.bed_code}</span>
                 <span className={`w-2 h-2 rounded-full ${
-                  b.status === 'AVAILABLE' ? 'bg-emerald-500' :
+                  b.status === 'AVAILABLE' ? 'bg-[#fbf8ee]0' :
                   b.status === 'OCCUPIED' ? 'bg-blue-600' :
                   b.status === 'RESERVED' ? 'bg-amber-500' : 'bg-rose-500'
                 }`} />
@@ -230,7 +230,7 @@ export const BedsPage: React.FC = () => {
               <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleOpenModal(b)}
-                  className="p-1 rounded text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                  className="p-1 rounded text-slate-500 hover:text-[#8a6d2b] hover:bg-[#fbf8ee] transition-colors"
                   title={isHousekeeping ? "Update Kondisi & Kebersihan Bed" : "Edit Status Bed"}
                 >
                   <Edit className="w-3 h-3" />
@@ -284,7 +284,7 @@ export const BedsPage: React.FC = () => {
               value={formData.room_id}
               disabled={isHousekeeping}
               onChange={(e) => setFormData({ ...formData, room_id: e.target.value })}
-              className={`w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 ${
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961] ${
                 isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed opacity-90' : ''
               }`}
             >
@@ -308,7 +308,7 @@ export const BedsPage: React.FC = () => {
                 placeholder="A101-B01"
                 value={formData.bed_code}
                 onChange={(e) => setFormData({ ...formData, bed_code: e.target.value })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl font-mono uppercase font-bold focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl font-mono uppercase font-bold focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
                 }`}
               />
@@ -318,7 +318,7 @@ export const BedsPage: React.FC = () => {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as BedStatus })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 font-medium"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961] font-medium"
               >
                 <option value="AVAILABLE">AVAILABLE (Kosong & Bersih)</option>
                 <option value="RESERVED">RESERVED (Telah Dipesan)</option>
@@ -337,7 +337,7 @@ export const BedsPage: React.FC = () => {
               placeholder="Contoh: Tempat tidur bawah dekat jendela, sprei baru diganti, kondisi kasur baik"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 

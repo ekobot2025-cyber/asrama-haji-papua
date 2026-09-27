@@ -103,7 +103,7 @@ export const ReportsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-emerald-800" />
+            <BarChart3 className="w-6 h-6 text-[#8a6d2b]" />
             Laporan Manajemen & Rekapitulasi Operasional
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -116,7 +116,7 @@ export const ReportsPage: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={handleExportCSV}
-            icon={<FileSpreadsheet className="w-4 h-4 text-emerald-800" />}
+            icon={<FileSpreadsheet className="w-4 h-4 text-[#8a6d2b]" />}
             className="bg-white"
           >
             Ekspor Excel (CSV)
@@ -125,7 +125,7 @@ export const ReportsPage: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={handleDirectPrint}
-            icon={<Printer className="w-4 h-4 text-emerald-800" />}
+            icon={<Printer className="w-4 h-4 text-[#8a6d2b]" />}
             className="bg-white"
             title="Cetak langsung laporan tanpa membuka tab baru"
           >
@@ -159,7 +159,7 @@ export const ReportsPage: React.FC = () => {
             onClick={() => setReportType(tab.key as any)}
             className={`px-3 py-2 rounded-xl transition-all ${
               reportType === tab.key
-                ? 'bg-emerald-800 text-white shadow-xs font-bold'
+                ? 'bg-[#c9a961] text-white shadow-xs font-bold'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
             }`}
           >
@@ -222,7 +222,7 @@ export const ReportsPage: React.FC = () => {
             <p className="text-xs text-slate-600 mt-0.5">{settings.address}, {settings.city}</p>
           </div>
           <div className="text-right">
-            <h3 className="text-sm font-black uppercase text-emerald-950">
+            <h3 className="text-sm font-black uppercase text-[#1A1410]">
               {reportType === 'penginapan' && 'REKAPITULASI PENGINAPAN TAMU'}
               {reportType === 'okupansi' && 'LAPORAN TINGKAT OKUPANSI ASRAMA'}
               {reportType === 'reservasi' && 'REKAPITULASI PERMOHONAN RESERVASI'}
@@ -248,7 +248,7 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-slate-500 text-[10px] font-bold uppercase">Total Malam Kamar (Room Nights)</p>
-                <p className="text-2xl font-black text-emerald-900">
+                <p className="text-2xl font-black text-[#8a6d2b]">
                   {reservations.reduce((acc, r) => acc + calculateNights(r.checkin_date, r.checkout_date) * r.total_rooms_requested, 0)} Kamar/Malam
                 </p>
               </div>
@@ -305,7 +305,7 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-slate-500 text-[10px] font-bold uppercase">Bed Tersedia</p>
-                <p className="text-2xl font-black text-emerald-900">
+                <p className="text-2xl font-black text-[#8a6d2b]">
                   {rooms.reduce((acc, r) => acc + r.capacity, 0) - rooms.reduce((acc, r) => acc + (r.occupied_beds || 0), 0)} Bed
                 </p>
               </div>
@@ -339,7 +339,7 @@ export const ReportsPage: React.FC = () => {
                       <td className="py-2.5 px-3 text-center">{bRooms.length} Kamar</td>
                       <td className="py-2.5 px-3 text-center font-semibold">{cap} Bed</td>
                       <td className="py-2.5 px-3 text-center font-bold text-blue-700">{occ} Bed</td>
-                      <td className="py-2.5 px-3 text-center font-bold text-emerald-700">{cap - occ} Bed</td>
+                      <td className="py-2.5 px-3 text-center font-bold text-[#8a6d2b]">{cap - occ} Bed</td>
                       <td className="py-2.5 px-3 text-right font-black">{rate}%</td>
                     </tr>
                   );
@@ -375,7 +375,7 @@ export const ReportsPage: React.FC = () => {
                     <td className="py-2 px-3 font-medium text-slate-800">{g.regency_city}</td>
                     <td className="py-2 px-3 text-slate-600">{g.province}</td>
                     <td className="py-2 px-3">{g.guest_type}</td>
-                    <td className="py-2 px-3 text-center font-bold text-emerald-800">{g.stay_count} Kali</td>
+                    <td className="py-2 px-3 text-center font-bold text-[#8a6d2b]">{g.stay_count} Kali</td>
                   </tr>
                 ))}
               </tbody>
@@ -386,20 +386,20 @@ export const ReportsPage: React.FC = () => {
         {/* 4. Laporan Keuangan PNBP */}
         {reportType === 'keuangan' && (
           <div className="space-y-4 text-xs">
-            <div className="grid grid-cols-3 gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+            <div className="grid grid-cols-3 gap-4 p-4 bg-[#fbf8ee] rounded-xl border border-[#e8dfc8]">
               <div>
-                <p className="text-emerald-800 text-[10px] font-bold uppercase">Total Penerimaan Disetor</p>
-                <p className="text-2xl font-black text-emerald-950 font-mono">
+                <p className="text-[#8a6d2b] text-[10px] font-bold uppercase">Total Penerimaan Disetor</p>
+                <p className="text-2xl font-black text-[#1A1410] font-mono">
                   {formatCurrency(payments.reduce((acc, p) => acc + p.amount, 0))}
                 </p>
               </div>
               <div>
-                <p className="text-emerald-800 text-[10px] font-bold uppercase">Jumlah Transaksi Kwitansi</p>
-                <p className="text-2xl font-black text-emerald-950">{payments.length} Lembar</p>
+                <p className="text-[#8a6d2b] text-[10px] font-bold uppercase">Jumlah Transaksi Kwitansi</p>
+                <p className="text-2xl font-black text-[#1A1410]">{payments.length} Lembar</p>
               </div>
               <div>
-                <p className="text-emerald-800 text-[10px] font-bold uppercase">Status Setoran Kas Negara</p>
-                <p className="text-xl font-bold text-emerald-900 mt-1">Tertib & Tervalidasi</p>
+                <p className="text-[#8a6d2b] text-[10px] font-bold uppercase">Status Setoran Kas Negara</p>
+                <p className="text-xl font-bold text-[#8a6d2b] mt-1">Tertib & Tervalidasi</p>
               </div>
             </div>
 
@@ -455,7 +455,7 @@ export const ReportsPage: React.FC = () => {
                     <td className="py-2.5 px-3 text-center font-semibold">{fac.capacity} Orang</td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold">{formatCurrency(fac.daily_rate)}</td>
                     <td className="py-2.5 px-3 text-center">
-                      <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      <span className="font-bold text-[#8a6d2b] bg-[#fbf8ee] px-2 py-0.5 rounded-full border border-[#e8dfc8]">
                         {fac.status}
                       </span>
                     </td>
@@ -475,7 +475,7 @@ export const ReportsPage: React.FC = () => {
                 <h4 className="text-base font-black text-white">Laporan Penutupan Hari Operasional Wisma</h4>
                 <p className="text-xs text-slate-300 mt-0.5">Tanggal Operasional: {formatDateIndo('2026-09-26')}</p>
               </div>
-              <span className="text-xs font-bold bg-emerald-500 text-slate-950 px-3 py-1 rounded-full">
+              <span className="text-xs font-bold bg-[#fbf8ee]0 text-slate-950 px-3 py-1 rounded-full">
                 Audit Seimbang (Balanced)
               </span>
             </div>
@@ -489,7 +489,7 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                 <span className="text-[10px] font-bold uppercase text-slate-500 block">Check-in Hari Ini</span>
-                <span className="text-xl font-black text-emerald-700">{reservations.filter(r => r.checkin_date === '2026-09-26').length} Tamu / Grup</span>
+                <span className="text-xl font-black text-[#8a6d2b]">{reservations.filter(r => r.checkin_date === '2026-09-26').length} Tamu / Grup</span>
                 <span className="text-[10px] text-slate-500 block mt-0.5">Kedatangan terdaftar</span>
               </div>
               <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
@@ -499,7 +499,7 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                 <span className="text-[10px] font-bold uppercase text-slate-500 block">Total Penerimaan Kasir & Bank</span>
-                <span className="text-xl font-black text-emerald-900 font-mono">{formatCurrency(payments.reduce((acc, p) => acc + p.amount, 0))}</span>
+                <span className="text-xl font-black text-[#8a6d2b] font-mono">{formatCurrency(payments.reduce((acc, p) => acc + p.amount, 0))}</span>
                 <span className="text-[10px] text-slate-500 block mt-0.5">Kasir PNBP terverifikasi</span>
               </div>
             </div>

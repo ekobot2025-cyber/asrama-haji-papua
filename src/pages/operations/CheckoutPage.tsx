@@ -127,7 +127,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <LogOut className="w-6 h-6 text-emerald-800" />
+            <LogOut className="w-6 h-6 text-[#8a6d2b]" />
             Check-out Tamu & Serah Terima Kamar
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -142,7 +142,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
             placeholder="Cari tamu yang sedang menginap..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
           />
         </div>
       </div>
@@ -166,7 +166,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs font-bold text-emerald-900">{rsv.reservation_no}</span>
+                    <span className="font-mono text-xs font-bold text-[#8a6d2b]">{rsv.reservation_no}</span>
                     <Badge status="OCCUPIED" label="Menginap" size="sm" />
                   </div>
 
@@ -176,7 +176,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
                   <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">Kamar Ditempati:</span>
-                      <span className="font-bold text-emerald-800">
+                      <span className="font-bold text-[#8a6d2b]">
                         {assignedRoomsStr ? `Kamar ${assignedRoomsStr}` : '-'}
                       </span>
                     </div>
@@ -193,7 +193,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
 
                     <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
                       <span className="text-slate-500">Status Pembayaran:</span>
-                      <span className={`font-bold ${isUnpaid ? 'text-rose-600' : 'text-emerald-700'}`}>
+                      <span className={`font-bold ${isUnpaid ? 'text-rose-600' : 'text-[#8a6d2b]'}`}>
                         {isUnpaid ? `Belum Lunas: ${formatCurrency(rsv.remaining_amount)}` : 'LUNAS'}
                       </span>
                     </div>
@@ -254,7 +254,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
             <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1.5 text-slate-800">
               <div className="flex justify-between">
                 <span className="text-slate-500">Kamar yang Dikosongkan:</span>
-                <span className="font-bold text-emerald-800">{getAssignedRooms(selectedRsv.id)}</span>
+                <span className="font-bold text-[#8a6d2b]">{getAssignedRooms(selectedRsv.id)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Petugas Checkout:</span>
@@ -285,7 +285,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
                 type="checkbox"
                 checked={returnDeposit}
                 onChange={(e) => setReturnDeposit(e.target.checked)}
-                className="rounded text-emerald-800 focus:ring-emerald-700 w-4 h-4"
+                className="rounded text-[#8a6d2b] focus:ring-[#c9a961] w-4 h-4"
               />
               <span>Kunci kartu diterima lengkap & jaminan/deposit dikembalikan</span>
             </label>

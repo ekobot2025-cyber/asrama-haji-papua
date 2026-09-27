@@ -278,7 +278,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 localStorage.clear();
                 window.location.reload();
               }}
-              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 rounded-xl text-xs font-semibold text-white transition-colors"
+              className="px-4 py-2 bg-[#c9a961] hover:bg-[#c9a961] rounded-xl text-xs font-semibold text-white transition-colors"
             >
               Reset Data & Muat Ulang
             </button>

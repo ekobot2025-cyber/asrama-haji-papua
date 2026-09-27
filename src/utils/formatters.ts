@@ -96,7 +96,7 @@ export function getStatusColor(status: string): { bg: string; text: string; bord
     case 'COMPLETED':
     case 'CONFIRMED':
     case 'ACTIVE':
-      return { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', dot: 'bg-emerald-500' };
+      return { bg: 'bg-[#fbf8ee]', text: 'text-[#8a6d2b]', border: 'border-[#e8dfc8]', dot: 'bg-[#c9a961]' };
     
     case 'OCCUPIED':
     case 'CHECKED_IN':

@@ -127,7 +127,7 @@ export const UsersPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <UserCog className="w-6 h-6 text-emerald-800" />
+            <UserCog className="w-6 h-6 text-[#8a6d2b]" />
             Manajemen Pengguna & Hak Akses (RBAC)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -156,7 +156,7 @@ export const UsersPage: React.FC = () => {
                 <span className="font-mono text-[10px] text-slate-400">@{u.username}</span>
                 <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
                   u.status === 'ACTIVE' 
-                    ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' 
+                    ? 'text-[#8a6d2b] bg-[#fbf8ee] border border-[#e8dfc8]' 
                     : 'text-slate-600 bg-slate-100'
                 }`}>
                   <CheckCircle2 className="w-3 h-3" /> {u.status}
@@ -164,7 +164,7 @@ export const UsersPage: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-800 text-white font-bold flex items-center justify-center text-sm shadow-xs shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#c9a961] text-white font-bold flex items-center justify-center text-sm shadow-xs shrink-0">
                   {u.name.charAt(0)}
                 </div>
                 <div className="overflow-hidden">
@@ -176,7 +176,7 @@ export const UsersPage: React.FC = () => {
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 mb-2">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500">Peran / Role:</span>
-                  <span className="font-bold text-emerald-900 bg-emerald-100/60 px-2 py-0.5 rounded">
+                  <span className="font-bold text-[#8a6d2b] bg-[#f4ebd0] px-2 py-0.5 rounded">
                     {u.role}
                   </span>
                 </div>
@@ -235,7 +235,7 @@ export const UsersPage: React.FC = () => {
                 placeholder="petugas_desk"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -243,7 +243,7 @@ export const UsersPage: React.FC = () => {
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="SUPER_ADMIN">SUPER_ADMIN (Semua Modul & Konfigurasi)</option>
                 <option value="ADMIN_PENGINAPAN">ADMIN_PENGINAPAN (Reservasi & Alokasi)</option>
@@ -263,7 +263,7 @@ export const UsersPage: React.FC = () => {
               placeholder="Contoh: Muhammad Ramadhan, S.Sos"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -275,7 +275,7 @@ export const UsersPage: React.FC = () => {
                 placeholder="petugas@kemenag.go.id"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -285,7 +285,7 @@ export const UsersPage: React.FC = () => {
                 placeholder="0812-xxxx-xxxx"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
           </div>
@@ -298,7 +298,7 @@ export const UsersPage: React.FC = () => {
                 placeholder="Front Desk / Kasir / Housekeeping"
                 value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -306,7 +306,7 @@ export const UsersPage: React.FC = () => {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as User['status'] })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="ACTIVE">ACTIVE (Dapat Login)</option>
                 <option value="INACTIVE">INACTIVE (Dibekukan)</option>

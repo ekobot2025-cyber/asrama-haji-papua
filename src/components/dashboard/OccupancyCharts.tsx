@@ -17,9 +17,9 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
   }, {} as Record<string, number>);
 
   const pieData = [
-    { name: 'Available', value: statusCounts['AVAILABLE'] || 0, color: '#16a34a' },
+    { name: 'Available', value: statusCounts['AVAILABLE'] || 0, color: '#c9a961' },
     { name: 'Occupied', value: statusCounts['OCCUPIED'] || 0, color: '#2563eb' },
-    { name: 'Reserved', value: statusCounts['RESERVED'] || 0, color: '#f59e0b' },
+    { name: 'Reserved', value: statusCounts['RESERVED'] || 0, color: '#d4af37' },
     { name: 'Cleaning', value: statusCounts['CLEANING'] || 0, color: '#ea580c' },
     { name: 'Maintenance', value: statusCounts['MAINTENANCE'] || 0, color: '#e11d48' },
   ];
@@ -47,11 +47,11 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
 
   // 4. Breakdown by Activity/Guest Type
   const guestTypeData = [
-    { name: 'Jamaah Haji', count: 185, fill: '#0f5132' },
+    { name: 'Jamaah Haji', count: 185, fill: '#c9a961' },
     { name: 'Kedinasan', count: 95, fill: '#1d4ed8' },
-    { name: 'Manasik', count: 68, fill: '#c59b27' },
+    { name: 'Manasik', count: 68, fill: '#d4af37' },
     { name: 'Pelatihan', count: 52, fill: '#7c3aed' },
-    { name: 'Umum', count: 28, fill: '#059669' },
+    { name: 'Umum', count: 28, fill: '#8a6d2b' },
   ];
 
   return (
@@ -63,7 +63,7 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
             <h4 className="text-sm font-bold text-slate-900">Tren Okupansi Tempat Tidur (7 Hari Terakhir)</h4>
             <p className="text-xs text-slate-500">Persentase tingkat hunian asrama haji Jayapura</p>
           </div>
-          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/80 shadow-2xs">
+          <span className="text-xs font-bold text-[#8a6d2b] bg-[#fbf8ee] px-3 py-1 rounded-full border border-[#e8dfc8] shadow-2xs">
             Rata-rata 62.1%
           </span>
         </div>
@@ -72,8 +72,8 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
             <AreaChart data={sevenDaysData}>
               <defs>
                 <linearGradient id="colorOcc" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0F5132" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#0F5132" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="#c9a961" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#c9a961" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -83,7 +83,7 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
                 formatter={(val: number) => [`${val}%`, 'Tingkat Okupansi']} 
                 contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '12px' }}
               />
-              <Area type="monotone" dataKey="occupancy" stroke="#0F5132" strokeWidth={3} fillOpacity={1} fill="url(#colorOcc)" />
+              <Area type="monotone" dataKey="occupancy" stroke="#c9a961" strokeWidth={3} fillOpacity={1} fill="url(#colorOcc)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>

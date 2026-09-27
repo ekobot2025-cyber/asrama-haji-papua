@@ -43,13 +43,13 @@ export const ScrollToTopButton: React.FC = () => {
         onClick={handleScrollToTop}
         title="Kembali ke Halaman Paling Atas"
         aria-label="Kembali ke Halaman Paling Atas"
-        className={`flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-950 via-emerald-800 to-emerald-700 hover:from-emerald-900 hover:to-emerald-600 text-white shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 cursor-pointer group ${
+        className={`flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-[#1A1410] via-[#2A2018] to-[#382b20] hover:from-[#2A2018] hover:to-[#1A1410] text-white shadow-xl hover:shadow-[#c9a961]/30 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-[#c9a961] focus:outline-none focus:ring-2 focus:ring-[#c9a961] focus:ring-offset-2 cursor-pointer group ${
           visible
             ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
             : 'opacity-0 translate-y-4 scale-75 pointer-events-none'
         }`}
       >
-        <ArrowUp className="w-5 h-5 text-amber-300 stroke-[2.8] group-hover:-translate-y-0.5 transition-transform" />
+        <ArrowUp className="w-5 h-5 text-[#c9a961] stroke-[2.8] group-hover:-translate-y-0.5 transition-transform" />
       </button>
     </div>
   );

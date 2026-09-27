@@ -148,7 +148,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <CreditCard className="w-6 h-6 text-emerald-800" />
+            <CreditCard className="w-6 h-6 text-[#8a6d2b]" />
             Kasir Pembayaran & Kwitansi Resmi
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -181,7 +181,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
             placeholder="Cari nomor kwitansi, bukti pembayaran, nama pembayar..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
           />
         </div>
       </div>
@@ -212,7 +212,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
                 filtered.map((pay) => (
                   <tr key={pay.id} className="hover:bg-slate-50/60 transition-colors">
                     <td className="py-3 px-4">
-                      <p className="font-mono font-bold text-emerald-900">{pay.receipt_no}</p>
+                      <p className="font-mono font-bold text-[#8a6d2b]">{pay.receipt_no}</p>
                       <p className="text-[10px] text-slate-400 font-mono mt-0.5">{pay.payment_no}</p>
                     </td>
 
@@ -245,7 +245,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
                           setSelectedPayment(pay);
                           setIsReceiptOpen(true);
                         }}
-                        className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors inline-flex items-center gap-1 font-bold text-[11px]"
+                        className="p-1.5 rounded-lg bg-[#fbf8ee] text-[#8a6d2b] hover:bg-[#f4ebd0] transition-colors inline-flex items-center gap-1 font-bold text-[11px]"
                         title="Lihat & Cetak Kwitansi"
                       >
                         <Receipt className="w-3.5 h-3.5" />
@@ -296,7 +296,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
                 required
                 value={amount}
                 onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900 text-sm"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-[#8a6d2b] text-sm"
               />
               <p className="text-[10px] text-slate-400 mt-1 italic">
                 Terbilang: {amount > 0 ? terbilang(amount) : '-'}
@@ -369,7 +369,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
                   size="sm"
                   variant="outline"
                   onClick={handleDirectPrint}
-                  icon={<Printer className="w-4 h-4 text-emerald-800" />}
+                  icon={<Printer className="w-4 h-4 text-[#8a6d2b]" />}
                   title="Cetak langsung kwitansi tanpa tab baru"
                 >
                   Cetak Langsung
@@ -406,7 +406,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
               </div>
 
               <div className="text-right">
-                <span className="text-lg font-black tracking-widest uppercase text-emerald-950 block">
+                <span className="text-lg font-black tracking-widest uppercase text-[#1A1410] block">
                   KWITANSI
                 </span>
                 <p className="font-mono text-xs font-bold text-slate-800">{selectedPayment.receipt_no}</p>
@@ -444,9 +444,9 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
 
             {/* Nominal Box & Signature */}
             <div className="flex items-end justify-between pt-4">
-              <div className="bg-emerald-50/80 border-2 border-emerald-800 px-6 py-3 rounded-xl">
-                <span className="text-[10px] font-bold uppercase text-emerald-900 block">Jumlah Uang:</span>
-                <span className="text-2xl font-black font-mono text-emerald-950">
+              <div className="bg-[#fbf8ee] border-2 border-[#c9a961] px-6 py-3 rounded-xl">
+                <span className="text-[10px] font-bold uppercase text-[#8a6d2b] block">Jumlah Uang:</span>
+                <span className="text-2xl font-black font-mono text-[#1A1410]">
                   {formatCurrency(selectedPayment.amount)}
                 </span>
               </div>

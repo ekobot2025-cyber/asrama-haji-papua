@@ -40,7 +40,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => onPageChange(page)}
             className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
               currentPage === page
-                ? 'bg-emerald-800 text-white shadow-sm'
+                ? 'bg-[#c9a961] text-white shadow-sm'
                 : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >

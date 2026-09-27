@@ -29,7 +29,7 @@ export const SettingsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Settings className="w-6 h-6 text-emerald-800" />
+            <Settings className="w-6 h-6 text-[#8a6d2b]" />
             Pengaturan Sistem & Identitas Lembaga
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -42,7 +42,7 @@ export const SettingsPage: React.FC = () => {
         {/* Identitas Lembaga */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
           <h3 className="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-            <Building className="w-4 h-4 text-emerald-800" />
+            <Building className="w-4 h-4 text-[#8a6d2b]" />
             Identitas Unit Pelaksana Teknis (UPT)
           </h3>
 
@@ -113,7 +113,7 @@ export const SettingsPage: React.FC = () => {
         {/* Pejabat Penandatangan */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
           <h3 className="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-            <UserCheck className="w-4 h-4 text-emerald-800" />
+            <UserCheck className="w-4 h-4 text-[#8a6d2b]" />
             Pejabat Penandatangan Laporan & SK
           </h3>
 
@@ -143,7 +143,7 @@ export const SettingsPage: React.FC = () => {
         {/* Rekening Pembayaran Resmi */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
           <h3 className="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-            <Landmark className="w-4 h-4 text-emerald-800" />
+            <Landmark className="w-4 h-4 text-[#8a6d2b]" />
             Rekening Resmi Penerimaan PNBP (Tercetak di Invoice)
           </h3>
 

@@ -49,17 +49,17 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-md w-full pointer-events-none">
         {toasts.map((toast) => {
           const icons = {
-            success: <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />,
+            success: <CheckCircle2 className="w-5 h-5 text-[#c9a961] shrink-0 mt-0.5" />,
             error: <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />,
             warning: <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />,
-            info: <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />,
+            info: <Info className="w-5 h-5 text-[#8a6d2b] shrink-0 mt-0.5" />,
           };
 
           const borders = {
-            success: 'border-l-4 border-l-emerald-600 border-slate-200 bg-white shadow-lg',
+            success: 'border-l-4 border-l-[#c9a961] border-slate-200 bg-white shadow-lg',
             error: 'border-l-4 border-l-rose-600 border-slate-200 bg-white shadow-lg',
             warning: 'border-l-4 border-l-amber-600 border-slate-200 bg-white shadow-lg',
-            info: 'border-l-4 border-l-blue-600 border-slate-200 bg-white shadow-lg',
+            info: 'border-l-4 border-l-[#8a6d2b] border-slate-200 bg-white shadow-lg',
           };
 
           return (

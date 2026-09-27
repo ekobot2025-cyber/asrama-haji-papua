@@ -29,7 +29,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   const icon = {
     danger: <AlertCircle className="w-10 h-10 text-rose-600 bg-rose-50 p-2 rounded-full" />,
     warning: <AlertTriangle className="w-10 h-10 text-amber-600 bg-amber-50 p-2 rounded-full" />,
-    primary: <HelpCircle className="w-10 h-10 text-emerald-600 bg-emerald-50 p-2 rounded-full" />,
+    primary: <HelpCircle className="w-10 h-10 text-[#c9a961] bg-[#fbf8ee] border border-[#e8dfc8] p-2 rounded-full" />,
   };
 
   return (

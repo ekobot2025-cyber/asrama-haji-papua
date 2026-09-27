@@ -92,7 +92,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
       return { type: 'MIXED', label: 'Campur / Keluarga', badge: 'bg-amber-100 text-amber-900 border-amber-300', icon: '👥' };
     }
     if (hasMale) {
-      return { type: 'IKHWAN', label: 'Ikhwan (Pria)', badge: 'bg-teal-100 text-teal-900 border-teal-300', icon: '👳‍♂️' };
+      return { type: 'IKHWAN', label: 'Ikhwan (Pria)', badge: 'bg-[#fbf8ee] text-[#8a6d2b] border-[#e8dfc8]', icon: '👳‍♂️' };
     }
     if (hasFemale) {
       return { type: 'AKHWAT', label: 'Akhwat (Wanita)', badge: 'bg-purple-100 text-purple-900 border-purple-300', icon: '🧕' };
@@ -167,7 +167,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
             variant="secondary"
             size="sm"
             onClick={loadData}
-            icon={<RefreshCw className="w-4 h-4 text-emerald-800" />}
+            icon={<RefreshCw className="w-4 h-4 text-[#8a6d2b]" />}
           >
             Muat Ulang
           </Button>
@@ -187,14 +187,14 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
         <button
           onClick={() => setSelectedStatus(selectedStatus === 'AVAILABLE' ? 'all' : 'AVAILABLE')}
           className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all duration-200 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover ${
-            selectedStatus === 'AVAILABLE' ? 'ring-2 ring-emerald-600 bg-emerald-50/70 border-emerald-300' : 'bg-white border-slate-200/80 hover:border-slate-300'
+            selectedStatus === 'AVAILABLE' ? 'ring-2 ring-[#c9a961] bg-[#fbf8ee] border-[#c9a961]' : 'bg-white border-slate-200/80 hover:border-slate-300'
           }`}
         >
           <div>
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Available</p>
-            <p className="text-2xl font-black text-emerald-800">{availableCount}</p>
+            <p className="text-2xl font-black text-[#8a6d2b]">{availableCount}</p>
           </div>
-          <span className="w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
+          <span className="w-3 h-3 rounded-full bg-[#fbf8ee]0 ring-4 ring-[#c9a961]/20" />
         </button>
 
         <button
@@ -264,7 +264,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
               placeholder="Contoh: A101, B102..."
               value={searchNumber}
               onChange={(e) => setSearchNumber(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -280,7 +280,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
               setSelectedBuildingId(e.target.value);
               setSelectedFloorId('all'); // Reset floor
             }}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Gedung</option>
             {buildings.map((b) => (
@@ -297,7 +297,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
           <select
             value={selectedFloorId}
             onChange={(e) => setSelectedFloorId(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Lantai</option>
             {floors
@@ -316,7 +316,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
           <select
             value={selectedGenderFilter}
             onChange={(e) => setSelectedGenderFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Kamar</option>
             <option value="IKHWAN">👳‍♂️ Ikhwan (Pria)</option>
@@ -357,7 +357,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
               {/* Floor Group Header */}
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-800" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#c9a961]" />
                   <h3 className="text-sm font-bold text-slate-900 tracking-wide uppercase">
                     {groupTitle}
                   </h3>
@@ -374,7 +374,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
 
                   // Card border color based on status
                   const statusStyles: Record<RoomStatus, { border: string; bg: string; text: string; topAccent: string }> = {
-                    AVAILABLE: { border: 'border-slate-200/80 hover:border-emerald-400', bg: 'bg-white hover:bg-emerald-50/20', text: 'text-emerald-700', topAccent: 'bg-emerald-500' },
+                    AVAILABLE: { border: 'border-slate-200/80 hover:border-[#c9a961]', bg: 'bg-white hover:bg-[#fbf8ee]', text: 'text-[#8a6d2b]', topAccent: 'bg-[#fbf8ee]0' },
                     OCCUPIED: { border: 'border-slate-200/80 hover:border-blue-400', bg: 'bg-white hover:bg-blue-50/20', text: 'text-blue-700', topAccent: 'bg-blue-600' },
                     RESERVED: { border: 'border-slate-200/80 hover:border-amber-400', bg: 'bg-white hover:bg-amber-50/20', text: 'text-amber-700', topAccent: 'bg-amber-500' },
                     CLEANING: { border: 'border-slate-200/80 hover:border-orange-400', bg: 'bg-white hover:bg-orange-50/20', text: 'text-orange-700', topAccent: 'bg-orange-500' },
@@ -394,11 +394,11 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                       <div>
                         {/* Header: Room Number and Status */}
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-base font-black text-slate-900 group-hover:text-emerald-800 transition-colors">
+                          <span className="text-base font-black text-slate-900 group-hover:text-[#8a6d2b] transition-colors">
                             {r.room_number}
                           </span>
                           <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full ${
-                            r.status === 'AVAILABLE' ? 'bg-emerald-100 text-emerald-800' :
+                            r.status === 'AVAILABLE' ? 'bg-[#f4ebd0] text-[#8a6d2b]' :
                             r.status === 'OCCUPIED' ? 'bg-blue-100 text-blue-800' :
                             r.status === 'RESERVED' ? 'bg-amber-100 text-amber-800' :
                             r.status === 'CLEANING' ? 'bg-orange-100 text-orange-800' :
@@ -527,7 +527,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
             <div>
               <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-emerald-800" /> Alokasi Tempat Tidur & Penghuni ({selectedRoom.capacity} Bed)
+                  <Layers className="w-3.5 h-3.5 text-[#8a6d2b]" /> Alokasi Tempat Tidur & Penghuni ({selectedRoom.capacity} Bed)
                 </span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getRoomGenderProfile(selectedRoom.id).badge}`}>
                   {getRoomGenderProfile(selectedRoom.id).icon} {getRoomGenderProfile(selectedRoom.id).label}
@@ -583,7 +583,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                           {rsv && (
                             <div className="pt-1 border-t border-slate-100 text-[10px] text-slate-500 flex justify-between">
                               <span>Reservasi: <strong className="text-slate-800">{rsv.reservation_no}</strong></span>
-                              <span>Status: <strong className="text-emerald-700">{rsv.status}</strong></span>
+                              <span>Status: <strong className="text-[#8a6d2b]">{rsv.status}</strong></span>
                             </div>
                           )}
                         </div>

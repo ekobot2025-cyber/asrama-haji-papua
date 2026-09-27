@@ -120,7 +120,7 @@ export const InstitutionsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Landmark className="w-6 h-6 text-emerald-800" />
+            <Landmark className="w-6 h-6 text-[#8a6d2b]" />
             Master Instansi & Lembaga Rekanan
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -147,7 +147,7 @@ export const InstitutionsPage: React.FC = () => {
               placeholder="Cari nama instansi, kontak person, alamat..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -160,7 +160,7 @@ export const InstitutionsPage: React.FC = () => {
             className="p-5 rounded-2xl border border-slate-200 bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow text-xs group"
           >
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-block mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-0.5 rounded-full border border-[#e8dfc8] inline-block mb-2">
                 {inst.type}
               </span>
               <h3 className="text-sm font-bold text-slate-900 leading-snug mb-2">{inst.name}</h3>
@@ -226,7 +226,7 @@ export const InstitutionsPage: React.FC = () => {
               placeholder="Contoh: Kantor Kemenag Kabupaten Keerom"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -236,7 +236,7 @@ export const InstitutionsPage: React.FC = () => {
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="KEMENAG">Kementerian Agama</option>
                 <option value="PEMDA">Pemerintah Daerah (Pemda)</option>
@@ -255,7 +255,7 @@ export const InstitutionsPage: React.FC = () => {
                 placeholder="0967-xxxxxx atau 0812-xxxx-xxxx"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
           </div>
@@ -269,7 +269,7 @@ export const InstitutionsPage: React.FC = () => {
                 placeholder="Nama PIC / Kasubbag TU"
                 value={formData.contact_person}
                 onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -279,7 +279,7 @@ export const InstitutionsPage: React.FC = () => {
                 placeholder="instansi@kemenag.go.id"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
           </div>
@@ -291,7 +291,7 @@ export const InstitutionsPage: React.FC = () => {
               placeholder="Jalan, Distrik, Kabupaten / Kota"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 

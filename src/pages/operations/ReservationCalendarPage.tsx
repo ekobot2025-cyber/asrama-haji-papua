@@ -82,7 +82,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
       type: 'CHECKIN',
       date: r.checkin_date,
       data: r,
-      color: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+      color: 'bg-[#f4ebd0] text-[#8a6d2b] border-[#c9a961]',
     });
     events.push({
       id: `${r.id}-cout`,
@@ -202,7 +202,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
         type: 'RESERVATION',
         date: dateStr,
         data: occData.reservation,
-        color: 'bg-emerald-100 text-emerald-800',
+        color: 'bg-[#f4ebd0] text-[#8a6d2b]',
       });
       setIsModalOpen(true);
     } else {
@@ -217,7 +217,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Hotel className="w-6 h-6 text-emerald-800" />
+            <Hotel className="w-6 h-6 text-[#8a6d2b]" />
             Bagan Jadwal & Room Rack (Tape Chart Hotel)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -232,7 +232,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
               onClick={() => setActiveTab('tape_chart')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 activeTab === 'tape_chart'
-                  ? 'bg-emerald-800 text-white shadow-xs'
+                  ? 'bg-[#c9a961] text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -243,7 +243,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
               onClick={() => setActiveTab('month')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 activeTab === 'month'
-                  ? 'bg-emerald-800 text-white shadow-xs'
+                  ? 'bg-[#c9a961] text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -286,7 +286,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
 
               <button
                 onClick={handleResetToToday}
-                className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-colors"
+                className="px-3 py-2 rounded-xl bg-[#fbf8ee] hover:bg-[#f4ebd0] text-[#8a6d2b] border border-[#e8dfc8] text-xs font-bold transition-colors"
               >
                 Hari Ini (26 Sep)
               </button>
@@ -311,7 +311,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
                 <select
                   value={selectedBuildingId}
                   onChange={(e) => setSelectedBuildingId(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
                 >
                   <option value="all">Semua Gedung</option>
                   {buildings.map((b) => (
@@ -330,7 +330,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
               <span>In-House (Occupied)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-emerald-600" />
+              <span className="w-3 h-3 rounded bg-[#c9a961]" />
               <span>Confirmed (Pasti)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -366,11 +366,11 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
                       <th
                         key={td.dateStr}
                         className={`p-2 min-w-[70px] text-center border-r border-slate-200 font-bold ${
-                          td.isToday ? 'bg-emerald-100/70 text-emerald-950 font-black' : ''
+                          td.isToday ? 'bg-[#f4ebd0] text-[#1A1410] font-black' : ''
                         }`}
                       >
                         <div className="text-[10px] text-slate-500 uppercase">{td.dayName}</div>
-                        <div className={`text-sm ${td.isToday ? 'text-emerald-800' : 'text-slate-800'}`}>
+                        <div className={`text-sm ${td.isToday ? 'text-[#8a6d2b]' : 'text-slate-800'}`}>
                           {td.dayNum}
                         </div>
                       </th>
@@ -390,7 +390,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
                           <div className="flex items-center justify-between">
                             <span className="font-black text-sm text-slate-900">{room.room_number}</span>
                             <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
-                              room.status === 'AVAILABLE' ? 'bg-emerald-100 text-emerald-800' :
+                              room.status === 'AVAILABLE' ? 'bg-[#f4ebd0] text-[#8a6d2b]' :
                               room.status === 'OCCUPIED' ? 'bg-blue-100 text-blue-800' :
                               room.status === 'RESERVED' ? 'bg-amber-100 text-amber-800' :
                               room.status === 'CLEANING' ? 'bg-orange-100 text-orange-800' :
@@ -417,7 +417,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
 
                             const colorBg = 
                               r.status === 'CHECKED_IN' ? 'bg-blue-600 text-white hover:bg-blue-700' :
-                              r.status === 'CONFIRMED' ? 'bg-emerald-600 text-white hover:bg-emerald-700' :
+                              r.status === 'CONFIRMED' ? 'bg-[#c9a961] text-white hover:bg-[#c9a961]' :
                               'bg-amber-500 text-white hover:bg-amber-600';
 
                             return (
@@ -425,7 +425,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
                                 key={td.dateStr}
                                 onClick={() => handleCellClick(room, td.dateStr, occData)}
                                 className={`p-1 border-r border-slate-200 text-center cursor-pointer transition-all ${
-                                  td.isToday ? 'bg-emerald-50/30' : ''
+                                  td.isToday ? 'bg-[#fbf8ee]' : ''
                                 }`}
                                 title={`${guestName} (${r.reservation_no}) • ${r.status}`}
                               >
@@ -460,13 +460,13 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
                             <td
                               key={td.dateStr}
                               onClick={() => handleCellClick(room, td.dateStr, null)}
-                              className={`p-1 border-r border-slate-200 text-center cursor-pointer hover:bg-emerald-50/50 group transition-colors ${
-                                td.isToday ? 'bg-emerald-50/20' : ''
+                              className={`p-1 border-r border-slate-200 text-center cursor-pointer hover:bg-[#fbf8ee] group transition-colors ${
+                                td.isToday ? 'bg-[#fbf8ee]' : ''
                               }`}
                               title={`Kamar ${room.room_number} Kosong pada ${formatDateIndo(td.dateStr)}. Klik untuk Walk-in / Pesan.`}
                             >
                               <div className="h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <span className="text-emerald-700 font-bold text-xs">+</span>
+                                <span className="text-[#8a6d2b] font-bold text-xs">+</span>
                               </div>
                             </td>
                           );
@@ -488,11 +488,11 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
                         <td
                           key={td.dateStr}
                           className={`p-2 text-center border-r border-slate-200 font-bold ${
-                            td.isToday ? 'bg-emerald-200/60 text-emerald-950 font-black' : ''
+                            td.isToday ? 'bg-[#f4ebd0]/60 text-[#1A1410] font-black' : ''
                           }`}
                         >
                           <span className={`px-1.5 py-0.5 rounded ${
-                            occ.pct >= 70 ? 'bg-emerald-100 text-emerald-800' :
+                            occ.pct >= 70 ? 'bg-[#f4ebd0] text-[#8a6d2b]' :
                             occ.pct >= 40 ? 'bg-blue-100 text-blue-800' :
                             'bg-slate-200 text-slate-700'
                           }`}>
@@ -542,7 +542,7 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
               <div>Rabu</div>
               <div>Kamis</div>
               <div>Jumat</div>
-              <div className="text-emerald-800">Sabtu</div>
+              <div className="text-[#8a6d2b]">Sabtu</div>
             </div>
 
             <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-slate-100 text-xs">
@@ -559,19 +559,19 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
                   <div
                     key={`day-${day}`}
                     className={`min-h-[110px] p-2 transition-colors flex flex-col justify-between ${
-                      isToday ? 'bg-emerald-50/40 ring-2 ring-emerald-600 inset-0' : 'hover:bg-slate-50/60'
+                      isToday ? 'bg-[#fbf8ee] ring-2 ring-[#c9a961] inset-0' : 'hover:bg-slate-50/60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span
                         className={`inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs ${
-                          isToday ? 'bg-emerald-800 text-white' : 'text-slate-800'
+                          isToday ? 'bg-[#c9a961] text-white' : 'text-slate-800'
                         }`}
                       >
                         {day}
                       </span>
                       {isToday && (
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-[#8a6d2b] bg-[#f4ebd0] px-1.5 py-0.5 rounded">
                           Hari Ini
                         </span>
                       )}
@@ -645,13 +645,13 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Status Pembayaran:</span>
-                <span className={`font-bold ${selectedEvent.data.payment_status === 'PAID' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                <span className={`font-bold ${selectedEvent.data.payment_status === 'PAID' ? 'text-[#8a6d2b]' : 'text-amber-700'}`}>
                   {selectedEvent.data.payment_status === 'PAID' ? 'LUNAS' : formatCurrency(selectedEvent.data.remaining_amount)}
                 </span>
               </div>
             </div>
 
-            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900">
+            <div className="p-3 bg-[#fbf8ee] rounded-xl border border-[#e8dfc8] text-[#8a6d2b]">
               <p className="font-bold">Periode Menginap:</p>
               <p className="mt-0.5 text-xs">
                 {formatDateIndo(selectedEvent.data.checkin_date)} s/d {formatDateIndo(selectedEvent.data.checkout_date)}

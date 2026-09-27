@@ -117,7 +117,7 @@ export const RoomTypesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <BedDouble className="w-6 h-6 text-emerald-800" />
+            <BedDouble className="w-6 h-6 text-[#8a6d2b]" />
             Master Jenis Kamar (Room Types)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -143,7 +143,7 @@ export const RoomTypesPage: React.FC = () => {
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
+                <span className="font-mono text-xs font-bold text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-0.5 rounded-md border border-[#e8dfc8]">
                   {t.code}
                 </span>
                 <span className="font-bold text-slate-800 text-xs bg-slate-100 px-2.5 py-0.5 rounded-full">
@@ -156,7 +156,7 @@ export const RoomTypesPage: React.FC = () => {
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs mb-4">
                 <span className="text-slate-500 font-medium">Tarif Standar Acuan:</span>
-                <span className="font-black font-mono text-emerald-900 text-sm">
+                <span className="font-black font-mono text-[#8a6d2b] text-sm">
                   {formatCurrency(t.base_rate_per_night)} / malam
                 </span>
               </div>
@@ -216,7 +216,7 @@ export const RoomTypesPage: React.FC = () => {
                 placeholder="STD-QUAD / VIP-TWIN"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl uppercase font-mono focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl uppercase font-mono focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
             <div>
@@ -227,7 +227,7 @@ export const RoomTypesPage: React.FC = () => {
                 required
                 value={formData.default_capacity}
                 onChange={(e) => setFormData({ ...formData, default_capacity: parseInt(e.target.value) || 1 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
           </div>
@@ -240,7 +240,7 @@ export const RoomTypesPage: React.FC = () => {
               placeholder="Contoh: Kamar Standard 4 Bed (Quad)"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -252,7 +252,7 @@ export const RoomTypesPage: React.FC = () => {
               required
               value={formData.base_rate_per_night}
               onChange={(e) => setFormData({ ...formData, base_rate_per_night: parseInt(e.target.value) || 0 })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-[#8a6d2b] focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -263,7 +263,7 @@ export const RoomTypesPage: React.FC = () => {
               placeholder="Jelaskan spesifikasi kamar, ukuran tempat tidur (bed), peruntukan jamaah/tamu..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -274,7 +274,7 @@ export const RoomTypesPage: React.FC = () => {
               placeholder="AC, Kamar Mandi Dalam, Air Panas, Lemari Pakaian, Sajadah & Arah Kiblat"
               value={formData.amenities}
               onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 

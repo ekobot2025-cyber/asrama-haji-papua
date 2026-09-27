@@ -92,7 +92,7 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
         <div className="rounded-3xl bg-white p-5 sm:p-6 border border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] hover:shadow-card-hover transition-all duration-200 flex flex-col">
           <div className="flex items-center justify-between pb-4 border-b border-slate-100">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-800 ring-4 ring-emerald-500/10 shrink-0">
+              <div className="p-2.5 rounded-2xl bg-[#fbf8ee] text-[#8a6d2b] ring-4 ring-[#c9a961]/20 shrink-0">
                 <LogIn className="w-5 h-5" />
               </div>
               <div>
@@ -102,7 +102,7 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
             </div>
             <button
               onClick={() => onNavigate('checkin')}
-              className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100/80 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+              className="text-xs font-semibold text-[#8a6d2b] hover:text-[#7a6122] flex items-center gap-1 bg-[#fbf8ee] hover:bg-[#f4ebd0] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
             >
               Lihat Semua <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
@@ -118,13 +118,13 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
               </div>
             ) : (
               todayCheckins.map((rsv) => (
-                <div key={rsv.id} className="p-3.5 rounded-2xl bg-slate-50/70 hover:bg-slate-100/80 border border-slate-200/60 hover:border-emerald-200 transition-all duration-150 flex items-start justify-between gap-3 text-xs group">
+                <div key={rsv.id} className="p-3.5 rounded-2xl bg-slate-50/70 hover:bg-slate-100/80 border border-slate-200/60 hover:border-[#c9a961] transition-all duration-150 flex items-start justify-between gap-3 text-xs group">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-emerald-800 font-bold flex items-center justify-center text-xs shrink-0 ring-1 ring-emerald-600/10">
+                    <div className="w-8 h-8 rounded-xl bg-[#fbf8ee] text-[#8a6d2b] font-bold flex items-center justify-center text-xs shrink-0 ring-1 ring-[#c9a961]/30">
                       {getGuestOrGroupName(rsv).charAt(0) || 'T'}
                     </div>
                     <div>
-                      <p className="font-bold text-slate-900 group-hover:text-emerald-950 transition-colors">{getGuestOrGroupName(rsv)}</p>
+                      <p className="font-bold text-slate-900 group-hover:text-[#8a6d2b] transition-colors">{getGuestOrGroupName(rsv)}</p>
                       <p className="text-[11px] text-slate-500 truncate max-w-[180px]">
                         {getInstitutionName(rsv)}
                       </p>
@@ -204,7 +204,7 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
                         </span>
                         <span className={`px-2 py-0.5 rounded-md border font-semibold ${
                           rsv.payment_status === 'PAID' 
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                            ? 'bg-[#fbf8ee] text-[#8a6d2b] border-[#e8dfc8]' 
                             : 'bg-amber-50 text-amber-800 border-amber-200'
                         }`}>
                           {rsv.payment_status === 'PAID' ? 'LUNAS' : `Sisa: ${formatCurrency(rsv.remaining_amount)}`}
@@ -283,7 +283,7 @@ export const TodayOperations: React.FC<TodayOperationsProps> = ({
                       size="sm"
                       variant="primary"
                       onClick={() => setVerifyModal({ isOpen: true, reservation: rsv, isApprove: true })}
-                      className="flex-1 py-1 text-[11px] bg-emerald-700 hover:bg-emerald-800 font-semibold"
+                      className="flex-1 py-1 text-[11px] font-semibold"
                       icon={<CheckCircle2 className="w-3.5 h-3.5" />}
                     >
                       Setujui

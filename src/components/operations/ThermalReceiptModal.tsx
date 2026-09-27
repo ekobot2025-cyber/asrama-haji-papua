@@ -111,7 +111,7 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
               variant="outline"
               size="sm"
               onClick={onNewTransaction}
-              icon={<Plus className="w-4 h-4 text-emerald-800" />}
+              icon={<Plus className="w-4 h-4 text-[#8a6d2b]" />}
               className="w-full sm:w-auto"
             >
               Baru (F2)
@@ -133,7 +133,7 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
               variant="outline"
               size="sm"
               onClick={handleDirectPrint}
-              icon={<Printer className="w-4 h-4 text-emerald-800" />}
+              icon={<Printer className="w-4 h-4 text-[#8a6d2b]" />}
               title="Cetak struk langsung tanpa tab baru"
             >
               Cetak Struk
@@ -154,13 +154,13 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
     >
       <div className="space-y-4">
         {/* Success Banner */}
-        <div className="flex items-center gap-3 p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-xs">
-          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3 p-3.5 bg-[#fbf8ee] rounded-xl border border-[#e8dfc8] text-[#8a6d2b] text-xs">
+          <div className="w-8 h-8 rounded-full bg-[#c9a961] text-white flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div className="leading-snug">
             <p className="font-bold">Check-in & Pembayaran Berhasil Didaftarkan!</p>
-            <p className="text-[11px] text-emerald-700">Kamar telah berstatus OCCUPIED dan struk kasir siap dicetak untuk tamu.</p>
+            <p className="text-[11px] text-[#8a6d2b]">Kamar telah berstatus OCCUPIED dan struk kasir siap dicetak untuk tamu.</p>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
                 </div>
               )}
               {data.roomInfo && (
-                <div className="flex justify-between text-emerald-900 font-semibold bg-emerald-50 px-1 py-0.5 rounded">
+                <div className="flex justify-between text-[#8a6d2b] font-semibold bg-[#fbf8ee] px-1 py-0.5 rounded">
                   <span>Kamar Terpilih</span>
                   <span>{data.roomInfo.roomNumber} ({data.roomInfo.buildingName})</span>
                 </div>
@@ -245,7 +245,7 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
               </div>
 
               {data.discountAmount > 0 && (
-                <div className="flex justify-between text-[10px] text-emerald-700">
+                <div className="flex justify-between text-[10px] text-[#8a6d2b]">
                   <span>Diskon</span>
                   <span>-{formatCurrency(data.discountAmount)}</span>
                 </div>
@@ -274,7 +274,7 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
               {data.simponiBillingCode && (
                 <div className="mt-1 pt-1 border-t border-dotted border-slate-300 text-center">
                   <p className="text-[9px] text-slate-500 uppercase font-semibold">Kode Billing SIMPONI MPN-G3</p>
-                  <p className="font-bold text-xs tracking-wider font-mono text-emerald-900">{data.simponiBillingCode}</p>
+                  <p className="font-bold text-xs tracking-wider font-mono text-[#8a6d2b]">{data.simponiBillingCode}</p>
                 </div>
               )}
             </div>

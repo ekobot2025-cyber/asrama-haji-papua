@@ -133,7 +133,7 @@ export const RoomAssignmentPage: React.FC<RoomAssignmentPageProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <UserCheck className="w-6 h-6 text-emerald-800" />
+            <UserCheck className="w-6 h-6 text-[#8a6d2b]" />
             Penempatan Kamar & Alokasi Bed (Room Assignment)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -145,7 +145,7 @@ export const RoomAssignmentPage: React.FC<RoomAssignmentPageProps> = ({
           variant="secondary"
           size="sm"
           onClick={loadData}
-          icon={<RefreshCw className="w-4 h-4 text-emerald-800" />}
+          icon={<RefreshCw className="w-4 h-4 text-[#8a6d2b]" />}
         >
           Muat Ulang
         </Button>
@@ -160,7 +160,7 @@ export const RoomAssignmentPage: React.FC<RoomAssignmentPageProps> = ({
           <select
             value={selectedRsvId}
             onChange={(e) => setSelectedRsvId(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50 font-semibold"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50 font-semibold"
           >
             {reservations.map((r) => (
               <option key={r.id} value={r.id}>
@@ -178,9 +178,9 @@ export const RoomAssignmentPage: React.FC<RoomAssignmentPageProps> = ({
               <span className="text-slate-400 text-[10px] ml-1">({currentRsv.male_count}L / {currentRsv.female_count}P)</span>
             </div>
 
-            <div className="bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200 text-xs">
-              <span className="text-emerald-700 block text-[10px] font-bold uppercase">Sudah Ditempatkan</span>
-              <span className="font-extrabold text-emerald-900">
+            <div className="bg-[#fbf8ee] px-3 py-2 rounded-xl border border-[#e8dfc8] text-xs">
+              <span className="text-[#8a6d2b] block text-[10px] font-bold uppercase">Sudah Ditempatkan</span>
+              <span className="font-extrabold text-[#8a6d2b]">
                 {currentAssignments.length} / {currentRsv.total_guests} Bed
               </span>
             </div>
@@ -212,7 +212,7 @@ export const RoomAssignmentPage: React.FC<RoomAssignmentPageProps> = ({
                   type="checkbox"
                   checked={separateGender}
                   onChange={(e) => setSeparateGender(e.target.checked)}
-                  className="rounded text-emerald-800 focus:ring-emerald-700 w-4 h-4"
+                  className="rounded text-[#8a6d2b] focus:ring-[#c9a961] w-4 h-4"
                 />
                 <span>Pisahkan kamar pria dan wanita (Syari’ah)</span>
               </label>
@@ -317,7 +317,7 @@ export const RoomAssignmentPage: React.FC<RoomAssignmentPageProps> = ({
             {currentAssignments.length === 0 ? (
               <div className="p-12 text-center text-xs text-slate-400 border-2 border-dashed border-slate-100 rounded-xl">
                 Belum ada tamu yang ditempatkan ke kamar pada reservasi ini.
-                <br />Gunakan tombol <span className="font-semibold text-emerald-800">Auto Assign</span> atau form manual di samping kiri.
+                <br />Gunakan tombol <span className="font-semibold text-[#8a6d2b]">Auto Assign</span> atau form manual di samping kiri.
               </div>
             ) : (
               <div className="overflow-x-auto flex-1">
@@ -346,7 +346,7 @@ export const RoomAssignmentPage: React.FC<RoomAssignmentPageProps> = ({
                           <td className="py-2.5 px-3 font-semibold text-slate-900">
                             {room ? `Kamar ${room.room_number}` : '-'}
                           </td>
-                          <td className="py-2.5 px-3 font-mono font-bold text-emerald-800">
+                          <td className="py-2.5 px-3 font-mono font-bold text-[#8a6d2b]">
                             {bed?.bed_code || a.bed_id}
                           </td>
                           <td className="py-2.5 px-3">

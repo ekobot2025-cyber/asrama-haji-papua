@@ -134,7 +134,7 @@ export const BuildingsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-emerald-800" />
+            <Building2 className="w-6 h-6 text-[#8a6d2b]" />
             Master Gedung Asrama Haji
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -171,12 +171,12 @@ export const BuildingsPage: React.FC = () => {
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                  <span className="font-mono text-xs font-bold text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-1 rounded-md border border-[#e8dfc8]">
                     KODE: {b.code}
                   </span>
                   <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
                     b.status === 'ACTIVE' 
-                      ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' 
+                      ? 'text-[#8a6d2b] bg-[#fbf8ee] border border-[#e8dfc8]' 
                       : b.status === 'MAINTENANCE' 
                         ? 'text-amber-700 bg-amber-50 border border-amber-200' 
                         : 'text-slate-600 bg-slate-100'
@@ -201,7 +201,7 @@ export const BuildingsPage: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold uppercase block">Kapasitas</span>
-                    <span className="font-extrabold text-emerald-800 text-sm">{totalBeds} Bed</span>
+                    <span className="font-extrabold text-[#8a6d2b] text-sm">{totalBeds} Bed</span>
                   </div>
                 </div>
               </div>
@@ -269,7 +269,7 @@ export const BuildingsPage: React.FC = () => {
                 placeholder="GDD / GDE / GD-VIP"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl uppercase font-mono focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl uppercase font-mono focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
                 }`}
               />
@@ -285,7 +285,7 @@ export const BuildingsPage: React.FC = () => {
                 readOnly={isHousekeeping}
                 value={formData.total_floors}
                 onChange={(e) => setFormData({ ...formData, total_floors: parseInt(e.target.value) || 1 })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
                 }`}
               />
@@ -303,7 +303,7 @@ export const BuildingsPage: React.FC = () => {
               placeholder="Contoh: Gedung Biak Numfor / Gedung Timika"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                 isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
               }`}
             />
@@ -314,7 +314,7 @@ export const BuildingsPage: React.FC = () => {
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 font-medium"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961] font-medium"
             >
               <option value="ACTIVE">Aktif (Siap Digunakan)</option>
               <option value="MAINTENANCE">Dalam Pemeliharaan / Renovasi</option>
@@ -331,7 +331,7 @@ export const BuildingsPage: React.FC = () => {
               placeholder="Contoh: Gedung dalam kondisi bersih, pembersihan rutin lantai dan koridor..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 

@@ -144,7 +144,7 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <LogIn className="w-6 h-6 text-emerald-800" />
+            <LogIn className="w-6 h-6 text-[#8a6d2b]" />
             Check-in Tamu & Registrasi Masuk
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -169,7 +169,7 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
               placeholder="Cari reservasi / tamu..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
             />
           </div>
         </div>
@@ -190,13 +190,13 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
               <div
                 key={rsv.id}
                 className={`p-5 rounded-2xl border bg-white shadow-xs flex flex-col justify-between transition-all ${
-                  isCheckedIn ? 'border-blue-200 bg-blue-50/20' : 'border-slate-200 hover:border-emerald-300'
+                  isCheckedIn ? 'border-blue-200 bg-blue-50/20' : 'border-slate-200 hover:border-[#c9a961]'
                 }`}
               >
                 <div>
                   {/* Top Bar: No and Status */}
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs font-bold text-emerald-900">{rsv.reservation_no}</span>
+                    <span className="font-mono text-xs font-bold text-[#8a6d2b]">{rsv.reservation_no}</span>
                     <Badge status={rsv.status} size="sm" />
                   </div>
 
@@ -219,14 +219,14 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
 
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">Alokasi Kamar:</span>
-                      <span className="font-bold text-emerald-800">
+                      <span className="font-bold text-[#8a6d2b]">
                         {assignedRoomsStr ? `Kamar ${assignedRoomsStr}` : 'Belum Ditentukan'}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
                       <span className="text-slate-500">Status Pembayaran:</span>
-                      <span className={`font-semibold ${rsv.payment_status === 'PAID' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                      <span className={`font-semibold ${rsv.payment_status === 'PAID' ? 'text-[#8a6d2b]' : 'text-amber-700'}`}>
                         {rsv.payment_status === 'PAID' ? 'Lunas' : formatCurrency(rsv.remaining_amount)}
                       </span>
                     </div>
@@ -238,7 +238,7 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
                   <button
                     type="button"
                     onClick={() => setSpmaTarget(rsv)}
-                    className="p-2 border border-slate-200 rounded-xl hover:bg-slate-100 text-slate-600 hover:text-emerald-800 transition-colors flex-shrink-0"
+                    className="p-2 border border-slate-200 rounded-xl hover:bg-slate-100 text-slate-600 hover:text-[#8a6d2b] transition-colors flex-shrink-0"
                     title="Cetak SPMA Digital & Label Koper (Munakosah)"
                   >
                     <Printer className="w-4 h-4" />
@@ -269,7 +269,7 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
                       <span>Sudah Check-in</span>
                       <button
                         onClick={() => onNavigate('checkout', rsv.id)}
-                        className="text-emerald-800 hover:underline font-bold"
+                        className="text-[#8a6d2b] hover:underline font-bold"
                       >
                         Checkout &rarr;
                       </button>
@@ -292,7 +292,7 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
           maxWidth="md"
         >
           <form onSubmit={handleExecuteCheckin} className="space-y-4 text-xs">
-            <div className="bg-emerald-50 p-3.5 rounded-xl border border-emerald-200 space-y-1.5 text-emerald-900">
+            <div className="bg-[#fbf8ee] p-3.5 rounded-xl border border-[#e8dfc8] space-y-1.5 text-[#8a6d2b]">
               <div className="flex justify-between">
                 <span>Nama Tamu / Rombongan:</span>
                 <span className="font-bold">{getGuestOrGroupName(selectedRsv)}</span>
@@ -307,7 +307,7 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
               </div>
               <div className="flex justify-between">
                 <span>Alokasi Kamar:</span>
-                <span className="font-bold text-emerald-800">{getAssignedRooms(selectedRsv.id)}</span>
+                <span className="font-bold text-[#8a6d2b]">{getAssignedRooms(selectedRsv.id)}</span>
               </div>
             </div>
 

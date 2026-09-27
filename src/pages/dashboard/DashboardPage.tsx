@@ -59,11 +59,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   return (
     <div className="space-y-6">
       {/* Welcome Banner with subtle Papua & Islamic motif */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-haji-dark p-6 sm:p-7 text-white shadow-luxury border border-emerald-800/60">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1A1410] via-[#2A2018] to-[#1A1410] p-6 sm:p-7 text-white shadow-luxury border border-[#c9a961]/60">
         {/* Subtle Papuan Geometric Overlay & Ambient Glow */}
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#c59b27_1px,transparent_1px)] [background-size:20px_20px]" />
         <div className="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#c9a961]/15 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
           <div className="space-y-1.5">
@@ -72,12 +72,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 Pusat Komando Operasional
               </span>
-              <span className="text-xs text-emerald-200/90 font-medium">UPT Asrama Haji Provinsi Papua</span>
+              <span className="text-xs text-[#c9a961]/90 font-medium">UPT Asrama Haji Provinsi Papua</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white pt-1">
               Selamat Datang, {currentUser?.name || 'Petugas Asrama Haji'}
             </h1>
-            <p className="text-xs sm:text-sm text-emerald-100/80 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-stone-300 max-w-2xl leading-relaxed">
               Pantau ketersediaan kamar, arus kedatangan jamaah, kegiatan kedinasan, dan status operasional Asrama Haji secara langsung dan terintegrasi.
             </p>
           </div>
@@ -95,7 +95,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               onClick={() => onNavigate('room-status-board')}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs bg-white/15 hover:bg-white/25 text-white border border-white/25 backdrop-blur-md shadow-xs transition-all duration-200 cursor-pointer"
             >
-              <Hotel className="w-4 h-4 text-emerald-300" />
+              <Hotel className="w-4 h-4 text-[#c9a961]" />
               <span>Peta Kamar</span>
             </button>
           </div>
@@ -106,7 +106,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       <div className="space-y-3.5">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#fbf8ee]0 ring-4 ring-[#c9a961]/20" />
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800">
               Kapasitas & Fasilitas Fisik Akomodasi
             </h2>
@@ -130,7 +130,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             value={totalRooms}
             subtitle="Suite, VIP, Deluxe, Superior"
             icon={BedDouble}
-            colorScheme="emerald"
+            colorScheme="gold"
             onClick={() => onNavigate('rooms')}
           />
           <KpiCard
@@ -154,7 +154,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             value={availableBeds}
             subtitle="Siap ditempati tamu"
             icon={CheckCircle}
-            colorScheme="emerald"
+            colorScheme="gold"
             onClick={() => onNavigate('room-status-board')}
           />
         </div>
@@ -189,7 +189,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             value={todayCheckins.length}
             subtitle="Jadwal masuk hari ini"
             icon={CalendarCheck}
-            colorScheme="emerald"
+            colorScheme="gold"
             onClick={() => onNavigate('checkin')}
           />
           <KpiCard

@@ -131,7 +131,7 @@ export const MaintenancePage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Wrench className="w-6 h-6 text-emerald-800" />
+            <Wrench className="w-6 h-6 text-[#8a6d2b]" />
             Maintenance & Pemeliharaan Fasilitas
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -159,7 +159,7 @@ export const MaintenancePage: React.FC = () => {
               placeholder="Cari tiket perbaikan, kamar, kerusakan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -168,7 +168,7 @@ export const MaintenancePage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Status Tiket</option>
             <option value="OPEN">OPEN (Belum Dikerjakan)</option>
@@ -244,7 +244,7 @@ export const MaintenancePage: React.FC = () => {
                           Selesaikan
                         </Button>
                       ) : (
-                        <span className="text-[11px] text-emerald-700 font-bold flex items-center justify-end gap-1">
+                        <span className="text-[11px] text-[#8a6d2b] font-bold flex items-center justify-end gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5" /> Selesai
                         </span>
                       )}
@@ -399,7 +399,7 @@ export const MaintenancePage: React.FC = () => {
                 required
                 value={completeModal.actualCost}
                 onChange={(e) => setCompleteModal({ ...completeModal, actualCost: parseInt(e.target.value) || 0 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-[#8a6d2b]"
               />
             </div>
 

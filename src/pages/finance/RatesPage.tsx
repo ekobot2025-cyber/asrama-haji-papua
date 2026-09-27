@@ -129,7 +129,7 @@ export const RatesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Receipt className="w-6 h-6 text-emerald-800" />
+            <Receipt className="w-6 h-6 text-[#8a6d2b]" />
             Master Tarif Layanan & Akomodasi
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -157,7 +157,7 @@ export const RatesPage: React.FC = () => {
               placeholder="Cari nama tarif, kategori, sasaran..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -166,7 +166,7 @@ export const RatesPage: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Kategori</option>
             <option value="KAMAR">Kamar</option>
@@ -220,7 +220,7 @@ export const RatesPage: React.FC = () => {
                   </td>
                   <td className="py-3 px-4 text-center">
                     {item.is_active ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#8a6d2b] bg-[#fbf8ee] px-2 py-0.5 rounded-full border border-[#e8dfc8]">
                         <CheckCircle2 className="w-3 h-3" /> Aktif
                       </span>
                     ) : (
@@ -233,7 +233,7 @@ export const RatesPage: React.FC = () => {
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => handleOpenModal(item)}
-                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] transition-colors"
                         title="Edit Tarif"
                       >
                         <Edit className="w-3.5 h-3.5" />
@@ -272,7 +272,7 @@ export const RatesPage: React.FC = () => {
               placeholder="Contoh: Sewa Kamar VIP Pejabat"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -282,7 +282,7 @@ export const RatesPage: React.FC = () => {
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="KAMAR">Kamar</option>
                 <option value="FASILITAS">Fasilitas / Aula</option>
@@ -295,7 +295,7 @@ export const RatesPage: React.FC = () => {
               <select
                 value={formData.unit}
                 onChange={(e) => setFormData({ ...formData, unit: e.target.value as any })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961]"
               >
                 <option value="PER_ROOM">PER ROOM (Per Kamar/Malam)</option>
                 <option value="PER_PERSON">PER PERSON (Per Orang)</option>
@@ -315,7 +315,7 @@ export const RatesPage: React.FC = () => {
                 required
                 value={formData.rate}
                 onChange={(e) => setFormData({ ...formData, rate: parseInt(e.target.value) || 0 })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-[#8a6d2b] focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
 
@@ -326,7 +326,7 @@ export const RatesPage: React.FC = () => {
                 placeholder="Instansi / Jamaah / Umum"
                 value={formData.user_type}
                 onChange={(e) => setFormData({ ...formData, user_type: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
               />
             </div>
           </div>
@@ -336,7 +336,7 @@ export const RatesPage: React.FC = () => {
             <select
               value={formData.is_active ? 'true' : 'false'}
               onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'true' })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961]"
             >
               <option value="true">Aktif (Dapat Digunakan untuk Reservasi & Tagihan)</option>
               <option value="false">Non-Aktif (Diarsipkan)</option>
@@ -350,7 +350,7 @@ export const RatesPage: React.FC = () => {
               placeholder="Ketentuan pemakaian..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 

@@ -25,7 +25,7 @@ export const ExtraChargeModal: React.FC<ExtraChargeModalProps> = ({
   const toast = useToast();
 
   const standardServices = [
-    { title: 'Extra Bed (Kasur Tambahan)', category: 'SERVICE' as const, rate: 75000, icon: <BedDouble className="w-4 h-4 text-emerald-700" /> },
+    { title: 'Extra Bed (Kasur Tambahan)', category: 'SERVICE' as const, rate: 75000, icon: <BedDouble className="w-4 h-4 text-[#8a6d2b]" /> },
     { title: 'Laundry Pakaian Jamaah (per Kg)', category: 'SERVICE' as const, rate: 25000, icon: <Sparkles className="w-4 h-4 text-blue-700" /> },
     { title: 'Paket Konsumsi / Catering Prasmanan (per Porsi)', category: 'SERVICE' as const, rate: 45000, icon: <Coffee className="w-4 h-4 text-amber-700" /> },
     { title: 'Sewa Aula Pertemuan / Ruang Rapat (per Hari)', category: 'FACILITY' as const, rate: 1500000, icon: <Landmark className="w-4 h-4 text-purple-700" /> },
@@ -97,7 +97,7 @@ export const ExtraChargeModal: React.FC<ExtraChargeModalProps> = ({
                 onClick={() => handleSelectPredefined(item)}
                 className={`p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all ${
                   selectedService === item.title
-                    ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20'
+                    ? 'border-[#c9a961] bg-[#fbf8ee] ring-2 ring-[#c9a961]/20'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >
@@ -122,7 +122,7 @@ export const ExtraChargeModal: React.FC<ExtraChargeModalProps> = ({
               required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
             />
           </div>
 
@@ -132,7 +132,7 @@ export const ExtraChargeModal: React.FC<ExtraChargeModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as any)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
               >
                 <option value="SERVICE">Layanan</option>
                 <option value="FACILITY">Fasilitas</option>
@@ -148,7 +148,7 @@ export const ExtraChargeModal: React.FC<ExtraChargeModalProps> = ({
                 required
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white font-mono"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white font-mono"
               />
             </div>
 
@@ -161,14 +161,14 @@ export const ExtraChargeModal: React.FC<ExtraChargeModalProps> = ({
                 required
                 value={unitPrice}
                 onChange={(e) => setUnitPrice(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white font-mono"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white font-mono"
               />
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
             <span className="font-bold text-slate-600">Total Tambahan Folio:</span>
-            <span className="font-black text-sm text-emerald-900 font-mono">
+            <span className="font-black text-sm text-[#8a6d2b] font-mono">
               {formatCurrency(totalCharge)}
             </span>
           </div>

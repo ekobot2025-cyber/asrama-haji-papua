@@ -278,7 +278,7 @@ export function generateFormalReportPdf(options: {
   doc.text('KEMENTERIAN AGAMA REPUBLIK INDONESIA', pageWidth / 2, 14, { align: 'center' });
 
   doc.setFontSize(12);
-  doc.setTextColor(15, 81, 50); // Emerald Deep
+  doc.setTextColor(138, 109, 43); // Kiswah Gold Deep (#8a6d2b)
   doc.text('KANTOR WILAYAH KEMENTERIAN AGAMA PROVINSI PAPUA', pageWidth / 2, 19, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
@@ -288,7 +288,7 @@ export function generateFormalReportPdf(options: {
   doc.text('Jl. Asrama Haji No. 01, Jayapura • Telp: (0967) 581-229 • Email: asramahaji.papua@kemenag.go.id', pageWidth / 2, 27.5, { align: 'center' });
 
   // Double horizontal separator line
-  doc.setDrawColor(15, 81, 50);
+  doc.setDrawColor(201, 169, 97); // #c9a961 Kiswah Gold
   doc.setLineWidth(0.8);
   doc.line(14, 30, pageWidth - 14, 30);
   doc.setLineWidth(0.2);
@@ -297,7 +297,7 @@ export function generateFormalReportPdf(options: {
   // 2. Report Title & Meta
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.setTextColor(15, 23, 42);
+  doc.setTextColor(26, 20, 16); // #1A1410 Kiswah Charcoal
   doc.text(title.toUpperCase(), pageWidth / 2, 38, { align: 'center' });
 
   if (subtitle) {
@@ -320,8 +320,8 @@ export function generateFormalReportPdf(options: {
     const cardWidth = (pageWidth - 28 - (summaryStats.length - 1) * 4) / summaryStats.length;
     summaryStats.forEach((stat, i) => {
       const x = 14 + i * (cardWidth + 4);
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(226, 232, 240);
+      doc.setFillColor(251, 248, 238); // #fbf8ee
+      doc.setDrawColor(232, 223, 200); // #e8dfc8
       doc.roundedRect(x, startY, cardWidth, 14, 2, 2, 'FD');
 
       doc.setFont('helvetica', 'normal');
@@ -331,7 +331,7 @@ export function generateFormalReportPdf(options: {
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10.5);
-      doc.setTextColor(15, 81, 50);
+      doc.setTextColor(138, 109, 43); // #8a6d2b Kiswah Gold Deep
       doc.text(stat.value, x + cardWidth / 2, startY + 11, { align: 'center' });
     });
     startY += 19;
@@ -347,13 +347,13 @@ export function generateFormalReportPdf(options: {
       font: 'helvetica',
       fontSize: 8,
       cellPadding: 2.5,
-      textColor: [30, 41, 59],
-      lineColor: [226, 232, 240],
+      textColor: [26, 20, 16],
+      lineColor: [232, 223, 200],
       lineWidth: 0.15,
     },
     headStyles: {
-      fillColor: [15, 81, 50],
-      textColor: [255, 255, 255],
+      fillColor: [26, 20, 16], // Kiswah Charcoal #1A1410
+      textColor: [201, 169, 97], // Kiswah Gold #c9a961
       fontStyle: 'bold',
       fontSize: 8.5,
       halign: 'center',

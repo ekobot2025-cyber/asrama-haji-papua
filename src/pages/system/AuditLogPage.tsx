@@ -28,7 +28,7 @@ export const AuditLogPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <History className="w-6 h-6 text-emerald-800" />
+            <History className="w-6 h-6 text-[#8a6d2b]" />
             Audit Log Sistem & Rekam Jejak Aktivitas
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -52,7 +52,7 @@ export const AuditLogPage: React.FC = () => {
               placeholder="Cari user, uraian mutasi data, nomor dokumen..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -61,7 +61,7 @@ export const AuditLogPage: React.FC = () => {
           <select
             value={moduleFilter}
             onChange={(e) => setModuleFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Modul</option>
             <option value="Reservasi">Reservasi</option>
@@ -105,7 +105,7 @@ export const AuditLogPage: React.FC = () => {
                       {log.user_role}
                     </span>
                   </td>
-                  <td className="py-3 px-4 font-semibold text-emerald-900 font-sans">
+                  <td className="py-3 px-4 font-semibold text-[#8a6d2b] font-sans">
                     {log.module}
                   </td>
                   <td className="py-3 px-4 font-bold text-slate-700">

@@ -166,7 +166,7 @@ export const FacilitiesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Landmark className="w-6 h-6 text-emerald-800" />
+            <Landmark className="w-6 h-6 text-[#8a6d2b]" />
             Fasilitas Umum & Ruang Pertemuan (Aula)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -200,7 +200,7 @@ export const FacilitiesPage: React.FC = () => {
               placeholder="Cari fasilitas, aula, lokasi..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -214,7 +214,7 @@ export const FacilitiesPage: React.FC = () => {
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-0.5 rounded-full border border-[#e8dfc8]">
                   {fac.type.replace(/_/g, ' ')}
                 </span>
                 <Badge status={fac.status} size="sm" />
@@ -235,7 +235,7 @@ export const FacilitiesPage: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-slate-400 font-bold uppercase block">Tarif Harian</span>
-                  <span className="font-mono font-black text-emerald-900 text-sm">
+                  <span className="font-mono font-black text-[#8a6d2b] text-sm">
                     {fac.daily_rate > 0 ? formatCurrency(fac.daily_rate) : 'Gratis'}
                   </span>
                 </div>
@@ -316,7 +316,7 @@ export const FacilitiesPage: React.FC = () => {
               placeholder="Contoh: Aula Utama Cenderawasih"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                 isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
               }`}
             />
@@ -331,7 +331,7 @@ export const FacilitiesPage: React.FC = () => {
                 value={formData.type}
                 disabled={isHousekeeping}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as Facility['type'] })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed opacity-90' : ''
                 }`}
               >
@@ -355,7 +355,7 @@ export const FacilitiesPage: React.FC = () => {
                 readOnly={isHousekeeping}
                 value={formData.capacity}
                 onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 1 })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
                 }`}
               />
@@ -373,7 +373,7 @@ export const FacilitiesPage: React.FC = () => {
                 placeholder="Gedung Utama Lt. 1 / Samping Masjid"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
                 }`}
               />
@@ -383,7 +383,7 @@ export const FacilitiesPage: React.FC = () => {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as Facility['status'] })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-700 font-medium"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961] font-medium"
               >
                 <option value="AVAILABLE">AVAILABLE (Tersedia & Bersih)</option>
                 <option value="OCCUPIED">OCCUPIED (Sedang Digunakan)</option>
@@ -404,7 +404,7 @@ export const FacilitiesPage: React.FC = () => {
                 readOnly={isHousekeeping}
                 value={formData.daily_rate}
                 onChange={(e) => setFormData({ ...formData, daily_rate: parseInt(e.target.value) || 0 })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl font-bold text-[#8a6d2b] focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
                 }`}
               />
@@ -419,7 +419,7 @@ export const FacilitiesPage: React.FC = () => {
                 readOnly={isHousekeeping}
                 value={formData.hourly_rate}
                 onChange={(e) => setFormData({ ...formData, hourly_rate: parseInt(e.target.value) || 0 })}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+                className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                   isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
                 }`}
               />
@@ -435,7 +435,7 @@ export const FacilitiesPage: React.FC = () => {
               placeholder="Deskripsikan kondisi kebersihan, kesiapan sound, AC, dan perlengkapan aula..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
             />
           </div>
 
@@ -449,7 +449,7 @@ export const FacilitiesPage: React.FC = () => {
               placeholder="Sound System Wireless, Proyektor LCD, AC Standing, Meja & Kursi"
               value={formData.amenities}
               onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
-              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 ${
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                 isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
               }`}
             />

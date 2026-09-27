@@ -177,14 +177,14 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {/* Banner Quick Walk-In */}
-        <div className="p-3.5 bg-gradient-to-r from-emerald-900 to-emerald-950 text-white rounded-xl flex items-center justify-between shadow-2xs">
+        <div className="p-3.5 bg-gradient-to-r from-[#1A1410] via-[#2A2018] to-[#1A1410] text-white rounded-xl flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-800 rounded-lg text-amber-400">
+            <div className="p-2 bg-[#c9a961] rounded-lg text-amber-400">
               <Hotel className="w-5 h-5" />
             </div>
             <div>
               <h4 className="font-bold text-sm text-white">Layanan Walk-In Hospitality</h4>
-              <p className="text-[11px] text-emerald-200">
+              <p className="text-[11px] text-[#c9a961]">
                 Pendaftaran kilat 1 langkah: registrasi tamu, alokasi kamar, penerbitan kartu kunci, dan kuitansi kasir.
               </p>
             </div>
@@ -198,7 +198,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
           {/* Kolom Kiri: Data Tamu */}
           <div className="space-y-3 p-4 bg-slate-50/70 border border-slate-200 rounded-xl">
             <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5 border-b border-slate-200 pb-1.5">
-              <User className="w-3.5 h-3.5 text-emerald-800" />
+              <User className="w-3.5 h-3.5 text-[#8a6d2b]" />
               1. Identitas Tamu Menginap
             </h4>
 
@@ -210,7 +210,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                 placeholder="Nama sesuai KTP..."
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
               />
             </div>
 
@@ -224,7 +224,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   placeholder="9171xxxxxxxxxxxx"
                   value={nik}
                   onChange={(e) => setNik(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white font-mono text-[11px]"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white font-mono text-[11px]"
                 />
               </div>
 
@@ -236,7 +236,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   placeholder="08xxxxxxxxxx"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value as 'L' | 'P')}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 >
                   <option value="L">👳‍♂️ Laki-laki (Ikhwan)</option>
                   <option value="P">🧕 Perempuan (Akhwat)</option>
@@ -259,7 +259,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                 <select
                   value={guestType}
                   onChange={(e) => setGuestType(e.target.value as Guest['guest_type'])}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 >
                   <option value="UMUM">Umum / Mandiri</option>
                   <option value="KEDINASAN">Tamu Kedinasan (SPJ)</option>
@@ -277,7 +277,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                 <select
                   value={regencyCity}
                   onChange={(e) => setRegencyCity(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 >
                   {papuaRegencies.map((reg) => (
                     <option key={reg} value={reg}>{reg}</option>
@@ -292,7 +292,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   placeholder="Contoh: Kemenag Prov. Papua..."
                   value={institutionName}
                   onChange={(e) => setInstitutionName(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 />
               </div>
             </div>
@@ -301,7 +301,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
           {/* Kolom Kanan: Pilihan Kamar & Pembayaran */}
           <div className="space-y-3 p-4 bg-slate-50/70 border border-slate-200 rounded-xl">
             <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5 border-b border-slate-200 pb-1.5">
-              <BedDouble className="w-3.5 h-3.5 text-emerald-800" />
+              <BedDouble className="w-3.5 h-3.5 text-[#8a6d2b]" />
               2. Alokasi Kamar & Menginap
             </h4>
 
@@ -315,7 +315,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                 <select
                   value={selectedRoomId}
                   onChange={(e) => handleRoomChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white font-medium"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white font-medium"
                 >
                   {availableRooms.map((rm) => {
                     const tName = roomTypes.find((t) => t.id === rm.room_type_id)?.name || 'Kamar';
@@ -337,7 +337,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   value={selectedBedId}
                   onChange={(e) => setSelectedBedId(e.target.value)}
                   disabled={availableBeds.length === 0}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white font-mono"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white font-mono"
                 >
                   {availableBeds.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -352,7 +352,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                 <select
                   value={nights}
                   onChange={(e) => setNights(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 10, 14, 30].map((n) => (
                     <option key={n} value={n}>{n} Malam</option>
@@ -370,7 +370,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   max={4}
                   value={cardKeys}
                   onChange={(e) => setCardKeys(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 />
               </div>
 
@@ -381,13 +381,13 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   step={25000}
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                 />
               </div>
             </div>
 
             {/* Billing Summary Box */}
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1.5 text-emerald-950">
+            <div className="p-3 bg-[#fbf8ee] border border-[#e8dfc8] rounded-xl space-y-1.5 text-[#1A1410]">
               <div className="flex justify-between">
                 <span>Tarif Kamar ({nights} malam):</span>
                 <span className="font-bold">{formatCurrency(totalRoomBill)}</span>
@@ -396,9 +396,9 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                 <span>Deposit Jaminan Kunci:</span>
                 <span className="font-medium">{formatCurrency(depositAmount)}</span>
               </div>
-              <div className="flex justify-between pt-1 border-t border-emerald-200 text-xs">
+              <div className="flex justify-between pt-1 border-t border-[#e8dfc8] text-xs">
                 <span className="font-extrabold uppercase">Total Diterima di Kasir:</span>
-                <span className="font-black text-sm text-emerald-900 font-mono">
+                <span className="font-black text-sm text-[#8a6d2b] font-mono">
                   {formatCurrency(grandTotalAtCheckin)}
                 </span>
               </div>
@@ -412,7 +412,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   id="payNow"
                   checked={payNow}
                   onChange={(e) => setPayNow(e.target.checked)}
-                  className="rounded text-emerald-700 focus:ring-emerald-600"
+                  className="rounded text-[#8a6d2b] focus:ring-[#c9a961]"
                 />
                 <label htmlFor="payNow" className="font-bold text-slate-800">
                   Bayar Lunas Sewa Kamar Sekarang
@@ -425,7 +425,7 @@ export const WalkInModal: React.FC<WalkInModalProps> = ({
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value as Payment['payment_method'])}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-700 bg-white"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#c9a961] bg-white"
                   >
                     <option value="CASH">💵 Uang Tunai (Cash Front Desk)</option>
                     <option value="TRANSFER_BPD_PAPUA">🏦 Bank Papua (Rek. Penerimaan)</option>

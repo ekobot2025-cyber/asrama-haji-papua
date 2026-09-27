@@ -10,7 +10,7 @@ interface KpiCardProps {
     value: string;
     isPositive: boolean;
   };
-  colorScheme?: 'emerald' | 'amber' | 'blue' | 'purple' | 'rose' | 'slate';
+  colorScheme?: 'gold' | 'amber' | 'blue' | 'purple' | 'rose' | 'slate';
   badge?: string;
   onClick?: () => void;
 }
@@ -21,16 +21,16 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   subtitle,
   icon: Icon,
   trend,
-  colorScheme = 'emerald',
+  colorScheme = 'gold',
   badge,
   onClick,
 }) => {
   const schemes = {
-    emerald: {
-      borderHover: 'hover:border-emerald-300',
-      topLine: 'bg-emerald-600',
-      iconBox: 'bg-emerald-50 text-emerald-800 border-emerald-200/80',
-      badge: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    gold: {
+      borderHover: 'hover:border-[#c9a961]',
+      topLine: 'bg-gradient-to-r from-[#c9a961] to-[#b8941e]',
+      iconBox: 'bg-[#fbf8ee] text-[#8a6d2b] border-[#e8dfc8]',
+      badge: 'bg-[#fbf8ee] text-[#8a6d2b] border-[#e8dfc8]',
     },
     amber: {
       borderHover: 'hover:border-amber-300',
@@ -92,7 +92,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
           </h3>
           {trend && (
             <span className={`inline-flex items-center text-[10px] font-black px-1.5 py-0.5 rounded-full border ${
-              trend.isPositive ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'
+              trend.isPositive ? 'bg-[#fbf8ee] text-[#8a6d2b] border-[#e8dfc8]' : 'bg-rose-50 text-rose-800 border-rose-200'
             }`}>
               {trend.isPositive ? '↑' : '↓'} {trend.value}
             </span>

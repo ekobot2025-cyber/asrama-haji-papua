@@ -63,7 +63,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
       >
         <div className="space-y-5 text-xs text-slate-700">
           {/* Hero Banner Munakosah */}
-          <div className="bg-gradient-to-r from-emerald-900 to-emerald-950 text-white p-4 rounded-2xl border border-emerald-800 shadow-xs relative overflow-hidden">
+          <div className="bg-gradient-to-r from-[#1A1410] via-[#2A2018] to-[#1A1410] text-white p-4 rounded-2xl border border-[#c9a961] shadow-xs relative overflow-hidden">
             <div className="relative z-10">
               <span className="bg-amber-400/20 text-amber-300 border border-amber-300/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-block mb-1.5">
                 Layanan Cepat Satu Atap (One Stop Service)
@@ -71,7 +71,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
               <h3 className="text-base font-black tracking-tight text-white mb-1">
                 Layanan Cek Penempatan Kamar & Tempat Tidur
               </h3>
-              <p className="text-[11px] text-emerald-200 leading-relaxed max-w-lg">
+              <p className="text-[11px] text-[#c9a961] leading-relaxed max-w-lg">
                 Masukkan NIK KTP, Nomor Porsi Haji, Nama Lengkap, atau Nomor Reservasi Anda untuk menemukan lokasi gedung dan tempat tidur Anda seketika.
               </p>
             </div>
@@ -93,7 +93,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Ketik NIK, Nama Tamu, No. HP, atau No. Reservasi..."
-                className="w-full pl-9 pr-3 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-700 font-medium bg-slate-50"
+                className="w-full pl-9 pr-3 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#c9a961] font-medium bg-slate-50"
                 autoFocus
               />
             </div>
@@ -111,7 +111,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
                 setSearchQuery('Sulaiman');
                 handleSearch('Sulaiman');
               }}
-              className="bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 px-2 py-0.5 rounded-lg border border-slate-200 transition-colors"
+              className="bg-slate-100 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] px-2 py-0.5 rounded-lg border border-slate-200 transition-colors"
             >
               H. Sulaiman
             </button>
@@ -121,7 +121,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
                 setSearchQuery('Fatimah');
                 handleSearch('Fatimah');
               }}
-              className="bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 px-2 py-0.5 rounded-lg border border-slate-200 transition-colors"
+              className="bg-slate-100 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] px-2 py-0.5 rounded-lg border border-slate-200 transition-colors"
             >
               Hj. Siti Fatimah
             </button>
@@ -131,7 +131,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
                 setSearchQuery('RSV/AHP/2026/00001');
                 handleSearch('RSV/AHP/2026/00001');
               }}
-              className="bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 px-2 py-0.5 rounded-lg border border-slate-200 transition-colors font-mono"
+              className="bg-slate-100 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] px-2 py-0.5 rounded-lg border border-slate-200 transition-colors font-mono"
             >
               RSV-00001
             </button>
@@ -141,14 +141,14 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
           {hasSearched && searchResult && (
             <div>
               {searchResult.found ? (
-                <div className="border-2 border-emerald-800 rounded-2xl p-5 bg-white shadow-md space-y-4">
+                <div className="border-2 border-[#c9a961] rounded-2xl p-5 bg-white shadow-md space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-700" />
+                      <span className="w-8 h-8 rounded-full bg-[#f4ebd0] text-[#8a6d2b] flex items-center justify-center font-bold">
+                        <CheckCircle2 className="w-5 h-5 text-[#8a6d2b]" />
                       </span>
                       <div>
-                        <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider block">
+                        <span className="text-[10px] text-[#8a6d2b] font-bold uppercase tracking-wider block">
                           Data Akomodasi Ditemukan
                         </span>
                         <h4 className="text-base font-black text-slate-900 leading-tight">
@@ -177,15 +177,15 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
                       </span>
                     </div>
 
-                    <div className="bg-emerald-50 p-3.5 rounded-xl border border-emerald-200 text-center">
-                      <span className="text-[10px] text-emerald-700 font-bold uppercase block mb-1">
+                    <div className="bg-[#fbf8ee] p-3.5 rounded-xl border border-[#e8dfc8] text-center">
+                      <span className="text-[10px] text-[#8a6d2b] font-bold uppercase block mb-1">
                         Nomor Kamar
                       </span>
-                      <BedDouble className="w-5 h-5 text-emerald-800 mx-auto mb-1" />
-                      <span className="font-black text-emerald-950 text-2xl block">
+                      <BedDouble className="w-5 h-5 text-[#8a6d2b] mx-auto mb-1" />
+                      <span className="font-black text-[#1A1410] text-2xl block">
                         {searchResult.room?.room_number || 'A100'}
                       </span>
-                      <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-full inline-block mt-0.5">
+                      <span className="text-[10px] font-bold text-[#8a6d2b] bg-white px-2 py-0.5 rounded-full inline-block mt-0.5">
                         {searchResult.room?.housekeeping_status || 'READY'}
                       </span>
                     </div>

@@ -154,7 +154,7 @@ export const GuestsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Users className="w-6 h-6 text-emerald-800" />
+            <Users className="w-6 h-6 text-[#8a6d2b]" />
             Database Tamu & Jamaah (Guest Directory)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -182,7 +182,7 @@ export const GuestsPage: React.FC = () => {
               placeholder="Cari nama tamu, NIK, nomor HP, asal daerah..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"
             />
           </div>
         </div>
@@ -191,7 +191,7 @@ export const GuestsPage: React.FC = () => {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 bg-white"
+            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] bg-white"
           >
             <option value="all">Semua Tipe Tamu</option>
             <option value="JAMAAH">Jamaah Haji / Umrah</option>
@@ -255,7 +255,7 @@ export const GuestsPage: React.FC = () => {
                   </td>
 
                   <td className="py-3 px-4">
-                    <span className="font-semibold text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <span className="font-semibold text-[11px] text-[#8a6d2b] bg-[#fbf8ee] px-2 py-0.5 rounded-full border border-[#e8dfc8]">
                       {g.guest_type}
                     </span>
                   </td>
@@ -268,7 +268,7 @@ export const GuestsPage: React.FC = () => {
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => handleOpenModal(g)}
-                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                        className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] transition-colors"
                         title="Edit Data Tamu"
                       >
                         <Edit className="w-3.5 h-3.5" />
