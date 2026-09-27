@@ -43,11 +43,11 @@ export const ExecutiveDashboardPage: React.FC = () => {
 
   // Most Occupied Rooms
   const topRooms = [
-    { room: 'Kamar A101 (Standard)', bld: 'Gedung Nabire', daysOccupied: 26, occupancy: 87 },
-    { room: 'Kamar B101 (Rombongan)', bld: 'Gedung Jayapura', daysOccupied: 25, occupancy: 83 },
-    { room: 'Kamar A201 (VIP Twin)', bld: 'Gedung Nabire', daysOccupied: 24, occupancy: 80 },
-    { room: 'Kamar B102 (Rombongan)', bld: 'Gedung Jayapura', daysOccupied: 22, occupancy: 73 },
-    { room: 'Kamar A205 (VIP Suite)', bld: 'Gedung Nabire', daysOccupied: 20, occupancy: 67 },
+    { room: 'Kamar M101 (Superior)', bld: 'Gedung Mina', daysOccupied: 27, occupancy: 90 },
+    { room: 'Kamar M102 (Superior)', bld: 'Gedung Mina', daysOccupied: 26, occupancy: 87 },
+    { room: 'Kamar M103 (Standar)', bld: 'Gedung Mina', daysOccupied: 25, occupancy: 83 },
+    { room: 'Kamar M104 (Standar)', bld: 'Gedung Mina', daysOccupied: 24, occupancy: 80 },
+    { room: 'Kamar M201 (Standar)', bld: 'Gedung Mina', daysOccupied: 22, occupancy: 73 },
   ];
 
   const handleDirectPrint = () => {

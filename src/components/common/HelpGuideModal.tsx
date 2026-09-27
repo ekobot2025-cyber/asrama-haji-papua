@@ -105,9 +105,9 @@ export const HelpGuideModal: React.FC<HelpGuideModalProps> = ({
       steps: [
         {
           title: '1. Kapasitas Berbasis Tempat Tidur (Bed-Level)',
-          description: 'Setiap kamar di Asrama Haji memiliki kode tempat tidur individual (misal: A101-B01 s.d A101-B04). Tamu disewakan per-tempat tidur atau per-kamar penuh.',
+          description: 'Setiap kamar di Asrama Haji memiliki kode tempat tidur individual (misal: M101-B01 s.d M101-B02). Tamu disewakan per-tempat tidur atau per-kamar penuh.',
           role: 'Petugas / Admin',
-          tips: 'Gedung Arafah, Mina, dan Madinah memiliki 2 hingga 4 tempat tidur per kamar.',
+          tips: 'Gedung Mina memiliki 32 kamar (2 Superior & 30 Standar) dengan 2 tempat tidur per kamar.',
         },
         {
           title: '2. Pemisahan Gender Rombongan',
@@ -117,7 +117,7 @@ export const HelpGuideModal: React.FC<HelpGuideModalProps> = ({
         },
         {
           title: '3. Kamar Mandiri / Keluarga',
-          description: 'Untuk tamu keluarga sah (suami-istri/anak), kamar tipe VIP atau Standard dapat dibooking penuh (Full Room) dengan verifikasi identitas buku nikah/KTP.',
+          description: 'Untuk tamu keluarga sah (suami-istri/anak), kamar tipe Superior atau Standar dapat dibooking penuh (Full Room) dengan verifikasi identitas buku nikah/KTP.',
           role: 'Petugas Resepsionis',
           tips: 'Pastikan memilih tipe tamu KEDINASAN / UMUM untuk keluarga mandiri.',
         },

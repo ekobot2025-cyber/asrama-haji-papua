@@ -261,7 +261,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
-              placeholder="Contoh: A101, B102..."
+              placeholder="Contoh: M101, M201..."
               value={searchNumber}
               onChange={(e) => setSearchNumber(e.target.value)}
               className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9a961] bg-slate-50/50"

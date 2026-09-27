@@ -149,7 +149,7 @@ export const BedsPage: React.FC = () => {
             Manajemen Tempat Tidur Individual (Bed)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Asrama Haji berbasis kapasitas tempat tidur individual per kamar (A101-B01, A101-B02, dst).
+            Asrama Haji berbasis kapasitas tempat tidur individual per kamar (M101-B01, M101-B02, dst).
           </p>
         </div>
 
@@ -305,7 +305,7 @@ export const BedsPage: React.FC = () => {
                 type="text"
                 required
                 readOnly={isHousekeeping}
-                placeholder="A101-B01"
+                placeholder="M101-B01"
                 value={formData.bed_code}
                 onChange={(e) => setFormData({ ...formData, bed_code: e.target.value })}
                 className={`w-full px-3 py-2 border border-slate-200 rounded-xl font-mono uppercase font-bold focus:ring-2 focus:ring-[#c9a961] ${

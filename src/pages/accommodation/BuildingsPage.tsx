@@ -138,7 +138,7 @@ export const BuildingsPage: React.FC = () => {
             Master Gedung Asrama Haji
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Data gedung akomodasi (Gedung Nabire, Jayapura, Merauke), zonasi, jumlah lantai, dan status operasional.
+            Data gedung akomodasi (Gedung Mina), zonasi, jumlah lantai, dan status operasional.
           </p>
         </div>
 

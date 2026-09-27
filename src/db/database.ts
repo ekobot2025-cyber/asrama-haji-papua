@@ -13,7 +13,7 @@ import {
 } from './seedData';
 import { terbilang } from '../utils/terbilang';
 
-const DB_VERSION = 'simaha_papua_v3.0_clean_users';
+const DB_VERSION = 'simaha_papua_v4.0_gedung_mina_32kamar';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -80,14 +80,14 @@ class DatabaseService {
     this.auditLogs = [...initialAuditLogs];
     this.settings = { ...initialSettings };
 
-    // Initial assignments for checked-in rooms
+    // Initial assignments for checked-in rooms (Gedung Mina)
     this.roomAssignments = [
       {
         id: 'ra-01',
         reservation_id: 'rsv-003',
         guest_id: 'gst-001',
-        room_id: 'room-009', // A201
-        bed_id: 'bed-room-009-1',
+        room_id: 'room-001', // M101 (Superior)
+        bed_id: 'bed-room-001-1',
         assigned_at: '2026-09-25T14:00:00Z',
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
@@ -96,8 +96,8 @@ class DatabaseService {
         id: 'ra-02',
         reservation_id: 'rsv-004',
         guest_id: 'gst-010',
-        room_id: 'room-010', // A202
-        bed_id: 'bed-room-010-1',
+        room_id: 'room-003', // M103 (Standar)
+        bed_id: 'bed-room-003-1',
         assigned_at: '2026-09-25T14:15:00Z',
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
@@ -106,8 +106,8 @@ class DatabaseService {
         id: 'ra-03',
         reservation_id: 'rsv-001',
         guest_id: 'gst-005',
-        room_id: 'room-015', // B101
-        bed_id: 'bed-room-015-1',
+        room_id: 'room-004', // M104 (Standar)
+        bed_id: 'bed-room-004-1',
         assigned_at: '2026-09-25T14:30:00Z',
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
@@ -116,8 +116,8 @@ class DatabaseService {
         id: 'ra-04',
         reservation_id: 'rsv-001',
         guest_id: 'gst-006',
-        room_id: 'room-016', // B102
-        bed_id: 'bed-room-016-1',
+        room_id: 'room-017', // M201 (Standar)
+        bed_id: 'bed-room-017-1',
         assigned_at: '2026-09-25T14:30:00Z',
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
@@ -143,7 +143,7 @@ class DatabaseService {
         checkin_by: 'Resepsionis',
         card_keys_issued: 1,
         deposit_amount: 100000,
-        notes: 'Tamu VIP Kemenag Papua',
+        notes: 'Tamu VIP Kemenag Papua (Kamar Superior M101)',
       },
     ];
 
@@ -154,7 +154,7 @@ class DatabaseService {
         checkout_no: 'COUT/2026/0001',
         checkout_time: '2026-09-26T11:45:00Z',
         checkout_by: 'Resepsionis',
-        room_condition_notes: 'Kamar A104 rapi, kunci kartu lengkap dikembalikan',
+        room_condition_notes: 'Kamar M106 rapi, kunci kartu lengkap dikembalikan',
         deposit_returned: true,
         notes: 'Selesai menginap',
       },
