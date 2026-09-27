@@ -63,7 +63,7 @@ export const HelpGuideModal: React.FC<HelpGuideModalProps> = ({
         },
         {
           title: '3. Penempatan Kamar Syariah (Room Assignment)',
-          description: 'Sistem otomatis memisahkan tempat tidur pria (ikhwan) dan wanita (akhwat). Petugas juga dapat memindahkan ranjang manual.',
+          description: 'Sistem otomatis memisahkan tempat tidur pria (ikhwan) dan wanita (akhwat). Petugas juga dapat memindahkan tempat tidur secara manual.',
           role: 'Admin / Petugas',
           tips: 'Pemisahan gender mutlak berlaku untuk rombongan jamaah/pelatihan.',
         },
@@ -101,13 +101,13 @@ export const HelpGuideModal: React.FC<HelpGuideModalProps> = ({
       icon: <BedDouble className="w-4 h-4 text-emerald-600" />,
       category: 'Kamar',
       badge: 'Syariah Compliant',
-      summary: 'Panduan tata cara penempatan ranjang (bed-level) dan kepatuhan syariah pemisahan gender ikhwan dan akhwat di wisma asrama haji.',
+      summary: 'Panduan tata cara penempatan tempat tidur (bed-level) dan kepatuhan syariah pemisahan gender ikhwan dan akhwat di wisma asrama haji.',
       steps: [
         {
           title: '1. Kapasitas Berbasis Tempat Tidur (Bed-Level)',
-          description: 'Setiap kamar di Asrama Haji memiliki kode ranjang individual (misal: A101-B01 s.d A101-B04). Tamu disewakan per-ranjang atau per-kamar penuh.',
+          description: 'Setiap kamar di Asrama Haji memiliki kode tempat tidur individual (misal: A101-B01 s.d A101-B04). Tamu disewakan per-tempat tidur atau per-kamar penuh.',
           role: 'Petugas / Admin',
-          tips: 'Gedung Arafah, Mina, dan Madinah memiliki 2 hingga 4 ranjang per kamar.',
+          tips: 'Gedung Arafah, Mina, dan Madinah memiliki 2 hingga 4 tempat tidur per kamar.',
         },
         {
           title: '2. Pemisahan Gender Rombongan',
@@ -161,7 +161,7 @@ export const HelpGuideModal: React.FC<HelpGuideModalProps> = ({
       icon: <Sparkles className="w-4 h-4 text-amber-600" />,
       category: 'Housekeeping',
       badge: 'Kebersihan & Sarpras',
-      summary: 'Standar kebersihan kamar asrama haji dan alur eskalasi jika ditemukan kerusakan fasilitas (AC, pipa air, ranjang).',
+      summary: 'Standar kebersihan kamar asrama haji dan alur eskalasi jika ditemukan kerusakan fasilitas (AC, pipa air, tempat tidur).',
       steps: [
         {
           title: '1. Status DIRTY (Kamar Kotor)',
@@ -171,7 +171,7 @@ export const HelpGuideModal: React.FC<HelpGuideModalProps> = ({
         },
         {
           title: '2. Pembersihan & Ganti Linen (IN CLEANING)',
-          description: 'Klik "Mulai Bersihkan". Petugas mengganti sprei ranjang, membersihkan kamar mandi, melengkapi sajadah dan perlengkapan ibadah.',
+          description: 'Klik "Mulai Bersihkan". Petugas mengganti sprei tempat tidur, membersihkan kamar mandi, melengkapi sajadah dan perlengkapan ibadah.',
           role: 'Petugas Kebersihan',
           tips: 'Pastikan fasilitas arah kiblat dan sajadah dalam keadaan suci dan bersih.',
         },

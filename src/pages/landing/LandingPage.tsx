@@ -311,7 +311,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
                       Anjungan Mandiri (Kiosk)
                     </span>
-                    <h3 className="text-lg font-black text-slate-900 mt-1">Cek Kamar & Ranjang</h3>
+                    <h3 className="text-lg font-black text-slate-900 mt-1">Cek Kamar & Tempat Tidur</h3>
                     <p className="text-xs text-slate-500">Cari penempatan kamar jemaah haji & tamu umum</p>
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center border border-emerald-200">
@@ -383,7 +383,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                             <strong className="text-slate-900">{quickResult.building?.name || 'Gedung Madinah'}</strong>
                           </div>
                           <div>
-                            <span className="text-slate-400 block text-[10px]">Kamar / Ranjang</span>
+                            <span className="text-slate-400 block text-[10px]">Kamar / Tempat Tidur</span>
                             <strong className="text-emerald-800">
                               Kamar {quickResult.room?.roomNumber || '301'} &bull; Bed {quickResult.bed?.bedNumber || 'B-01'}
                             </strong>
@@ -422,7 +422,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
             <div className="bg-white/10 backdrop-blur-xs border border-white/15 p-4 rounded-2xl text-center">
               <Users className="w-5 h-5 text-amber-400 mx-auto mb-1.5" />
-              <div className="text-2xl font-black text-white">480+ Ranjang</div>
+              <div className="text-2xl font-black text-white">480+ Tempat Tidur</div>
               <div className="text-[11px] text-emerald-200 font-medium">Kapasitas Tempat Tidur Resmi</div>
             </div>
             <div className="bg-white/10 backdrop-blur-xs border border-white/15 p-4 rounded-2xl text-center">
@@ -548,7 +548,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <div>
                 <h3 className="text-xl font-black">Superior / Rombongan</h3>
-                <p className="text-xs text-slate-300">Kapasitas 4 Bed &bull; Tarif Per Ranjang</p>
+                <p className="text-xs text-slate-300">Kapasitas 4 Bed &bull; Tarif Per Tempat Tidur</p>
               </div>
             </div>
             <div className="p-6 flex-1 flex flex-col justify-between space-y-5">

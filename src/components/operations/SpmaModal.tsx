@@ -155,7 +155,7 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
             </div>
 
             <p className="text-[11px] text-slate-600 mb-4 leading-relaxed">
-              Berdasarkan pendaftaran akomodasi Asrama Haji Provinsi Papua, bersama ini diperintahkan kepada jemaah / tamu berikut untuk memasuki fasilitas asrama sesuai jadwal dan penempatan ranjang:
+              Berdasarkan pendaftaran akomodasi Asrama Haji Provinsi Papua, bersama ini diperintahkan kepada jemaah / tamu berikut untuk memasuki fasilitas asrama sesuai jadwal dan penempatan tempat tidur:
             </p>
 
             {/* Identitas Jemaah / Tamu */}
@@ -218,7 +218,7 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
                 </div>
 
                 <div className="bg-white p-3 rounded-lg border border-emerald-200">
-                  <span className="text-[10px] text-slate-500 block uppercase font-bold">Nomor Ranjang (Bed)</span>
+                  <span className="text-[10px] text-slate-500 block uppercase font-bold">Nomor Tempat Tidur (Bed)</span>
                   <span className="font-black text-amber-700 text-xl font-mono">{bed?.bed_code || `${room?.room_number || 'A100'}-B01`}</span>
                   <span className="text-[10px] text-emerald-700 block font-bold mt-0.5">Satu Tamu / Bed</span>
                 </div>
@@ -279,7 +279,7 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
                 Standar Labeling Tas Kabin & Bagasi Jemaah (Munakosah PPIH)
               </p>
               <p className="text-[11px] text-amber-800">
-                Gunting dan sematkan label ini pada pegangan koper atau tas jemaah agar tim logistik asrama dapat langsung mengantar koper ke kamar dan ranjang yang bersangkutan tanpa tertukar.
+                Gunting dan sematkan label ini pada pegangan koper atau tas jemaah agar tim logistik asrama dapat langsung mengantar koper ke kamar dan tempat tidur yang bersangkutan tanpa tertukar.
               </p>
             </div>
 

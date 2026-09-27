@@ -260,7 +260,7 @@ export const RoomTypesPage: React.FC = () => {
             <label className="block font-bold text-slate-700 mb-1">Deskripsi & Standar Fasilitas</label>
             <textarea
               rows={2}
-              placeholder="Jelaskan spesifikasi kamar, ukuran ranjang, peruntukan jamaah/tamu..."
+              placeholder="Jelaskan spesifikasi kamar, ukuran tempat tidur (bed), peruntukan jamaah/tamu..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"

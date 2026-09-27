@@ -55,10 +55,10 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
                 Layanan Cepat Satu Atap (One Stop Service)
               </span>
               <h3 className="text-base font-black tracking-tight text-white mb-1">
-                Layanan Cek Penempatan Kamar & Ranjang
+                Layanan Cek Penempatan Kamar & Tempat Tidur
               </h3>
               <p className="text-[11px] text-emerald-200 leading-relaxed max-w-lg">
-                Masukkan NIK KTP, Nomor Porsi Haji, Nama Lengkap, atau Nomor Reservasi Anda untuk menemukan lokasi gedung dan ranjang Anda seketika.
+                Masukkan NIK KTP, Nomor Porsi Haji, Nama Lengkap, atau Nomor Reservasi Anda untuk menemukan lokasi gedung dan tempat tidur Anda seketika.
               </p>
             </div>
             <Sparkles className="w-24 h-24 text-white/5 absolute -right-4 -bottom-4 pointer-events-none" />
@@ -185,7 +185,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
                         {searchResult.bed?.bed_code || `${searchResult.room?.room_number || 'A100'}-B01`}
                       </span>
                       <span className="text-[10px] text-amber-800 block mt-0.5">
-                        Ranjang Pribadi
+                        Tempat Tidur Pribadi
                       </span>
                     </div>
                   </div>

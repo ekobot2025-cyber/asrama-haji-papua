@@ -334,7 +334,7 @@ export const BedsPage: React.FC = () => {
             </label>
             <input
               type="text"
-              placeholder="Contoh: Ranjang bawah dekat jendela, sprei baru diganti, kondisi kasur baik"
+              placeholder="Contoh: Tempat tidur bawah dekat jendela, sprei baru diganti, kondisi kasur baik"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700"
