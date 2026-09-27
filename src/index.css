@@ -3,40 +3,59 @@
 @tailwind utilities;
 
 :root {
-  --primary-color: #1e40af; /* haji.go.id Royal Navy */
-  --primary-dark: #1e3a8a;
-  --secondary-color: #059669; /* haji.go.id Emerald */
-  --secondary-dark: #047857;
-  --accent-gold: #c9a961; /* haji.go.id Official Gold */
+  --primary-color: #c9a961; /* Signature Kiswah Gold */
+  --primary-dark: #b8941e;
+  --secondary-color: #b8941e;
+  --secondary-dark: #8a6d2b;
+  --accent-gold: #c9a961;
   --accent-gold-dark: #b8941e;
-  --accent-gold-light: #fff8e7;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
+  --accent-gold-light: #fbf8ee;
+  --bg-primary: #FAF9F5;
+  --bg-secondary: #fbf8ee;
+  --text-primary: #1A1410;
+  --text-secondary: #7a6122;
+  --border-gold: #e8dfc8;
 }
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+    @apply bg-[#FAF9F5] text-[#1A1410] font-sans antialiased selection:bg-[#c9a961] selection:text-[#1A1410];
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-/* Custom Scrollbar - haji.go.id Navy & Emerald */
+/* Custom Scrollbar - Kiswah Gold Theme */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.05);
+  background: rgba(26, 20, 16, 0.05);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(30, 64, 175, 0.4) 0%, rgba(5, 150, 105, 0.4) 100%);
+  background: linear-gradient(180deg, rgba(201, 169, 97, 0.4) 0%, rgba(184, 148, 30, 0.4) 100%);
   border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #1e40af 0%, #059669 100%);
+  background: linear-gradient(180deg, #c9a961 0%, #b8941e 100%);
+}
+
+/* Utilities matching siap-haji-papua.vercel.app */
+.btn-kemenhaj-primary {
+  background: linear-gradient(135deg, #c9a961, #b8941e);
+  font-weight: 700;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 8px rgba(201, 169, 97, 0.25);
+  color: #ffffff !important;
+}
+.btn-kemenhaj-primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 14px rgba(201, 169, 97, 0.35);
+}
+.badge-kemenhaj-gold {
+  color: #8a6d2b;
+  background-color: #fbf8ee;
+  border: 1px solid #e8dfc8;
 }
 
 /* Print Specific Rules for A4 Documents */

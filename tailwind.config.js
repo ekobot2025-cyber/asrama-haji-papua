@@ -7,69 +7,43 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Official haji.go.id Palette: Royal Navy Blue, Kemenag Emerald, Kiswah Gold
-        kemenag: {
-          blue: {
-            50: '#eff6ff',
-            100: '#dbeafe',
-            200: '#bfdbfe',
-            300: '#93c5fd',
-            400: '#60a5fa',
-            500: '#3b82f6',
-            600: '#2563eb',
-            700: '#1d4ed8',
-            800: '#1e40af', // haji.go.id --primary-color
-            900: '#1e3a8a', // haji.go.id --primary-dark
-            950: '#0f172a',
-          },
-          green: {
-            50: '#f0fdf4',
-            100: '#dcfce7',
-            200: '#bbf7d0',
-            300: '#86efac',
-            400: '#4ade80',
-            500: '#22c55e',
-            600: '#16a34a',
-            700: '#059669', // haji.go.id --secondary-color
-            800: '#047857', // haji.go.id --secondary-dark
-            900: '#064e3b',
-            950: '#022c22',
-          },
-          gold: {
-            50: '#fffdf5',
-            100: '#fff8e7', // haji.go.id background tint
-            200: '#fdf1cc',
-            300: '#fbe4a3',
-            400: '#f7cf6e',
-            500: '#c9a961', // haji.go.id official gold
-            600: '#b8941e', // haji.go.id --secondary-color in loading
-            700: '#947214',
-            800: '#795b16',
-            900: '#674d17',
-          }
+        // Kiswah Gold & Charcoal Palette (siap-haji-papua.vercel.app)
+        kiswah: {
+          50: '#FAF9F5', // Cream body background
+          100: '#fbf8ee', // Gold light badge & hover
+          200: '#f4ebd0', // Gold cream active
+          300: '#e8dfc8', // Warm gold border
+          400: '#d4af37', // Metallic gold highlight
+          500: '#c9a961', // Signature Kiswah Gold
+          600: '#b8941e', // Rich Gold Dark / Ochre
+          700: '#8a6d2b', // Deep Gold Text
+          800: '#7a6122', // Darker Gold Text
+          900: '#2A2018', // Kiswah Dark Charcoal
+          950: '#1A1410', // Deepest Kiswah Black
         },
         haji: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#059669',
-          800: '#047857',
-          900: '#064e3b',
-          950: '#0f172a',
-          primary: '#1e40af', // haji.go.id Primary Royal Navy
-          secondary: '#059669', // haji.go.id Secondary Emerald
-          gold: '#c9a961', // haji.go.id Accent Gold
-          dark: '#0f172a', // haji.go.id Dark Navy
-          light: '#eff6ff',
+          50: '#FAF9F5',
+          100: '#fbf8ee',
+          200: '#f4ebd0',
+          300: '#e8dfc8',
+          400: '#d4af37',
+          500: '#c9a961',
+          600: '#b8941e',
+          700: '#8a6d2b',
+          800: '#7a6122',
+          900: '#2A2018',
+          950: '#1A1410',
+          primary: '#c9a961', // Signature Kiswah Gold
+          secondary: '#b8941e', // Kiswah Gold Dark
+          gold: '#c9a961',
+          dark: '#1A1410', // Kiswah Black
+          light: '#FAF9F5',
+          border: '#e8dfc8',
         },
         papua: {
-          gold: '#c9a961', // haji.go.id Gold
+          gold: '#c9a961',
           goldDark: '#b8941e',
-          goldLight: '#fff8e7',
+          goldLight: '#fbf8ee',
           red: '#B91C1C',
           earth: '#8B4513',
         }

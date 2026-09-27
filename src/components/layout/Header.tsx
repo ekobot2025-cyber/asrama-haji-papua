@@ -93,12 +93,12 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 backdrop-blur-xl sm:px-6 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#e8dfc8] bg-[#FAF9F5]/90 px-4 backdrop-blur-xl sm:px-6 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
       {/* Left Area: Mobile Toggle & Global Search */}
       <div className="flex items-center gap-3">
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+          className="lg:hidden p-2 rounded-xl text-stone-600 hover:bg-[#fbf8ee] transition-colors"
           aria-label="Buka Menu"
         >
           <Menu className="w-5 h-5" />
@@ -107,11 +107,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Global Search Bar */}
         <div 
           onClick={onOpenGlobalSearch}
-          className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-100/70 hover:bg-slate-100 border border-slate-200/70 text-xs text-slate-500 cursor-pointer transition-all duration-200 w-36 md:w-52 lg:w-60 xl:w-64 group shrink ring-1 ring-transparent hover:ring-blue-700/20"
+          className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-stone-100/70 hover:bg-[#fbf8ee] border border-[#e8dfc8] text-xs text-stone-500 cursor-pointer transition-all duration-200 w-36 md:w-52 lg:w-60 xl:w-64 group shrink ring-1 ring-transparent hover:ring-[#c9a961]/30"
         >
-          <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-700 transition-colors shrink-0" />
+          <Search className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#8a6d2b] transition-colors shrink-0" />
           <span className="truncate">Cari data sistem...</span>
-          <kbd className="ml-auto text-[9px] font-mono bg-white px-1.5 py-0.5 rounded-md border border-slate-200 text-slate-400 shrink-0 shadow-2xs">
+          <kbd className="ml-auto text-[9px] font-mono bg-white px-1.5 py-0.5 rounded-md border border-[#e8dfc8] text-stone-400 shrink-0 shadow-2xs">
             ⌘K
           </kbd>
         </div>
@@ -119,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Mobile Search Icon */}
         <button
           onClick={onOpenGlobalSearch}
-          className="sm:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer"
+          className="sm:hidden p-2 rounded-xl text-stone-600 hover:bg-[#fbf8ee] cursor-pointer"
         >
           <Search className="w-5 h-5" />
         </button>
@@ -128,22 +128,22 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Right Area: Time, Reseed Button, Notifications, User Menu */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {/* WIT Clock with Live Pulse */}
-        <div className="hidden xl:flex items-center gap-2 text-xs text-slate-600 bg-slate-100/70 px-3 py-1.5 rounded-xl border border-slate-200/60 font-medium whitespace-nowrap shrink-0">
+        <div className="hidden xl:flex items-center gap-2 text-xs text-stone-600 bg-[#fbf8ee] px-3 py-1.5 rounded-xl border border-[#e8dfc8] font-medium whitespace-nowrap shrink-0">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c9a961] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#b8941e]"></span>
           </span>
           <span>{currentTime}</span>
         </div>
 
-        {/* Kasir Resepsionis POS Quick Button (Signature Gradient) */}
+        {/* Kasir Resepsionis POS Quick Button (Signature Kiswah Gold Gradient) */}
         {['SUPER_ADMIN', 'ADMIN_PENGINAPAN', 'RESEPSIONIS'].includes(currentRole) && (
           <button
             onClick={() => onNavigate('frontdesk-pos')}
             title="Buka Kasir & Transaksi Resepsionis 1-Klik (Front Desk POS)"
-            className="flex items-center gap-1.5 text-xs font-semibold text-white bg-gradient-to-r from-[#1e40af] to-[#059669] hover:from-[#1e3a8a] hover:to-[#047857] border border-blue-700/80 px-3 py-1.5 rounded-xl transition-all shadow-xs hover:shadow-sm group whitespace-nowrap shrink-0 cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-semibold text-white bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] border border-[#c9a961] px-3 py-1.5 rounded-xl transition-all shadow-[0_2px_8px_rgba(201,169,97,0.3)] hover:shadow-[0_4px_12px_rgba(201,169,97,0.4)] group whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <Receipt className="w-3.5 h-3.5 text-[#c9a961] group-hover:rotate-6 transition-transform shrink-0" />
+            <Receipt className="w-3.5 h-3.5 text-white group-hover:rotate-6 transition-transform shrink-0" />
             <span className="hidden sm:inline">Kasir POS</span>
           </button>
         )}
@@ -152,7 +152,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={() => setIsMunakosahOpen(true)}
           title="Anjungan Cek Kamar Mandiri Jemaah & Tamu (Munakosah Papua)"
-          className="flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-blue-900 bg-slate-100/80 hover:bg-blue-50/80 border border-slate-200/70 hover:border-blue-200 px-3 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+          className="flex items-center gap-1.5 text-xs font-medium text-stone-700 hover:text-[#8a6d2b] bg-[#fbf8ee] hover:bg-[#f4ebd0] border border-[#e8dfc8] hover:border-[#c9a961] px-3 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
         >
           <span className="text-xs shrink-0">🕋</span>
           <span className="hidden sm:inline">Cek Kamar</span>
@@ -162,9 +162,9 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onOpenHelpGuide}
           title="Buka Buku Panduan & SOP Operasional SIPAH (F1 atau ?)"
-          className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-blue-900 bg-slate-100/80 hover:bg-blue-50/80 border border-slate-200/70 hover:border-blue-200 px-3 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+          className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-stone-700 hover:text-[#8a6d2b] bg-[#fbf8ee] hover:bg-[#f4ebd0] border border-[#e8dfc8] hover:border-[#c9a961] px-3 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
         >
-          <BookOpen className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+          <BookOpen className="w-3.5 h-3.5 text-[#8a6d2b] shrink-0" />
           <span>Panduan SOP</span>
         </button>
 
@@ -184,7 +184,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setShowNotifMenu(!showNotifMenu)}
-            className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-blue-800 transition-colors"
+            className="relative p-2 rounded-xl text-stone-600 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] transition-colors"
             aria-label="Notifikasi"
           >
             <Bell className="w-5 h-5" />
@@ -197,10 +197,10 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Notifications Dropdown */}
           {showNotifMenu && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white shadow-2xl border border-slate-200 p-0 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-              <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-100">
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white shadow-2xl border border-[#e8dfc8] p-0 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center justify-between px-4 py-3 bg-[#fbf8ee] border-b border-[#e8dfc8]">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Notifikasi Operasional</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#8a6d2b]">Notifikasi Operasional</h4>
                   {unreadCount > 0 && (
                     <span className="text-[10px] bg-rose-100 text-rose-700 font-bold px-1.5 py-0.5 rounded-full">
                       {unreadCount} baru
@@ -210,16 +210,16 @@ export const Header: React.FC<HeaderProps> = ({
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-[11px] text-blue-700 font-semibold hover:underline"
+                    className="text-[11px] text-[#8a6d2b] font-semibold hover:underline"
                   >
                     Tandai dibaca
                   </button>
                 )}
               </div>
 
-              <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+              <div className="max-h-80 overflow-y-auto divide-y divide-[#e8dfc8]/50">
                 {notifications.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-slate-400">Tidak ada notifikasi saat ini.</div>
+                  <div className="p-6 text-center text-xs text-stone-400">Tidak ada notifikasi saat ini.</div>
                 ) : (
                   notifications.map((n) => (
                     <div
@@ -229,16 +229,16 @@ export const Header: React.FC<HeaderProps> = ({
                         if (n.link_page) onNavigate(n.link_page, n.link_id);
                         setShowNotifMenu(false);
                       }}
-                      className={`p-3.5 text-xs hover:bg-slate-50 cursor-pointer transition-colors flex items-start gap-3 ${
-                        !n.is_read ? 'bg-blue-50/40' : ''
+                      className={`p-3.5 text-xs hover:bg-[#fbf8ee] cursor-pointer transition-colors flex items-start gap-3 ${
+                        !n.is_read ? 'bg-[#fbf8ee]/60' : ''
                       }`}
                     >
-                      <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.is_read ? 'bg-blue-600 ring-4 ring-blue-100' : 'bg-slate-300'}`} />
+                      <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.is_read ? 'bg-[#c9a961] ring-4 ring-[#f4ebd0]' : 'bg-stone-300'}`} />
                       <div className="flex-1">
-                        <p className={`font-semibold ${!n.is_read ? 'text-slate-900' : 'text-slate-700'}`}>
+                        <p className={`font-semibold ${!n.is_read ? 'text-stone-900' : 'text-stone-700'}`}>
                           {n.title}
                         </p>
-                        <p className="text-slate-500 text-[11px] mt-0.5 leading-relaxed">{n.message}</p>
+                        <p className="text-stone-500 text-[11px] mt-0.5 leading-relaxed">{n.message}</p>
                       </div>
                     </div>
                   ))
@@ -252,34 +252,34 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="relative" ref={userRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1 rounded-xl hover:bg-slate-100/80 transition-colors text-left shrink-0 whitespace-nowrap cursor-pointer border border-transparent hover:border-slate-200/60"
+            className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1 rounded-xl hover:bg-[#fbf8ee] transition-colors text-left shrink-0 whitespace-nowrap cursor-pointer border border-transparent hover:border-[#e8dfc8]"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1e40af] to-[#059669] text-white font-bold flex items-center justify-center text-xs shadow-xs ring-2 ring-blue-600/20 shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#c9a961] to-[#b8941e] text-white font-bold flex items-center justify-center text-xs shadow-xs ring-2 ring-[#c9a961]/30 shrink-0">
               {currentUser?.name.charAt(0) || 'U'}
             </div>
             <div className="hidden md:block leading-tight">
-              <p className="text-xs font-bold text-slate-800 truncate max-w-[120px]">{currentUser?.name}</p>
-              <p className="text-[10px] font-semibold text-blue-700 truncate max-w-[120px]">
+              <p className="text-xs font-bold text-stone-800 truncate max-w-[120px]">{currentUser?.name}</p>
+              <p className="text-[10px] font-semibold text-[#8a6d2b] truncate max-w-[120px]">
                 {roleLabels[currentRole] || currentRole}
               </p>
             </div>
-            <ChevronDown className="w-4 h-4 text-slate-400 hidden sm:block shrink-0" />
+            <ChevronDown className="w-4 h-4 text-stone-400 hidden sm:block shrink-0" />
           </button>
 
           {/* User Menu Dropdown */}
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-slate-200/80 p-2 z-50 animate-in fade-in slide-in-from-top-2">
-              <div className="p-3 bg-gradient-to-br from-blue-50/80 via-slate-50 to-[#fff8e7] rounded-xl mb-2 border border-blue-100/80">
-                <p className="text-xs font-bold text-slate-900">{currentUser?.name}</p>
-                <p className="text-[11px] text-slate-600 truncate">{currentUser?.email}</p>
-                <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold bg-gradient-to-r from-[#1e40af] to-[#059669] text-white px-2.5 py-0.5 rounded-full shadow-2xs">
-                  <Shield className="w-3 h-3 text-[#c9a961]" />
+            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#e8dfc8] p-2 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="p-3 bg-gradient-to-br from-[#fbf8ee] via-white to-[#fbf8ee] rounded-xl mb-2 border border-[#e8dfc8]">
+                <p className="text-xs font-bold text-stone-900">{currentUser?.name}</p>
+                <p className="text-[11px] text-stone-600 truncate">{currentUser?.email}</p>
+                <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-white px-2.5 py-0.5 rounded-full shadow-2xs">
+                  <Shield className="w-3 h-3 text-white" />
                   {roleLabels[currentRole]}
                 </div>
               </div>
 
               {/* Role Switcher for Instant Testing */}
-              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
                 Ganti Role Pengguna (Demo):
               </div>
               <div className="space-y-0.5">
@@ -302,8 +302,8 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all ${
                       currentUser?.id === u.id
-                        ? 'bg-gradient-to-r from-[#1e40af] to-[#059669] text-white font-semibold shadow-xs'
-                        : 'text-slate-700 hover:bg-slate-100'
+                        ? 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-white font-semibold shadow-xs'
+                        : 'text-stone-700 hover:bg-[#fbf8ee]'
                     }`}
                   >
                     <span className="truncate">{roleLabels[u.role] || u.name}</span>
@@ -312,16 +312,16 @@ export const Header: React.FC<HeaderProps> = ({
                 ))}
               </div>
 
-              <div className="my-1.5 border-t border-slate-100" />
+              <div className="my-1.5 border-t border-[#e8dfc8]/60" />
 
               <button
                 onClick={() => {
                   onNavigate('landing');
                   setShowUserMenu(false);
                 }}
-                className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-blue-800 hover:bg-blue-50 flex items-center gap-2 transition-colors cursor-pointer"
+                className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-[#8a6d2b] hover:bg-[#fbf8ee] flex items-center gap-2 transition-colors cursor-pointer"
               >
-                <Compass className="w-4 h-4 text-blue-700" />
+                <Compass className="w-4 h-4 text-[#c9a961]" />
                 <span>Lihat Beranda Publik (Landing)</span>
               </button>
 

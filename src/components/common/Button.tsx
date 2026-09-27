@@ -21,12 +21,12 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
 
   const variants = {
-    primary: 'bg-gradient-to-r from-[#1e40af] to-[#059669] hover:from-[#1e3a8a] hover:to-[#047857] text-white shadow-sm hover:shadow-blue-900/20 focus:ring-[#1e40af]',
-    secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 focus:ring-slate-400',
-    outline: 'bg-transparent border border-slate-300 text-slate-700 hover:bg-slate-50 focus:ring-slate-400',
+    primary: 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#d8b870] hover:to-[#c9a961] text-white font-bold shadow-sm hover:shadow-[#c9a961]/30 focus:ring-[#c9a961]',
+    secondary: 'bg-[#fbf8ee] hover:bg-[#f4ebd0] text-[#8a6d2b] border border-[#e8dfc8] focus:ring-[#c9a961]',
+    outline: 'bg-transparent border border-[#e8dfc8] text-[#1A1410] hover:bg-[#fbf8ee] hover:border-[#c9a961] focus:ring-[#c9a961]',
     danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm focus:ring-rose-500',
-    amber: 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#d8b870] hover:to-[#c9a961] text-slate-950 font-bold shadow-sm focus:ring-amber-500',
-    ghost: 'bg-transparent hover:bg-slate-100 text-slate-600 focus:ring-slate-300',
+    amber: 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#d8b870] hover:to-[#c9a961] text-[#1A1410] font-bold shadow-sm focus:ring-[#c9a961]',
+    ghost: 'bg-transparent hover:bg-[#fbf8ee] text-[#7a6122] focus:ring-[#c9a961]',
   };
 
   const sizes = {
