@@ -71,10 +71,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
         <div className="p-6 sm:p-8">
           {/* Logo & Identity */}
           <div className="text-center mb-6">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#c9a961] via-[#d4af37] to-[#b8941e] p-0.5 shadow-lg flex items-center justify-center mb-3">
-              <div className="w-full h-full bg-[#1A1410] rounded-[14px] flex items-center justify-center text-[#c9a961]">
-                <Compass className="w-7 h-7 text-[#c9a961] animate-pulse" />
-              </div>
+            <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-tr from-[#c9a961] via-[#d4af37] to-[#b8941e] p-1 shadow-xl flex items-center justify-center mb-3">
+              <img 
+                src="/logo.png" 
+                alt="Logo Kementerian Haji dan Umrah RI" 
+                className="w-full h-full object-contain rounded-full bg-[#1A1410]"
+              />
             </div>
 
             <div className="flex items-center justify-center gap-1.5 mb-1">
@@ -83,11 +85,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                 PAPUA
               </span>
             </div>
-            <p className="text-xs font-bold text-[#8a6d2b]">
-              Sistem Informasi Manajemen Asrama Haji
+            <p className="text-xs font-bold text-[#8a6d2b] uppercase tracking-wide">
+              Kementerian Haji dan Umrah RI
             </p>
-            <p className="text-[11px] text-stone-500 mt-0.5">
-              Provinsi Papua
+            <p className="text-[11px] text-stone-500 mt-0.5 font-medium">
+              UPT Asrama Haji Transit Jayapura &bull; Provinsi Papua
             </p>
           </div>
 

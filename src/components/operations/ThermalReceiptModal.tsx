@@ -172,7 +172,12 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
           >
             {/* Kop Kasir Asrama Haji */}
             <div className="text-center pb-2 border-b border-dashed border-slate-400">
-              <p className="text-[10px] tracking-wider uppercase text-slate-500 font-bold">KEMENTERIAN AGAMA RI</p>
+              <img 
+                src="/logo.png" 
+                alt="Logo Kemenhaj RI" 
+                className="w-10 h-10 mx-auto mb-1 object-contain" 
+              />
+              <p className="text-[9.5px] tracking-wider uppercase text-slate-600 font-bold">KEMENTERIAN HAJI DAN UMRAH RI</p>
               <p className="font-extrabold text-xs text-slate-950 uppercase mt-0.5">UPT ASRAMA HAJI PAPUA</p>
               <p className="text-[10px] text-slate-600 leading-tight">Kotaraja, Abepura, Kota Jayapura</p>
               <p className="text-[9px] text-slate-500">Telp: (0967) 581234 &bull; SIMAHA Papua</p>

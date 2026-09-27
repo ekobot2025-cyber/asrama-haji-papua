@@ -221,24 +221,23 @@ export const SpkContractModal: React.FC<SpkContractModalProps> = ({
             className="bg-white p-5 sm:p-7 text-slate-900 font-sans shadow-xs mx-auto max-w-[760px] border border-slate-200"
             style={{ minHeight: '920px' }}
           >
-            {/* Kop Surat Kemenag Papua */}
+            {/* Kop Surat Kemenhaj Papua */}
             <div className="border-b-2 border-[#c9a961] pb-2.5 mb-2.5 text-center">
-              <div className="flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#c9a961] text-amber-300 flex items-center justify-center font-serif font-black text-lg shadow-xs flex-shrink-0">
-                  K
-                </div>
+              <div className="flex items-center justify-center gap-4">
+                <img 
+                  src="/logo.png" 
+                  alt="Logo Kementerian Haji dan Umrah" 
+                  className="w-12 h-12 object-contain shrink-0" 
+                />
                 <div>
                   <h2 className="text-xs font-black uppercase tracking-wide text-slate-900 leading-tight">
-                    KEMENTERIAN AGAMA REPUBLIK INDONESIA
+                    KEMENTERIAN HAJI DAN UMRAH REPUBLIK INDONESIA
                   </h2>
                   <h3 className="text-[11px] font-bold uppercase text-[#8a6d2b] leading-tight mt-0.5">
-                    KANTOR WILAYAH KEMENTERIAN AGAMA PROVINSI PAPUA
-                  </h3>
-                  <p className="text-[9.5px] text-slate-700 font-semibold mt-0.5">
                     UPT ASRAMA HAJI PROVINSI PAPUA
-                  </p>
+                  </h3>
                   <p className="text-[8.5px] text-slate-500">
-                    Jl. Asrama Haji No. 01, Jayapura &bull; Telp: (0967) 533451 &bull; Email: asramahaji.papua@kemenag.go.id
+                    Jl. Asrama Haji No. 01, Jayapura &bull; Telp: (0967) 533451 &bull; Email: asramahaji.papua@kemenhaj.go.id
                   </p>
                 </div>
               </div>

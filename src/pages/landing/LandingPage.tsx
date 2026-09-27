@@ -93,10 +93,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
           {/* Logo & Identity */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-[#c9a961] via-[#d4af37] to-[#b8941e] p-0.5 shadow-md flex items-center justify-center shrink-0">
-              <div className="w-full h-full bg-[#1A1410] rounded-[14px] flex items-center justify-center text-[#c9a961]">
-                <Compass className="w-5 h-5 animate-pulse" />
-              </div>
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-[#c9a961] via-[#d4af37] to-[#b8941e] p-0.5 shadow-md flex items-center justify-center shrink-0">
+              <img 
+                src="/logo.png" 
+                alt="Logo Kementerian Haji dan Umrah RI" 
+                className="w-full h-full object-contain rounded-full bg-[#1A1410]"
+              />
             </div>
             <div className="whitespace-nowrap">
               <div className="flex items-center gap-1.5">
@@ -106,10 +108,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </span>
               </div>
               <p className="text-[10px] sm:text-[11px] font-bold text-[#8a6d2b] leading-tight">
-                Sistem Informasi Manajemen Asrama Haji
+                Kementerian Haji dan Umrah RI
               </p>
               <p className="text-[9px] sm:text-[10px] text-stone-500 font-medium">
-                Provinsi Papua &bull; Layanan Perhotelan & Haji
+                UPT Asrama Haji Transit Jayapura &bull; Provinsi Papua
               </p>
             </div>
           </div>
@@ -864,7 +866,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-[#c9a961] shrink-0" />
-                  <span>Email: asramahaji.papua@kemenag.go.id</span>
+                  <span>Email: asramahaji.papua@kemenhaj.go.id</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock className="w-4 h-4 text-[#c9a961] shrink-0" />
@@ -874,7 +876,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div className="lg:col-span-5 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-[#c9a961]/20 text-center space-y-4">
-              <Compass className="w-12 h-12 text-[#c9a961] mx-auto animate-pulse" />
+              <img 
+                src="/logo.png" 
+                alt="Logo Kementerian Haji dan Umrah RI" 
+                className="w-16 h-16 mx-auto object-contain drop-shadow-xl"
+              />
               <h3 className="font-black text-lg text-white">Portal Pengguna Sistem SIMAHA</h3>
               <p className="text-xs text-stone-300">
                 Akses khusus bagi petugas Front Office, Pengelola Kamar, Housekeeping, Bendahara Keuangan, dan Pejabat Pimpinan.
@@ -895,12 +901,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <footer className="bg-[#1A1410] text-stone-400 text-xs py-12 px-4 sm:px-6 lg:px-8 border-t border-[#c9a961]/20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#2A2018] border border-[#c9a961]/30 flex items-center justify-center text-[#c9a961]">
-              <Compass className="w-5 h-5" />
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Logo Kementerian Haji dan Umrah RI" 
+              className="w-10 h-10 object-contain shrink-0"
+            />
             <div>
               <p className="font-bold text-stone-200">SIMAHA &bull; Sistem Informasi Manajemen Asrama Haji Papua</p>
-              <p className="text-[11px] text-stone-500">Kementerian Agama Republik Indonesia &bull; UPT Asrama Haji Transit Jayapura</p>
+              <p className="text-[11px] text-stone-400">Kementerian Haji dan Umrah Republik Indonesia &bull; UPT Asrama Haji Transit Jayapura</p>
             </div>
           </div>
 

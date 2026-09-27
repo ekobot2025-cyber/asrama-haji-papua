@@ -124,21 +124,23 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
         <div ref={printRef} className="space-y-4 text-xs text-slate-800 bg-white p-6 sm:p-8 shadow-sm mx-auto max-w-[794px]">
           {activeTab === 'SPMA' ? (
             <div>
-            {/* Kop Surat Kemenag Papua */}
+            {/* Kop Surat Kemenhaj Papua */}
             <div className="border-b-2 border-[#c9a961] pb-4 mb-4 text-center">
-              <div className="flex items-center justify-center gap-3 mb-1">
-                <div className="w-12 h-12 rounded-full bg-[#c9a961] text-amber-300 flex items-center justify-center font-serif font-black text-xl shadow-xs">
-                  K
-                </div>
+              <div className="flex items-center justify-center gap-4 mb-1">
+                <img 
+                  src="/logo.png" 
+                  alt="Logo Kementerian Haji dan Umrah" 
+                  className="w-14 h-14 object-contain shrink-0" 
+                />
                 <div>
                   <h2 className="text-sm font-black uppercase tracking-wide text-slate-900 leading-tight">
-                    KEMENTERIAN AGAMA REPUBLIK INDONESIA
+                    KEMENTERIAN HAJI DAN UMRAH REPUBLIK INDONESIA
                   </h2>
-                  <h3 className="text-xs font-bold uppercase text-[#8a6d2b] leading-tight">
-                    KANTOR WILAYAH KEMENTERIAN AGAMA PROVINSI PAPUA
+                  <h3 className="text-xs font-bold uppercase text-[#8a6d2b] leading-tight mt-0.5">
+                    UPT ASRAMA HAJI PROVINSI PAPUA
                   </h3>
                   <p className="text-[10px] text-slate-600 font-medium">
-                    UPT ASRAMA HAJI PROVINSI PAPUA — Jl. Asrama Haji No. 01, Jayapura
+                    Jl. Asrama Haji No. 01, Jayapura • Telp: (0967) 581-229 • Email: asramahaji.papua@kemenhaj.go.id
                   </p>
                 </div>
               </div>

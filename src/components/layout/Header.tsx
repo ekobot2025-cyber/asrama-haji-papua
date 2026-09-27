@@ -104,6 +104,16 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="w-5 h-5" />
         </button>
 
+        {/* Mobile Brand Logo */}
+        <div className="lg:hidden flex items-center gap-2">
+          <img 
+            src="/logo.png" 
+            alt="Logo Kementerian Haji dan Umrah RI" 
+            className="w-8 h-8 object-contain rounded-full shadow-xs"
+          />
+          <span className="font-extrabold tracking-wider text-sm text-[#1A1410]">SIMAHA</span>
+        </div>
+
         {/* Global Search Bar */}
         <div 
           onClick={onOpenGlobalSearch}

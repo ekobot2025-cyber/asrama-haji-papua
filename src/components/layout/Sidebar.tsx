@@ -150,11 +150,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={() => handleNav(currentRole === 'RESEPSIONIS' ? 'frontdesk-pos' : currentRole === 'HOUSEKEEPING' ? 'housekeeping' : currentRole === 'PIMPINAN' ? 'executive-dashboard' : 'dashboard')} 
             className="flex items-center gap-3 cursor-pointer select-none overflow-hidden"
           >
-            {/* Islamic Kiswah Emblem Motif */}
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#c9a961] via-[#d4af37] to-[#b8941e] p-0.5 shadow-md shrink-0 flex items-center justify-center">
-              <div className="w-full h-full bg-[#1A1410] rounded-[10px] flex items-center justify-center text-[#c9a961] font-bold text-lg">
-                <Compass className="w-5 h-5 text-[#c9a961] animate-pulse" />
-              </div>
+            {/* Logo Resmi Kementerian Haji dan Umrah RI */}
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#c9a961] via-[#d4af37] to-[#b8941e] p-0.5 shadow-md shrink-0 flex items-center justify-center">
+              <img 
+                src="/logo.png" 
+                alt="Logo Kementerian Haji dan Umrah RI" 
+                className="w-full h-full object-contain rounded-full bg-[#1A1410]"
+              />
             </div>
 
             {!collapsed && (

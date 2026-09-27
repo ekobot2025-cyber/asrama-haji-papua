@@ -271,21 +271,20 @@ export function generateFormalReportPdf(options: {
 
   const pageWidth = orientation === 'landscape' ? 297 : 210;
 
-  // 1. Official Kop Surat Kemenag Papua
+  // 1. Official Kop Surat Kemenhaj Papua
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(10.5);
   doc.setTextColor(30, 41, 59);
-  doc.text('KEMENTERIAN AGAMA REPUBLIK INDONESIA', pageWidth / 2, 14, { align: 'center' });
+  doc.text('KEMENTERIAN HAJI DAN UMRAH REPUBLIK INDONESIA', pageWidth / 2, 14, { align: 'center' });
 
   doc.setFontSize(12);
   doc.setTextColor(138, 109, 43); // Kiswah Gold Deep (#8a6d2b)
-  doc.text('KANTOR WILAYAH KEMENTERIAN AGAMA PROVINSI PAPUA', pageWidth / 2, 19, { align: 'center' });
+  doc.text('UPT ASRAMA HAJI PROVINSI PAPUA', pageWidth / 2, 19.5, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(71, 85, 105);
-  doc.text('UPT ASRAMA HAJI PROVINSI PAPUA', pageWidth / 2, 23.5, { align: 'center' });
-  doc.text('Jl. Asrama Haji No. 01, Jayapura • Telp: (0967) 581-229 • Email: asramahaji.papua@kemenag.go.id', pageWidth / 2, 27.5, { align: 'center' });
+  doc.text('Jl. Asrama Haji No. 01, Jayapura • Telp: (0967) 581-229 • Email: asramahaji.papua@kemenhaj.go.id', pageWidth / 2, 24.5, { align: 'center' });
 
   // Double horizontal separator line
   doc.setDrawColor(201, 169, 97); // #c9a961 Kiswah Gold
