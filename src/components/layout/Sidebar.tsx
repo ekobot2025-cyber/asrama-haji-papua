@@ -48,8 +48,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const isActive = currentPage === pageKey;
     return `group relative flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
       isActive
-        ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold shadow-md shadow-emerald-950/40 ring-1 ring-emerald-400/30'
-        : 'text-emerald-100/75 hover:text-white hover:bg-white/[0.08] font-medium'
+        ? 'bg-gradient-to-r from-[#1e40af] to-[#059669] text-white font-bold shadow-md shadow-blue-950/40 ring-1 ring-blue-400/30'
+        : 'text-slate-300 hover:text-white hover:bg-white/[0.08] font-medium'
     }`;
   };
 
@@ -135,25 +135,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-gradient-to-b from-haji-dark via-emerald-950 to-haji-dark text-white border-r border-emerald-900/50 shadow-xl transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-gradient-to-b from-[#0f172a] via-[#111e3b] to-[#0b1329] text-white border-r border-slate-800/80 shadow-xl transition-all duration-300 ease-in-out ${
           collapsed ? 'w-20' : 'w-64'
         } ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        {/* Papua Geometric Accents on top */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-amber-500 via-emerald-400 to-amber-400" />
+        {/* Official Kemenag haji.go.id Gold - Navy - Emerald Accent Bar */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-[#c9a961] via-[#1e40af] to-[#059669]" />
 
         {/* Brand / Logo */}
-        <div className="p-4 border-b border-emerald-800/40 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-800/60 flex items-center justify-between">
           <div 
             onClick={() => handleNav(currentRole === 'RESEPSIONIS' ? 'frontdesk-pos' : currentRole === 'HOUSEKEEPING' ? 'housekeeping' : currentRole === 'PIMPINAN' ? 'executive-dashboard' : 'dashboard')} 
             className="flex items-center gap-3 cursor-pointer select-none overflow-hidden"
           >
-            {/* Islamic Star / Papuan Emblem Motif */}
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-emerald-600 to-emerald-500 p-0.5 shadow-md shrink-0 flex items-center justify-center">
-              <div className="w-full h-full bg-haji-dark rounded-[10px] flex items-center justify-center text-amber-400 font-bold text-lg">
-                <Compass className="w-5 h-5 text-amber-400 animate-pulse" />
+            {/* Islamic Emblem Motif */}
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#c9a961] via-[#1e40af] to-[#059669] p-0.5 shadow-md shrink-0 flex items-center justify-center">
+              <div className="w-full h-full bg-[#0f172a] rounded-[10px] flex items-center justify-center text-[#c9a961] font-bold text-lg">
+                <Compass className="w-5 h-5 text-[#c9a961] animate-pulse" />
               </div>
             </div>
 
@@ -161,17 +161,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="leading-tight truncate">
                 <div className="flex items-center gap-1.5">
                   <span className="font-extrabold tracking-wider text-base text-white">SIMAHA</span>
-                  <span className="font-bold text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/30">PAPUA</span>
+                  <span className="font-bold text-[#c9a961] text-xs px-1.5 py-0.5 rounded bg-[#c9a961]/20 border border-[#c9a961]/40">PAPUA</span>
                 </div>
-                <p className="text-[10px] text-emerald-200/90 font-medium truncate mt-0.5">Sistem Informasi Manajemen Asrama Haji</p>
-                <p className="text-[9px] text-amber-300/80 font-medium truncate">Provinsi Papua</p>
+                <p className="text-[10px] text-slate-300 font-medium truncate mt-0.5">Sistem Informasi Manajemen Asrama Haji</p>
+                <p className="text-[9px] text-[#c9a961]/90 font-medium truncate">Provinsi Papua</p>
               </div>
             )}
           </div>
 
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex p-1.5 rounded-lg text-emerald-300 hover:text-white hover:bg-emerald-800/50 transition-colors"
+            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
             title={collapsed ? 'Perluas Menu' : 'Perkecil Menu'}
           >
             <ChevronLeft className={`w-4 h-4 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`} />
@@ -183,12 +183,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* UTAMA */}
           {hasUtamaSection && (
             <div>
-              {!collapsed && <p className="px-3 text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider mb-1">Utama</p>}
+              {!collapsed && <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Utama</p>}
               <ul className="space-y-1">
                 {canAccess('dashboard') && (
                   <li>
                     <div onClick={() => handleNav('dashboard')} className={navItemClass('dashboard')} title="Dashboard Operasional">
-                      <LayoutDashboard className="w-4 h-4 shrink-0 text-emerald-300" />
+                      <LayoutDashboard className="w-4 h-4 shrink-0 text-blue-300" />
                       {!collapsed && <span>Dashboard Operasional</span>}
                     </div>
                   </li>
@@ -196,8 +196,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {canAccess('executive-dashboard') && (
                   <li>
                     <div onClick={() => handleNav('executive-dashboard')} className={navItemClass('executive-dashboard')} title="Dashboard Pimpinan">
-                      <Award className="w-4 h-4 shrink-0 text-amber-400" />
-                      {!collapsed && <span className="text-amber-200 font-bold">Dashboard Pimpinan</span>}
+                      <Award className="w-4 h-4 shrink-0 text-[#c9a961]" />
+                      {!collapsed && <span className="text-[#c9a961] font-bold">Dashboard Pimpinan</span>}
                     </div>
                   </li>
                 )}
@@ -211,7 +211,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!collapsed ? (
                 <div 
                   onClick={() => toggleSection('operasional')} 
-                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none hover:text-blue-300"
                 >
                   <span>Operasional</span>
                   {openSections.operasional ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -226,16 +226,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         onClick={() => handleNav('frontdesk-pos')} 
                         className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
                           currentPage === 'frontdesk-pos'
-                            ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
-                            : 'bg-emerald-900/60 text-amber-300 hover:bg-emerald-800 hover:text-white border border-amber-400/30'
+                            ? 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-slate-950 font-bold shadow-md'
+                            : 'bg-slate-800/70 text-[#c9a961] hover:bg-slate-800 hover:text-white border border-[#c9a961]/30'
                         }`} 
                         title="Kasir & Transaksi Resepsionis (Front Desk POS)"
                       >
-                        <Receipt className="w-4 h-4 shrink-0 text-amber-400 animate-pulse" />
+                        <Receipt className="w-4 h-4 shrink-0 text-[#c9a961] animate-pulse" />
                         {!collapsed && (
                           <div className="flex items-center justify-between w-full">
                             <span className="font-bold">Kasir Resepsionis (POS)</span>
-                            <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.2 rounded">KASIR</span>
+                            <span className="text-[9px] bg-[#c9a961] text-slate-950 font-black px-1.5 py-0.2 rounded">KASIR</span>
                           </div>
                         )}
                       </div>
@@ -244,7 +244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('reservations') && (
                     <li>
                       <div onClick={() => handleNav('reservations')} className={navItemClass('reservations')} title="Reservasi">
-                        <CalendarCheck className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <CalendarCheck className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Reservasi</span>}
                       </div>
                     </li>
@@ -252,7 +252,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('reservation-calendar') && (
                     <li>
                       <div onClick={() => handleNav('reservation-calendar')} className={navItemClass('reservation-calendar')} title="Bagan Jadwal / Tape Chart (Room Rack)">
-                        <CalendarDays className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <CalendarDays className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Tape Chart & Kalender</span>}
                       </div>
                     </li>
@@ -260,7 +260,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('checkin') && (
                     <li>
                       <div onClick={() => handleNav('checkin')} className={navItemClass('checkin')} title="Check-in">
-                        <LogIn className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <LogIn className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Check-in Tamu</span>}
                       </div>
                     </li>
@@ -268,7 +268,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('checkout') && (
                     <li>
                       <div onClick={() => handleNav('checkout')} className={navItemClass('checkout')} title="Check-out">
-                        <LogOut className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <LogOut className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Check-out Tamu</span>}
                       </div>
                     </li>
@@ -276,7 +276,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('room-assignment') && (
                     <li>
                       <div onClick={() => handleNav('room-assignment')} className={navItemClass('room-assignment')} title="Penempatan Kamar">
-                        <UserCheck className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <UserCheck className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Penempatan Kamar</span>}
                       </div>
                     </li>
@@ -284,7 +284,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('guests') && (
                     <li>
                       <div onClick={() => handleNav('guests')} className={navItemClass('guests')} title="Data Tamu">
-                        <Users className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Users className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Data Tamu</span>}
                       </div>
                     </li>
@@ -292,7 +292,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('groups') && (
                     <li>
                       <div onClick={() => handleNav('groups')} className={navItemClass('groups')} title="Rombongan">
-                        <Briefcase className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Briefcase className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Rombongan</span>}
                       </div>
                     </li>
@@ -308,7 +308,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!collapsed ? (
                 <div 
                   onClick={() => toggleSection('penginapan')} 
-                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none hover:text-blue-300"
                 >
                   <span>Penginapan & Kamar</span>
                   {openSections.penginapan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -320,7 +320,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('room-status-board') && (
                     <li>
                       <div onClick={() => handleNav('room-status-board')} className={navItemClass('room-status-board')} title="Status Kamar (Room Board)">
-                        <Hotel className="w-4 h-4 shrink-0 text-amber-400" />
+                        <Hotel className="w-4 h-4 shrink-0 text-[#c9a961]" />
                         {!collapsed && <span className="font-semibold text-amber-200">Room Status Board</span>}
                       </div>
                     </li>
@@ -328,7 +328,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('buildings') && (
                     <li>
                       <div onClick={() => handleNav('buildings')} className={navItemClass('buildings')} title="Gedung">
-                        <Building2 className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Building2 className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Gedung</span>}
                       </div>
                     </li>
@@ -336,7 +336,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('rooms') && (
                     <li>
                       <div onClick={() => handleNav('rooms')} className={navItemClass('rooms')} title="Kamar">
-                        <BedDouble className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <BedDouble className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Data Kamar</span>}
                       </div>
                     </li>
@@ -344,7 +344,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('beds') && (
                     <li>
                       <div onClick={() => handleNav('beds')} className={navItemClass('beds')} title="Tempat Tidur (Bed)">
-                        <Layers className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Layers className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Tempat Tidur (Bed)</span>}
                       </div>
                     </li>
@@ -352,7 +352,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('facilities') && (
                     <li>
                       <div onClick={() => handleNav('facilities')} className={navItemClass('facilities')} title="Fasilitas Asrama">
-                        <Landmark className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Landmark className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Fasilitas & Aula</span>}
                       </div>
                     </li>
@@ -368,7 +368,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!collapsed ? (
                 <div 
                   onClick={() => toggleSection('kamarOps')} 
-                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none hover:text-blue-300"
                 >
                   <span>Operasional Kamar</span>
                   {openSections.kamarOps ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -380,7 +380,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('housekeeping') && (
                     <li>
                       <div onClick={() => handleNav('housekeeping')} className={navItemClass('housekeeping')} title="Housekeeping">
-                        <Sparkles className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Sparkles className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Housekeeping</span>}
                       </div>
                     </li>
@@ -388,7 +388,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('maintenance') && (
                     <li>
                       <div onClick={() => handleNav('maintenance')} className={navItemClass('maintenance')} title="Maintenance">
-                        <Wrench className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Wrench className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Maintenance & Kerusakan</span>}
                       </div>
                     </li>
@@ -404,7 +404,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!collapsed ? (
                 <div 
                   onClick={() => toggleSection('keuangan')} 
-                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none hover:text-blue-300"
                 >
                   <span>Keuangan</span>
                   {openSections.keuangan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -416,7 +416,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('rates') && (
                     <li>
                       <div onClick={() => handleNav('rates')} className={navItemClass('rates')} title="Master Tarif">
-                        <Receipt className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Receipt className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Tarif Kamar & Fasilitas</span>}
                       </div>
                     </li>
@@ -424,7 +424,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('invoices') && (
                     <li>
                       <div onClick={() => handleNav('invoices')} className={navItemClass('invoices')} title="Tagihan & Invoice">
-                        <FileText className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <FileText className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Tagihan & Invoice</span>}
                       </div>
                     </li>
@@ -432,7 +432,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('payments') && (
                     <li>
                       <div onClick={() => handleNav('payments')} className={navItemClass('payments')} title="Pembayaran & Kwitansi">
-                        <CreditCard className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <CreditCard className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Pembayaran & Kwitansi</span>}
                       </div>
                     </li>
@@ -448,7 +448,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!collapsed ? (
                 <div 
                   onClick={() => toggleSection('laporan')} 
-                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none hover:text-blue-300"
                 >
                   <span>Laporan Manajemen</span>
                   {openSections.laporan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -460,7 +460,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('reports') && (
                     <li>
                       <div onClick={() => handleNav('reports')} className={navItemClass('reports')} title="Semua Laporan">
-                        <BarChart3 className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <BarChart3 className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Laporan Terpadu</span>}
                       </div>
                     </li>
@@ -476,7 +476,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!collapsed ? (
                 <div 
                   onClick={() => toggleSection('master')} 
-                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none hover:text-blue-300"
                 >
                   <span>Master Data</span>
                   {openSections.master ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -488,7 +488,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('master-institutions') && (
                     <li>
                       <div onClick={() => handleNav('master-institutions')} className={navItemClass('master-institutions')} title="Instansi">
-                        <Landmark className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Landmark className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Instansi & Lembaga</span>}
                       </div>
                     </li>
@@ -496,7 +496,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('master-room-types') && (
                     <li>
                       <div onClick={() => handleNav('master-room-types')} className={navItemClass('master-room-types')} title="Jenis Kamar">
-                        <BedDouble className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <BedDouble className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Jenis Kamar</span>}
                       </div>
                     </li>
@@ -512,7 +512,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!collapsed ? (
                 <div 
                   onClick={() => toggleSection('sistem')} 
-                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider select-none hover:text-emerald-300"
+                  className="flex items-center justify-between px-3 py-1 cursor-pointer text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none hover:text-blue-300"
                 >
                   <span>Sistem & Keamanan</span>
                   {openSections.sistem ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -524,7 +524,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('system-users') && (
                     <li>
                       <div onClick={() => handleNav('system-users')} className={navItemClass('system-users')} title="Pengguna & Role">
-                        <UserCog className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <UserCog className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Pengguna & Role</span>}
                       </div>
                     </li>
@@ -532,7 +532,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('audit-logs') && (
                     <li>
                       <div onClick={() => handleNav('audit-logs')} className={navItemClass('audit-logs')} title="Audit Log">
-                        <History className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <History className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Audit Log Sistem</span>}
                       </div>
                     </li>
@@ -540,7 +540,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {canAccess('settings') && (
                     <li>
                       <div onClick={() => handleNav('settings')} className={navItemClass('settings')} title="Pengaturan">
-                        <Settings className="w-4 h-4 shrink-0 text-emerald-300" />
+                        <Settings className="w-4 h-4 shrink-0 text-blue-300" />
                         {!collapsed && <span>Pengaturan Sistem</span>}
                       </div>
                     </li>
@@ -552,44 +552,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Public Landing Portal Preview Button */}
-        <div className="p-3 pb-0 bg-emerald-950/40">
+        <div className="p-3 pb-0 bg-slate-900/60">
           <button
             onClick={() => {
               onNavigate('landing');
               onCloseMobile();
             }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-200 hover:text-white hover:bg-emerald-900/80 bg-emerald-900/30 border border-emerald-700/40 transition-all text-left"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 bg-slate-800/40 border border-slate-700/50 transition-all text-left"
             title="Buka Beranda Publik (Landing Page)"
           >
-            <Compass className="w-4 h-4 text-emerald-400 shrink-0" />
+            <Compass className="w-4 h-4 text-blue-400 shrink-0" />
             {!collapsed && <span>Beranda Publik</span>}
           </button>
         </div>
 
         {/* Help & SOP Button */}
-        <div className="p-3 border-t border-emerald-900/60 bg-emerald-950/40">
+        <div className="p-3 border-t border-slate-800/80 bg-slate-900/60">
           <button
             onClick={() => {
               if (onOpenHelpGuide) onOpenHelpGuide();
               onCloseMobile();
             }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-300 hover:bg-amber-400/20 bg-amber-500/10 border border-amber-400/30 transition-all text-left"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#c9a961] hover:bg-amber-400/20 bg-amber-500/10 border border-[#c9a961]/40 transition-all text-left"
             title="Buku Panduan & SOP Operasional SIPAH"
           >
-            <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
+            <BookOpen className="w-4 h-4 text-[#c9a961] shrink-0" />
             {!collapsed && <span>Buku Panduan SOP</span>}
           </button>
         </div>
 
         {/* Sidebar Footer: Role Indicator & Version */}
-        <div className="p-3 border-t border-emerald-900/60 bg-emerald-950/80 text-[10px] text-emerald-300/70 flex items-center justify-between">
+        <div className="p-3 border-t border-slate-800/80 bg-[#0b1329]/90 text-[10px] text-slate-400 flex items-center justify-between">
           {!collapsed ? (
             <>
               <div className="flex items-center gap-1.5 truncate">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block shrink-0" />
-                <span className="font-bold text-amber-300 truncate">{currentRole}</span>
+                <span className="font-bold text-[#c9a961] truncate">{currentRole}</span>
               </div>
-              <span className="font-mono text-[9px] bg-emerald-900/80 px-1.5 py-0.5 rounded text-emerald-200 shrink-0">SIMAHA</span>
+              <span className="font-mono text-[9px] bg-slate-800 px-1.5 py-0.5 rounded text-blue-300 shrink-0">SIMAHA</span>
             </>
           ) : (
             <div className="mx-auto w-2 h-2 rounded-full bg-emerald-400" />

@@ -41,12 +41,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Background Subtle Papuan Gradients & Geometry */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-slate-900 to-haji-dark opacity-90" />
-      <div className="absolute inset-0 bg-[radial-gradient(#c59b27_1px,transparent_1px)] [background-size:24px_24px] opacity-15" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#111e3b] to-[#064e3b] opacity-95" />
+      <div className="absolute inset-0 bg-[radial-gradient(#c9a961_1px,transparent_1px)] [background-size:24px_24px] opacity-15" />
 
-      {/* Decorative Gold & Emerald Blurs */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Decorative Gold & Navy/Emerald Blurs */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#c9a961]/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Back to Landing Page Button */}
       {onBackToLanding && (
@@ -54,36 +54,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
           <button
             type="button"
             onClick={onBackToLanding}
-            className="inline-flex items-center gap-2 text-xs font-bold text-emerald-200 hover:text-white transition-colors bg-emerald-950/70 hover:bg-emerald-900 px-3.5 py-1.5 rounded-full border border-emerald-700/60 shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-2 text-xs font-bold text-blue-200 hover:text-white transition-colors bg-[#0f172a]/70 hover:bg-[#111e3b] px-3.5 py-1.5 rounded-full border border-slate-700/60 shadow-xs cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Kembali ke Halaman Beranda</span>
           </button>
-          <span className="text-[11px] text-emerald-300/70 font-medium">SIMAHA Papua</span>
+          <span className="text-[11px] text-[#c9a961] font-medium">SIMAHA Papua</span>
         </div>
       )}
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
         {/* Top Header Ribbon */}
-        <div className="h-2 w-full bg-gradient-to-r from-amber-500 via-emerald-600 to-amber-400" />
+        <div className="h-2 w-full bg-gradient-to-r from-[#c9a961] via-[#1e40af] to-[#059669]" />
 
         <div className="p-6 sm:p-8">
           {/* Logo & Identity */}
           <div className="text-center mb-6">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-600 via-emerald-700 to-emerald-600 p-0.5 shadow-lg flex items-center justify-center mb-3">
-              <div className="w-full h-full bg-emerald-950 rounded-[14px] flex items-center justify-center text-amber-400">
-                <Compass className="w-7 h-7 text-amber-400 animate-pulse" />
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#c9a961] via-[#1e40af] to-[#059669] p-0.5 shadow-lg flex items-center justify-center mb-3">
+              <div className="w-full h-full bg-[#0f172a] rounded-[14px] flex items-center justify-center text-[#c9a961]">
+                <Compass className="w-7 h-7 text-[#c9a961] animate-pulse" />
               </div>
             </div>
 
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <h2 className="text-2xl font-black tracking-wider text-slate-900">SIMAHA</h2>
-              <span className="text-xs font-bold bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded border border-amber-400/40">
+              <span className="text-xs font-bold bg-[#c9a961]/20 text-[#795b16] px-2 py-0.5 rounded border border-[#c9a961]/40">
                 PAPUA
               </span>
             </div>
-            <p className="text-xs font-semibold text-emerald-800">
+            <p className="text-xs font-semibold text-blue-900">
               Sistem Informasi Manajemen Asrama Haji
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
@@ -103,7 +103,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                   placeholder="superadmin / admin / petugas..."
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 focus:outline-none bg-slate-50/50 text-slate-800 font-medium"
+                  className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-700 focus:outline-none bg-slate-50/50 text-slate-800 font-medium"
                 />
               </div>
             </div>
@@ -118,7 +118,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-700 focus:outline-none bg-slate-50/50 text-slate-800 font-medium"
+                  className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-700 focus:outline-none bg-slate-50/50 text-slate-800 font-medium"
                 />
               </div>
             </div>
@@ -128,7 +128,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
               size="lg"
               type="submit"
               loading={loading}
-              className="w-full py-3 mt-2 shadow-md bg-emerald-800 hover:bg-emerald-900"
+              className="w-full py-3 mt-2 shadow-md"
               icon={<LogIn className="w-4 h-4" />}
             >
               Masuk ke Aplikasi
@@ -144,7 +144,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
               <button
                 type="button"
                 onClick={() => handleQuickLogin('superadmin')}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 text-left truncate transition-colors"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-left truncate transition-colors"
               >
                 <span className="font-bold block text-slate-900">Super Admin</span>
                 <span className="text-[10px] text-slate-500">Akses Penuh IT</span>
@@ -152,7 +152,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
               <button
                 type="button"
                 onClick={() => handleQuickLogin('admin')}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 text-left truncate transition-colors"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-left truncate transition-colors"
               >
                 <span className="font-bold block text-slate-900">Admin Penginapan</span>
                 <span className="text-[10px] text-slate-500">Reservasi & Kamar</span>
@@ -160,7 +160,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
               <button
                 type="button"
                 onClick={() => handleQuickLogin('resepsionis')}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 text-left truncate transition-colors"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-left truncate transition-colors"
               >
                 <span className="font-bold block text-slate-900">Petugas Front Office</span>
                 <span className="text-[10px] text-slate-500">Check-in / Check-out</span>
@@ -168,7 +168,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
               <button
                 type="button"
                 onClick={() => handleQuickLogin('keuangan')}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 text-left truncate transition-colors"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-left truncate transition-colors"
               >
                 <span className="font-bold block text-slate-900">Bendahara PNBP</span>
                 <span className="text-[10px] text-slate-500">Kwitansi & Kasir</span>
@@ -176,7 +176,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
               <button
                 type="button"
                 onClick={() => handleQuickLogin('housekeeping')}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 text-left truncate transition-colors"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-left truncate transition-colors"
               >
                 <span className="font-bold block text-slate-900">Housekeeping</span>
                 <span className="text-[10px] text-slate-500">Kebersihan Kamar</span>
@@ -184,7 +184,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
               <button
                 type="button"
                 onClick={() => handleQuickLogin('pimpinan')}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 text-left truncate transition-colors"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-left truncate transition-colors"
               >
                 <span className="font-bold block text-slate-900">Kepala UPT</span>
                 <span className="text-[10px] text-slate-500">Executive Read-only</span>
