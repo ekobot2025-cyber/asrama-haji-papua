@@ -231,7 +231,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
   const handleAddRoomToCart = (room: Room) => {
     // Check if already in cart
     if (cart.some((item) => item.roomId === room.id)) {
-      toast.info('Kamar Sudah Ada', `Kamar ${room.room_number} telah ada di keranjang kasir.`);
+      toast.info('Kamar Sudah Terpilih', `Kamar ${room.room_number} sudah aktif di keranjang kasir.`);
       return;
     }
 
@@ -251,8 +251,29 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
       bedId: availableBed?.id,
     };
 
-    setCart((prev) => [...prev, newItem]);
+    // Swap out any previous room so 1 room allocation is assigned per walkin transaction
+    setCart((prev) => {
+      const withoutRoom = prev.filter((item) => item.type !== 'ROOM');
+      return [newItem, ...withoutRoom];
+    });
     toast.success('Kamar Ditambahkan', `Kamar ${room.room_number} berhasil dimasukkan ke keranjang kasir.`);
+  };
+
+  // Selected room currently in cart
+  const selectedRoomInCart = useMemo(() => {
+    return cart.find((i) => i.type === 'ROOM');
+  }, [cart]);
+
+  // Direct selection from cashier dropdown
+  const handleSelectRoomFromDropdown = (roomId: string) => {
+    if (!roomId) {
+      setCart((prev) => prev.filter((item) => item.type !== 'ROOM'));
+      return;
+    }
+    const target = rooms.find((r) => r.id === roomId);
+    if (target) {
+      handleAddRoomToCart(target);
+    }
   };
 
   const handleAddServiceToCart = (service: CartItem) => {
@@ -351,7 +372,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
 
     const roomItem = cart.find((i) => i.type === 'ROOM');
     if (!roomItem || !roomItem.roomId) {
-      toast.warning('Pilih Kamar', 'Transaksi check-in resepsionis memerlukan minimal 1 alokasi kamar.');
+      toast.warning('Pilih Kamar Menginap', 'Silakan pilih kamar pada menu dropdown "Alokasi Kamar Menginap" atau klik salah satu kamar pada rak di sebelah kiri.');
       return;
     }
 
@@ -712,15 +733,20 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
             <>
               {/* SECTION: AVAILABLE ROOMS */}
               {(activeTab === 'ALL' || activeTab === 'ROOMS') && (
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                <div id="catalog-room-rack" className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 scroll-mt-24">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
                       <BedDouble className="w-4 h-4 text-emerald-800" />
                       Kamar Siap Huni ({filteredRooms.length} Kamar)
                     </h3>
-                    <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Durasi: {stayNights} Malam
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md hidden sm:inline font-medium">
+                        💡 Klik kartu kamar untuk memilih
+                      </span>
+                      <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+                        Durasi: {stayNights} Malam
+                      </span>
+                    </div>
                   </div>
 
                   {filteredRooms.length === 0 ? (
@@ -945,6 +971,83 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     className="w-full px-2 py-1 border border-slate-200 rounded-lg text-[11px] bg-white font-mono"
                   />
                 </div>
+              </div>
+
+              {/* FITUR PILIH KAMAR: Alokasi Kamar Menginap Langsung di Terminal Kasir */}
+              <div className="pt-2.5 border-t border-slate-200/70 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
+                    <BedDouble className="w-3.5 h-3.5 text-emerald-800" />
+                    <span>Pilih Kamar Menginap (Siap Huni) *</span>
+                  </label>
+                  {selectedRoomInCart ? (
+                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                      Kamar Terpilih
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
+                      Wajib Dipilih
+                    </span>
+                  )}
+                </div>
+
+                {/* Dropdown Langsung di Kasir */}
+                <select
+                  value={selectedRoomInCart?.roomId || ''}
+                  onChange={(e) => handleSelectRoomFromDropdown(e.target.value)}
+                  className={`w-full px-2.5 py-2 border rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    selectedRoomInCart
+                      ? 'border-emerald-500 bg-emerald-50/70 text-emerald-950 ring-1 ring-emerald-500 font-bold'
+                      : 'border-amber-400 bg-amber-50/70 text-slate-800 focus:ring-2 focus:ring-emerald-700 shadow-xs'
+                  }`}
+                >
+                  <option value="">-- Klik untuk Pilih Kamar Siap Huni ({availableRooms.length} Kamar) --</option>
+                  {availableRooms.map((rm) => {
+                    const bld = buildings.find((b) => b.id === rm.building_id)?.name || 'Gedung';
+                    const rType = roomTypes.find((t) => t.id === rm.room_type_id)?.name || 'Kamar';
+                    return (
+                      <option key={rm.id} value={rm.id}>
+                        Kamar {rm.room_number} — {rType} ({bld}) — {formatCurrency(rm.rate_per_night)}/malam ({rm.capacity} Bed)
+                      </option>
+                    );
+                  })}
+                </select>
+
+                {/* Info Status Kamar Terpilih atau Ajakan Pintasan ke Rak Kamar */}
+                {selectedRoomInCart ? (
+                  <div className="flex items-center justify-between text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900 px-2.5 py-1.5 rounded-lg">
+                    <div className="truncate">
+                      <span className="font-bold">{selectedRoomInCart.name}</span>
+                      <span className="text-[10px] text-emerald-700 ml-1.5 font-medium">
+                        ({stayNights} Malam &bull; {formatCurrency(selectedRoomInCart.unitPrice * stayNights)})
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem(selectedRoomInCart.id)}
+                      className="text-rose-600 hover:text-rose-800 text-[10px] font-bold underline shrink-0 cursor-pointer ml-2"
+                    >
+                      Ganti / Hapus
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between text-[11px] text-amber-900 bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg">
+                    <span className="text-[10px] font-medium">Atau pilih dari rak kamar sebelah kiri:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('ROOMS');
+                        const el = document.getElementById('catalog-room-rack');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="text-[10px] font-bold text-emerald-800 hover:text-emerald-950 underline shrink-0 cursor-pointer flex items-center gap-1"
+                    >
+                      <span>Buka Rak Kamar</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
