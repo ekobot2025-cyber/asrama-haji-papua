@@ -43,13 +43,18 @@ export interface RoomType {
   id: string;
   code: string;
   name: string;
+  category?: 'PENGINAPAN';
   description: string;
   default_capacity: number;
+  capacity?: number;
   base_rate_per_night: number;
+  base_rate?: number;
+  rate_unit?: 'PER_NIGHT';
   amenities: string[];
+  image_url?: string;
 }
 
-export type RoomStatus = 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'CLEANING' | 'MAINTENANCE';
+export type RoomStatus = 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'CLEANING' | 'MAINTENANCE' | 'INACTIVE';
 export type HousekeepingStatus = 'DIRTY' | 'IN_CLEANING' | 'INSPECTED' | 'READY';
 
 export interface Room {
@@ -65,6 +70,7 @@ export interface Room {
   status: RoomStatus;
   housekeeping_status: HousekeepingStatus;
   amenities: string[];
+  image_url?: string;
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -88,7 +94,8 @@ export type GuestType =
   | 'MANASIK' 
   | 'UMUM' 
   | 'ROMBONGAN' 
-  | 'PEGAWAI';
+  | 'PEGAWAI'
+  | 'BUMN';
 
 export interface Institution {
   id: string;
@@ -160,6 +167,15 @@ export interface Reservation {
   reservation_no: string; // RSV/AHP/2026/00001
   reservation_date: string;
   reservation_type: 'INDIVIDUAL' | 'ROMBONGAN' | 'INSTANSI' | 'KEGIATAN';
+  rental_category?: 'PENGINAPAN' | 'RUANG_PERTEMUAN';
+  room_type_id?: string;
+  room_type_name?: string;
+  facility_id?: string;
+  facility_name?: string;
+  unit_count?: number; // Jumlah kamar atau jumlah unit ruangan
+  duration?: number; // Jumlah malam (penginapan) atau jumlah hari (ruangan)
+  duration_unit?: 'MALAM' | 'HARI';
+  snapshot_rate?: number; // Snapshot tarif unit saat reservasi dibuat
   guest_id?: string; // PIC for individual
   group_id?: string; // If group
   institution_id?: string;
@@ -179,6 +195,8 @@ export interface Reservation {
   remaining_amount: number;
   notes?: string;
   spma_no?: string; // SPMA/AHP/2026/00123
+  simponi_billing_code?: string; // 15-digit Kode Billing MPN-G3 SIMPONI
+  guest_name?: string; // Nama pemesan / tamu langsung
   package_type?: 'REGULER' | 'FULLBOARD_DIKLAT' | 'MANASIK_AKBAR' | 'HALFDAY_MEETING';
   created_by: string;
   verified_by?: string;
@@ -224,13 +242,16 @@ export interface Facility {
   id: string;
   name: string;
   type: 'AULA' | 'RUANG_RAPAT' | 'RUANG_KELAS' | 'MASJID' | 'RUANG_MAKAN' | 'LAPANGAN_MANASIK' | 'LAINNYA';
+  category?: 'RUANG_PERTEMUAN' | 'FASILITAS_UMUM';
   location: string;
   capacity: number;
   daily_rate: number;
   hourly_rate?: number;
-  status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE';
+  rate_unit?: 'PER_DAY' | 'PER_HOUR' | 'PER_EVENT';
+  status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'INACTIVE';
   description: string;
   amenities: string[];
+  image_url?: string;
 }
 
 export interface FacilityReservation {
@@ -251,11 +272,24 @@ export interface RateItem {
   category: 'KAMAR' | 'FASILITAS' | 'LAYANAN';
   target_id?: string; // room_type_id or facility_id
   user_type: string; // Kemenag, Instansi Pemerintah, Swasta, Jamaah, Umum
-  unit: 'PER_NIGHT' | 'PER_PERSON' | 'PER_ROOM' | 'PER_EVENT' | 'PER_HOUR';
+  unit: 'PER_NIGHT' | 'PER_DAY' | 'PER_PERSON' | 'PER_ROOM' | 'PER_EVENT' | 'PER_HOUR';
   rate: number;
+  previous_rate?: number;
   description?: string;
   is_active: boolean;
   effective_date: string;
+}
+
+export interface RateHistory {
+  id: string;
+  rate_id: string;
+  rate_name: string;
+  previous_rate: number;
+  new_rate: number;
+  effective_date: string;
+  changed_by: string;
+  changed_at: string;
+  reason?: string;
 }
 
 export interface InvoiceItem {

@@ -1,17 +1,17 @@
-import { 
+import type { 
   User, Building, Floor, RoomType, Room, Bed, Institution, Guest, Group, 
   Reservation, RoomAssignment, Checkin, Checkout, Facility, FacilityReservation, 
-  RateItem, Invoice, InvoiceItem, Payment, HousekeepingTask, MaintenanceRequest, 
+  RateItem, RateHistory, Invoice, InvoiceItem, Payment, HousekeepingTask, MaintenanceRequest, 
   NotificationItem, AuditLog, AppSettings, RoomStatus, HousekeepingStatus
-} from '../types';
+} from '../types/index.ts';
 import { 
   initialUsers, initialBuildings, initialFloors, initialRoomTypes, 
   initialInstitutions, initialGuests, initialGroups, initialReservations, 
   initialHousekeepingTasks, initialMaintenanceRequests, initialInvoices, 
   initialInvoiceItems, initialPayments, initialRates, initialNotifications, 
   initialAuditLogs, initialSettings, initialFacilities, generateSeedRoomsAndBeds 
-} from './seedData';
-import { terbilang } from '../utils/terbilang';
+} from './seedData.ts';
+import { terbilang } from '../utils/terbilang.ts';
 
 const DB_VERSION = 'simaha_papua_v4.0_gedung_mina_32kamar';
 const STORAGE_PREFIX = 'sipah_';
@@ -33,6 +33,7 @@ class DatabaseService {
   private facilities: Facility[] = [];
   private facilityReservations: FacilityReservation[] = [];
   private rates: RateItem[] = [];
+  private rateHistories: RateHistory[] = [];
   private invoices: Invoice[] = [];
   private invoiceItems: InvoiceItem[] = [];
   private payments: Payment[] = [];
@@ -180,6 +181,7 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}checkouts`, JSON.stringify(this.checkouts));
     localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
     localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
+    localStorage.setItem(`${STORAGE_PREFIX}rateHistories`, JSON.stringify(this.rateHistories));
     localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
     localStorage.setItem(`${STORAGE_PREFIX}invoiceItems`, JSON.stringify(this.invoiceItems));
     localStorage.setItem(`${STORAGE_PREFIX}payments`, JSON.stringify(this.payments));
@@ -207,6 +209,7 @@ class DatabaseService {
       this.checkouts = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}checkouts`) || '[]') || [];
       this.facilities = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}facilities`) || '[]') || initialFacilities;
       this.rates = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}rates`) || '[]') || initialRates;
+      this.rateHistories = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}rateHistories`) || '[]') || [];
       this.invoices = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}invoices`) || '[]') || initialInvoices;
       this.invoiceItems = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}invoiceItems`) || '[]') || initialInvoiceItems;
       this.payments = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}payments`) || '[]') || initialPayments;
@@ -233,6 +236,92 @@ class DatabaseService {
         });
         needsSave = true;
 
+        // 1. RoomTypes: Superior & Standar official brochure specs
+        this.roomTypes.forEach(rt => {
+          if (rt.id === 'rt-spr' || rt.code === 'SUPERIOR') {
+            rt.name = 'Superior';
+            rt.category = 'PENGINAPAN';
+            rt.base_rate_per_night = 300000;
+            rt.base_rate = 300000;
+            rt.default_capacity = 2;
+            rt.capacity = 2;
+            rt.rate_unit = 'PER_NIGHT';
+            rt.amenities = ['Double Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk', 'Smart TV LED', 'Water Heater', 'WiFi Gratis'];
+            if (!rt.image_url) rt.image_url = 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600';
+            needsSave = true;
+          } else if (rt.id === 'rt-std' || rt.code === 'STANDAR') {
+            rt.name = 'Standar';
+            rt.category = 'PENGINAPAN';
+            rt.base_rate_per_night = 250000;
+            rt.base_rate = 250000;
+            rt.default_capacity = 2;
+            rt.capacity = 2;
+            rt.rate_unit = 'PER_NIGHT';
+            rt.amenities = ['2 Single Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk', 'WiFi Gratis'];
+            if (!rt.image_url) rt.image_url = 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=600';
+            needsSave = true;
+          }
+        });
+
+        // 2. Facilities: Aula (300 pax, Rp3.900.000) & Ruang Kelas (30 pax, Rp650.000)
+        const aulaFac = this.facilities.find(f => f.id === 'fac-01' || f.name.toLowerCase().includes('aula'));
+        if (aulaFac) {
+          aulaFac.name = 'Aula';
+          aulaFac.category = 'RUANG_PERTEMUAN';
+          aulaFac.capacity = 300;
+          aulaFac.daily_rate = 3900000;
+          aulaFac.rate_unit = 'PER_DAY';
+          aulaFac.amenities = ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi'];
+          if (!aulaFac.image_url) aulaFac.image_url = 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600';
+          needsSave = true;
+        }
+
+        if (!this.facilities.some(f => f.id === 'fac-07' || f.name.toLowerCase().includes('ruang kelas'))) {
+          this.facilities.push({
+            id: 'fac-07',
+            name: 'Ruang Kelas',
+            type: 'RUANG_KELAS',
+            category: 'RUANG_PERTEMUAN',
+            location: 'Gedung Diklat Lantai 1',
+            capacity: 30,
+            daily_rate: 650000,
+            hourly_rate: 100000,
+            rate_unit: 'PER_DAY',
+            status: 'AVAILABLE',
+            description: 'Ruang kelas representatif untuk diklat, bimtek, pelatihan intensif, dan rapat teknis berkapasitas maksimal 30 orang.',
+            amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi'],
+            image_url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600',
+          });
+          needsSave = true;
+        }
+
+        // 3. Rates: Update Aula rate to 3.900.000, add Ruang Kelas rate if missing
+        const aulaRate = this.rates.find(r => r.id === 'rate-03' || r.name.toLowerCase().includes('aula'));
+        if (aulaRate) {
+          aulaRate.name = 'Tarif Sewa Aula';
+          aulaRate.rate = 3900000;
+          aulaRate.unit = 'PER_DAY';
+          aulaRate.description = 'Tarif sewa Aula resmi brosur per hari (Kapasitas maks 300 orang, Sound System, Infocus/Proyektor, AC, Kursi)';
+          needsSave = true;
+        }
+
+        if (!this.rates.some(r => r.id === 'rate-05' || r.name.toLowerCase().includes('ruang kelas'))) {
+          this.rates.push({
+            id: 'rate-05',
+            name: 'Tarif Sewa Ruang Kelas',
+            category: 'FASILITAS',
+            target_id: 'fac-07',
+            user_type: 'Instansi Pemerintah / Pelatihan / Diklat',
+            unit: 'PER_DAY',
+            rate: 650000,
+            description: 'Tarif sewa Ruang Kelas resmi brosur per hari (Kapasitas maks 30 orang, Sound System, Infocus/Proyektor, AC, Kursi)',
+            is_active: true,
+            effective_date: '2026-01-01',
+          });
+          needsSave = true;
+        }
+
+        // 4. Update reservations with rental_category, duration, unit_count, and snapshot_rate if missing
         this.reservations.forEach((r, idx) => {
           if (!r.spma_no) {
             r.spma_no = `SPMA/AHP/2026/09/${String(idx + 1).padStart(4, '0')}`;
@@ -240,6 +329,31 @@ class DatabaseService {
           }
           if (!r.package_type) {
             r.package_type = 'REGULER';
+            needsSave = true;
+          }
+          if (!r.rental_category) {
+            r.rental_category = r.facility_requirements && !r.total_rooms_requested ? 'RUANG_PERTEMUAN' : 'PENGINAPAN';
+            needsSave = true;
+          }
+          if (!r.unit_count) {
+            r.unit_count = r.total_rooms_requested || 1;
+            needsSave = true;
+          }
+          if (!r.duration_unit) {
+            r.duration_unit = r.rental_category === 'PENGINAPAN' ? 'MALAM' : 'HARI';
+            needsSave = true;
+          }
+          if (!r.duration) {
+            const cin = new Date(r.checkin_date).getTime();
+            const cout = new Date(r.checkout_date).getTime();
+            const diffDays = Math.max(1, Math.round((cout - cin) / (1000 * 60 * 60 * 24)));
+            r.duration = diffDays;
+            needsSave = true;
+          }
+          if (!r.snapshot_rate) {
+            const nights = r.duration || 1;
+            const units = r.unit_count || 1;
+            r.snapshot_rate = Math.round(r.total_amount / (nights * units)) || 250000;
             needsSave = true;
           }
         });
@@ -332,6 +446,7 @@ class DatabaseService {
   public getCheckouts(): Checkout[] { return [...this.checkouts]; }
   public getFacilities(): Facility[] { return [...this.facilities]; }
   public getRates(): RateItem[] { return [...this.rates]; }
+  public getRateHistories(): RateHistory[] { return [...this.rateHistories]; }
   public getInvoices(): Invoice[] { return [...this.invoices]; }
   public getInvoiceItems(): InvoiceItem[] { return [...this.invoiceItems]; }
   public getPayments(): Payment[] { return [...this.payments]; }
@@ -678,8 +793,18 @@ class DatabaseService {
 
   // --- Master Data: Room Types Operations ---
   public saveRoomType(typeData: Partial<RoomType>, user?: User): RoomType {
+    const baseRate = Number(typeData.base_rate_per_night ?? typeData.base_rate) || 250000;
+    const cap = Number(typeData.default_capacity ?? typeData.capacity) || 2;
+
     if (typeData.id) {
-      this.roomTypes = this.roomTypes.map(t => t.id === typeData.id ? { ...t, ...typeData } as RoomType : t);
+      this.roomTypes = this.roomTypes.map(t => t.id === typeData.id ? { 
+        ...t, 
+        ...typeData,
+        base_rate_per_night: baseRate,
+        base_rate: baseRate,
+        default_capacity: cap,
+        capacity: cap
+      } as RoomType : t);
       localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
       if (user) this.logAudit(user.name, user.role, 'UPDATE_ROOM_TYPE', 'Master Tipe Kamar', `Mengubah tipe kamar ${typeData.name || typeData.id}`, typeData.id);
       return this.roomTypes.find(t => t.id === typeData.id)!;
@@ -688,10 +813,15 @@ class DatabaseService {
         id: `rt-${Date.now()}`,
         code: (typeData.code || 'TYPE').toUpperCase(),
         name: typeData.name || 'Tipe Kamar Baru',
+        category: 'PENGINAPAN',
+        rate_unit: 'PER_NIGHT',
         description: typeData.description || '',
-        default_capacity: Number(typeData.default_capacity) || 4,
-        base_rate_per_night: Number(typeData.base_rate_per_night) || 350000,
-        amenities: typeData.amenities || ['AC', 'Kamar Mandi Dalam', 'Air Panas'],
+        default_capacity: cap,
+        capacity: cap,
+        base_rate_per_night: baseRate,
+        base_rate: baseRate,
+        amenities: typeData.amenities || ['Double Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk'],
+        image_url: typeData.image_url,
       };
       this.roomTypes.push(newType);
       localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
@@ -824,6 +954,77 @@ class DatabaseService {
     }
   }
 
+  public updateRateWithHistory(
+    rateId: string, 
+    newRate: number, 
+    effectiveDate: string, 
+    reason: string, 
+    user: User
+  ): { success: boolean; message: string; rate?: RateItem; history?: RateHistory } {
+    const rate = this.rates.find(r => r.id === rateId);
+    if (!rate) return { success: false, message: 'Data tarif tidak ditemukan.' };
+
+    const previousRate = rate.rate;
+    rate.previous_rate = previousRate;
+    rate.rate = Number(newRate);
+    rate.effective_date = effectiveDate || new Date().toISOString().split('T')[0];
+
+    // If rate has target_id (RoomType or Facility), sync the master object base rate
+    if (rate.target_id) {
+      const rt = this.roomTypes.find(t => t.id === rate.target_id);
+      if (rt) {
+        rt.base_rate_per_night = Number(newRate);
+        localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
+      }
+      const fac = this.facilities.find(f => f.id === rate.target_id);
+      if (fac) {
+        fac.daily_rate = Number(newRate);
+        localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
+      }
+    }
+
+    const historyRecord: RateHistory = {
+      id: `rh-${Date.now()}`,
+      rate_id: rate.id,
+      rate_name: rate.name,
+      previous_rate: previousRate,
+      new_rate: Number(newRate),
+      effective_date: rate.effective_date,
+      changed_by: user.name,
+      changed_at: new Date().toISOString(),
+      reason: reason || 'Penyesuaian tarif resmi oleh Administrator',
+    };
+
+    this.rateHistories.unshift(historyRecord);
+
+    localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
+    localStorage.setItem(`${STORAGE_PREFIX}rateHistories`, JSON.stringify(this.rateHistories));
+
+    this.logAudit(
+      user.name, 
+      user.role, 
+      'UPDATE_RATE_WITH_HISTORY', 
+      'Master Tarif', 
+      `Mengubah tarif ${rate.name} dari Rp ${previousRate.toLocaleString('id-ID')} menjadi Rp ${Number(newRate).toLocaleString('id-ID')} (Berlaku mulai: ${rate.effective_date})`, 
+      rate.id
+    );
+
+    this.addNotification(
+      'Perubahan Tarif Resmi Disimpan',
+      `Tarif ${rate.name} diperbarui menjadi Rp ${Number(newRate).toLocaleString('id-ID')} oleh ${user.name}. Transaksi lama tetap menggunakan tarif saat reservasi dibuat.`,
+      'SYSTEM',
+      'rates',
+      rate.id
+    );
+
+    return { 
+      success: true, 
+      message: `Tarif ${rate.name} berhasil diperbarui menjadi Rp ${Number(newRate).toLocaleString('id-ID')} berlaku mulai ${rate.effective_date}.`, 
+      rate, 
+      history: historyRecord 
+    };
+  }
+
   public deleteRate(id: string, user?: User): { success: boolean; message: string } {
     if (user?.role === 'HOUSEKEEPING') {
       return { success: false, message: 'Akses ditolak: Petugas Housekeeping tidak diizinkan menghapus data tarif.' };
@@ -934,35 +1135,212 @@ class DatabaseService {
     return `SPK/AHP/KS/2026/${count}`;
   }
 
-  public createReservation(data: Partial<Reservation>, user: User): { success: boolean; message: string; reservation?: Reservation } {
+  // --- Availability & Conflict Prevention (Atomic Check) ---
+  public checkRoomAvailability(
+    roomTypeId: string, 
+    checkinDate: string, 
+    checkoutDate: string, 
+    requestedRooms: number, 
+    excludeReservationId?: string
+  ): { available: boolean; totalRooms: number; bookedRooms: number; availableRooms: number; message: string } {
+    const normalizeRoomTypeId = (id?: string) => (id === 'rt-sup' ? 'rt-spr' : id);
+    const targetTypeId = normalizeRoomTypeId(roomTypeId);
+    const totalRooms = this.rooms.filter(r => normalizeRoomTypeId(r.room_type_id) === targetTypeId && r.status !== 'INACTIVE').length;
+    
+    // Check overlap with active reservations for this room type
+    const overlapping = this.reservations.filter(r => {
+      if (excludeReservationId && r.id === excludeReservationId) return false;
+      if (r.status === 'CANCELLED' || r.status === 'REJECTED' || r.status === 'CHECKED_OUT') return false;
+      if (r.rental_category === 'RUANG_PERTEMUAN') return false;
+      if (r.room_type_id && normalizeRoomTypeId(r.room_type_id) !== targetTypeId) return false;
+
+      // Overlap condition: not (end <= start2 or start >= end2)
+      const rCheckin = r.checkin_date;
+      const rCheckout = r.checkout_date;
+      return !(checkoutDate <= rCheckin || checkinDate >= rCheckout);
+    });
+
+    const bookedRooms = overlapping.reduce((sum, r) => sum + (r.unit_count || r.total_rooms_requested || 1), 0);
+    const availableRooms = Math.max(0, totalRooms - bookedRooms);
+    const available = availableRooms >= requestedRooms;
+
+    return {
+      available,
+      totalRooms,
+      bookedRooms,
+      availableRooms,
+      message: available 
+        ? `Tersedia ${availableRooms} dari total ${totalRooms} kamar pada rentang tanggal tersebut.`
+        : `Kapasitas kamar tidak mencukupi (Double Booking Dicegah). Tersedia ${availableRooms} kamar, diminta ${requestedRooms} kamar untuk periode ${checkinDate} s.d. ${checkoutDate}.`
+    };
+  }
+
+  public checkFacilityAvailability(
+    facilityId: string, 
+    checkinDate: string, 
+    checkoutDate: string, 
+    excludeReservationId?: string
+  ): { available: boolean; conflictingReservation?: Reservation; message: string } {
+    const normalizeFacilityId = (id?: string) => {
+      if (!id) return 'fac-01';
+      if (id === 'fac-1') return 'fac-01';
+      if (id === 'fac-class') return 'fac-07';
+      return id;
+    };
+    const fId = normalizeFacilityId(facilityId);
+    const facility = this.facilities.find(f => normalizeFacilityId(f.id) === fId);
+    if (!facility) return { available: false, message: 'Ruang pertemuan / fasilitas tidak ditemukan.' };
+
+    if (facility.status === 'MAINTENANCE' || facility.status === 'INACTIVE') {
+      return { available: false, message: `Fasilitas ${facility.name} saat ini sedang dalam status ${facility.status}.` };
+    }
+
+    const conflict = this.reservations.find(r => {
+      if (excludeReservationId && r.id === excludeReservationId) return false;
+      if (r.status === 'CANCELLED' || r.status === 'REJECTED' || r.status === 'CHECKED_OUT') return false;
+      if (normalizeFacilityId(r.facility_id) !== fId) return false;
+
+      const rCheckin = r.checkin_date;
+      const rCheckout = r.checkout_date;
+      return !(checkoutDate <= rCheckin || checkinDate >= rCheckout);
+    });
+
+    if (conflict) {
+      return {
+        available: false,
+        conflictingReservation: conflict,
+        message: `Benturan Jadwal: ${facility.name} sudah dipesan pada tanggal tersebut untuk kegiatan "${conflict.activity_name || conflict.reservation_no}" (${conflict.checkin_date} s.d. ${conflict.checkout_date}).`
+      };
+    }
+
+    return {
+      available: true,
+      message: `${facility.name} tersedia pada periode ${checkinDate} s.d. ${checkoutDate}.`
+    };
+  }
+
+  public createReservation(data: Partial<Reservation>, user?: User): { success: boolean; message: string; reservation?: Reservation } {
     const reservationNo = this.generateReservationNo();
     const spmaNo = data.spma_no || this.generateSpmaNo();
+    const checkinDate = data.checkin_date || new Date().toISOString().split('T')[0];
+    const checkoutDate = data.checkout_date || checkinDate;
+    const simponiBillingCode = data.simponi_billing_code || this.generateSimponiBillingCode();
+
+    // Determine category
+    const rentalCategory = data.rental_category || (data.facility_id ? 'RUANG_PERTEMUAN' : 'PENGINAPAN');
+    const unitCount = Number(data.unit_count || data.total_rooms_requested || 1);
+    let snapshotRate = Number(data.snapshot_rate || 0);
+    let duration = Number(data.duration || 1);
+    let durationUnit: 'MALAM' | 'HARI' = rentalCategory === 'PENGINAPAN' ? 'MALAM' : 'HARI';
+    let calculatedTotal = 0;
+    let roomTypeName: string | undefined = data.room_type_name;
+    let facilityName: string | undefined = data.facility_name;
+
+    // Calculate dates duration
+    const cinTime = new Date(checkinDate).getTime();
+    const coutTime = new Date(checkoutDate).getTime();
+    const daysDiff = Math.max(1, Math.round((coutTime - cinTime) / (1000 * 60 * 60 * 24)));
+
+    if (rentalCategory === 'PENGINAPAN') {
+      durationUnit = 'MALAM';
+      duration = daysDiff;
+      const normalizeRoomTypeId = (id?: string) => (id === 'rt-sup' ? 'rt-spr' : id);
+      const roomTypeId = normalizeRoomTypeId(data.room_type_id || 'rt-std')!;
+      const rType = this.roomTypes.find(rt => normalizeRoomTypeId(rt.id) === roomTypeId);
+      if (rType) {
+        roomTypeName = rType.name;
+        if (!snapshotRate) snapshotRate = rType.base_rate_per_night || rType.base_rate || 250000;
+      } else {
+        if (!snapshotRate) snapshotRate = 250000;
+      }
+
+      // Check room availability (prevent double booking)
+      const avail = this.checkRoomAvailability(roomTypeId, checkinDate, checkoutDate, unitCount);
+      if (!avail.available) {
+        return { success: false, message: avail.message };
+      }
+
+      // Rumus Penginapan: Total Biaya = Jumlah Malam × Tarif Kamar × Jumlah Kamar
+      calculatedTotal = duration * snapshotRate * unitCount;
+    } else {
+      // RUANG_PERTEMUAN
+      durationUnit = 'HARI';
+      // For meeting room, if same day checkin & checkout, it counts as 1 day
+      duration = checkinDate === checkoutDate ? 1 : daysDiff;
+      const normalizeFacilityId = (id?: string) => {
+        if (!id) return 'fac-01';
+        if (id === 'fac-1') return 'fac-01';
+        if (id === 'fac-class') return 'fac-07';
+        return id;
+      };
+      const facilityId = normalizeFacilityId(data.facility_id);
+      const facility = this.facilities.find(f => normalizeFacilityId(f.id) === facilityId);
+      if (!facility) {
+        return { success: false, message: 'Fasilitas atau ruang pertemuan tidak ditemukan.' };
+      }
+      facilityName = facility.name;
+      if (!snapshotRate) snapshotRate = facility.daily_rate;
+
+      // Validate capacity
+      const totalGuests = Number(data.total_guests || 1);
+      if (facility.capacity && totalGuests > facility.capacity) {
+        return {
+          success: false,
+          message: `Kapasitas Terlampaui: Jumlah peserta (${totalGuests} orang) melebihi kapasitas maksimal ${facility.name} (${facility.capacity} orang).`
+        };
+      }
+
+      // Check facility schedule conflict
+      const conflictCheck = this.checkFacilityAvailability(facilityId, checkinDate, checkoutDate);
+      if (!conflictCheck.available) {
+        return { success: false, message: conflictCheck.message };
+      }
+
+      // Rumus Ruang Pertemuan: Total Biaya = Jumlah Hari × Tarif Ruangan × Jumlah Unit
+      calculatedTotal = duration * snapshotRate * unitCount;
+    }
+
+    const finalTotal = data.total_amount !== undefined && data.total_amount > 0 ? Number(data.total_amount) : calculatedTotal;
+    const creatorName = user?.name || (data.guest_name ? `Pemesan Online (${data.guest_name})` : 'Portal Reservasi Online (Mandiri)');
+    const creatorRole = user?.role || 'UMUM';
+
     const newReservation: Reservation = {
       id: `rsv-${Date.now()}`,
       reservation_no: reservationNo,
       reservation_date: new Date().toISOString(),
       reservation_type: data.reservation_type || 'INDIVIDUAL',
+      rental_category: rentalCategory,
+      room_type_id: data.room_type_id,
+      room_type_name: roomTypeName,
+      facility_id: data.facility_id,
+      facility_name: facilityName,
+      unit_count: unitCount,
+      duration: duration,
+      duration_unit: durationUnit,
+      snapshot_rate: snapshotRate,
       guest_id: data.guest_id,
+      guest_name: data.guest_name,
       group_id: data.group_id,
       institution_id: data.institution_id,
       activity_type: data.activity_type || 'UMUM',
-      activity_name: data.activity_name || 'Penginapan Asrama Haji',
-      checkin_date: data.checkin_date || '2026-09-26',
-      checkout_date: data.checkout_date || '2026-09-28',
+      activity_name: data.activity_name || (rentalCategory === 'PENGINAPAN' ? `Penginapan Kamar ${roomTypeName || ''}` : `Sewa Ruangan ${facilityName || ''}`),
+      checkin_date: checkinDate,
+      checkout_date: checkoutDate,
       total_guests: data.total_guests || 1,
       male_count: data.male_count || (data.total_guests || 1),
       female_count: data.female_count || 0,
-      total_rooms_requested: data.total_rooms_requested || 1,
+      total_rooms_requested: rentalCategory === 'PENGINAPAN' ? unitCount : 0,
       facility_requirements: data.facility_requirements,
       status: 'PENDING',
       payment_status: 'UNPAID',
-      total_amount: data.total_amount || 0,
+      total_amount: finalTotal,
       paid_amount: 0,
-      remaining_amount: data.total_amount || 0,
+      remaining_amount: finalTotal,
       notes: data.notes,
       spma_no: spmaNo,
+      simponi_billing_code: simponiBillingCode,
       package_type: data.package_type || 'REGULER',
-      created_by: user.name,
+      created_by: creatorName,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -970,10 +1348,59 @@ class DatabaseService {
     this.reservations.unshift(newReservation);
     localStorage.setItem(`${STORAGE_PREFIX}reservations`, JSON.stringify(this.reservations));
 
-    this.logAudit(user.name, user.role, 'CREATE_RESERVATION', 'Reservasi', `Membuat reservasi baru no ${reservationNo} (SPMA: ${spmaNo}) untuk ${newReservation.total_guests} orang.`, newReservation.id);
-    this.addNotification('Reservasi Baru Dibuat', `Reservasi ${reservationNo} (${spmaNo}) telah didaftarkan dan menunggu verifikasi.`, 'RESERVATION', 'reservations', newReservation.id);
+    // Create corresponding Invoice for PNBP & Financial Audit
+    const guestObj = data.guest_id ? this.guests.find(g => g.id === data.guest_id) : undefined;
+    const billTo = data.guest_name || guestObj?.full_name || 'Tamu Online';
+    const institutionObj = data.institution_id ? this.institutions.find(i => i.id === data.institution_id) : undefined;
 
-    return { success: true, message: `Reservasi ${reservationNo} berhasil dibuat.`, reservation: newReservation };
+    const newInvoice: Invoice = {
+      id: `inv-${Date.now()}`,
+      invoice_no: `INV/AHP/2026/${String(this.invoices.length + 1).padStart(5, '0')}`,
+      reservation_id: newReservation.id,
+      bill_to_name: billTo,
+      institution_name: institutionObj?.name,
+      issue_date: checkinDate,
+      due_date: checkoutDate,
+      subtotal: finalTotal,
+      discount_amount: 0,
+      tax_amount: 0,
+      extra_charges: 0,
+      total_amount: finalTotal,
+      paid_amount: 0,
+      balance_due: finalTotal,
+      status: 'UNPAID',
+      pnbp_account_code: rentalCategory === 'PENGINAPAN' ? '425111' : '425112',
+      pnbp_account_name: rentalCategory === 'PENGINAPAN' ? 'Pendapatan Sewa Kamar Asrama Haji / Wisma' : 'Pendapatan Sewa Fasilitas & Ruangan Pertemuan',
+      simponi_billing_code: simponiBillingCode,
+      billing_expired_at: checkoutDate,
+      notes: `Tagihan Reservasi ${reservationNo} (${rentalCategory}: ${roomTypeName || facilityName || ''})`,
+      created_at: new Date().toISOString(),
+    };
+    this.invoices.unshift(newInvoice);
+    localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
+
+    this.logAudit(
+      creatorName, 
+      creatorRole, 
+      'CREATE_RESERVATION', 
+      'Reservasi', 
+      `Membuat reservasi baru no ${reservationNo} (${rentalCategory}: ${duration} ${durationUnit} @ Rp ${snapshotRate.toLocaleString('id-ID')} x ${unitCount} unit = Rp ${finalTotal.toLocaleString('id-ID')})`, 
+      newReservation.id
+    );
+
+    this.addNotification(
+      'Reservasi Baru Dibuat', 
+      `Reservasi ${reservationNo} (${spmaNo}) telah didaftarkan senilai Rp ${finalTotal.toLocaleString('id-ID')} dengan Kode Billing SIMPONI ${simponiBillingCode} dan menunggu verifikasi.`, 
+      'RESERVATION', 
+      'reservations', 
+      newReservation.id
+    );
+
+    return { 
+      success: true, 
+      message: `Reservasi ${reservationNo} berhasil dibuat (${duration} ${durationUnit} x Rp ${snapshotRate.toLocaleString('id-ID')} = Rp ${finalTotal.toLocaleString('id-ID')}).`, 
+      reservation: newReservation 
+    };
   }
 
   public verifyReservation(reservationId: string, user: User, approve: boolean, notes?: string): boolean {
@@ -1695,10 +2122,11 @@ class DatabaseService {
       g.full_name.toLowerCase().includes(q)
     );
 
-    // Or find reservation directly by reservation_no or spma_no
+    // Or find reservation directly by reservation_no, spma_no, or simponi_billing_code
     let rsv = this.reservations.find(r => 
       r.reservation_no.toLowerCase().includes(q) || 
-      (r.spma_no && r.spma_no.toLowerCase().includes(q))
+      (r.spma_no && r.spma_no.toLowerCase().includes(q)) ||
+      (r.simponi_billing_code && r.simponi_billing_code.toLowerCase().includes(q))
     );
 
     if (!rsv && guest) {

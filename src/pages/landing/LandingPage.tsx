@@ -4,11 +4,13 @@ import {
   Calendar, CheckCircle2, ShieldCheck, MapPin, Phone, Mail, Clock, 
   CreditCard, Sparkles, Users, FileText, ChevronRight, HelpCircle, 
   BookOpen, Star, Award, Coffee, Wifi, Tv, Utensils, Info, Check, 
-  Calculator, Tag, Printer, ExternalLink, Menu, X
+  Calculator, Tag, Printer, ExternalLink, Menu, X, Landmark, School
 } from 'lucide-react';
 import { db } from '../../db/database';
+import { RoomType, Facility } from '../../types';
 import { SelfServiceLookupModal } from '../../components/operations/SelfServiceLookupModal';
 import { HelpGuideModal } from '../../components/common/HelpGuideModal';
+import { PublicSelfBookingModal } from '../../components/operations/PublicSelfBookingModal';
 import { formatCurrency } from '../../utils/formatters';
 
 interface LandingPageProps {
@@ -22,22 +24,114 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingCategory, setBookingCategory] = useState<'PENGINAPAN' | 'RUANG_PERTEMUAN'>('PENGINAPAN');
+  const [bookingItemId, setBookingItemId] = useState<string>('rt-sup');
+  const [bookingUnitCount, setBookingUnitCount] = useState<number>(1);
+  const [bookingDuration, setBookingDuration] = useState<number>(1);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const openBookingModal = (category: 'PENGINAPAN' | 'RUANG_PERTEMUAN', itemId?: string, unitCount: number = 1, duration: number = 1) => {
+    setBookingCategory(category);
+    if (itemId) setBookingItemId(itemId);
+    setBookingUnitCount(unitCount);
+    setBookingDuration(duration);
+    setIsBookingOpen(true);
+  };
 
   // Quick Mini Lookup on Hero
   const [quickQuery, setQuickQuery] = useState('');
   const [quickResult, setQuickResult] = useState<any>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Cost Calculator State
-  const [selectedRoomType, setSelectedRoomType] = useState('superior');
-  const [numRooms, setNumRooms] = useState(1);
-  const [numNights, setNumNights] = useState(2);
+  // Dynamic Master Data from Database
+  const [roomTypes] = useState<RoomType[]>(() => db.getRoomTypes());
+  const [facilities] = useState<Facility[]>(() => db.getFacilities());
 
-  const roomRates = {
-    superior: { name: 'Kamar Superior (Gedung Mina)', price: 300000, desc: 'Tersedia 2 Kamar Saja, AC Dual-Inverter, Smart TV, Water Heater, Meja Kerja (Check-in: 14.00, Check-out: 12.00 WIT)', capacity: 2, pnbpCode: '425111' },
-    standar: { name: 'Kamar Standar (Gedung Mina)', price: 250000, desc: 'Tersedia 30 Kamar, AC Individual, Kamar Mandi Dalam, Lemari, WiFi (Check-in: 14.00, Check-out: 12.00 WIT)', capacity: 2, pnbpCode: '425111' },
-    aula: { name: 'Aula Utama Cenderawasih (Harian)', price: 5000000, desc: 'Kapasitas s.d 500 Peserta, Sound System, AC Central, Videotron', capacity: 500, pnbpCode: '425112' }
+  const superiorType = roomTypes.find(rt => rt.id === 'rt-sup' || rt.code === 'SUP') || {
+    id: 'rt-sup',
+    name: 'Superior',
+    code: 'SUP',
+    category: 'PENGINAPAN' as const,
+    description: 'Kamar Superior representatif Gedung Mina',
+    default_capacity: 2,
+    capacity: 2,
+    base_rate_per_night: 300000,
+    base_rate: 300000,
+    rate_unit: 'PER_NIGHT' as const,
+    amenities: ['Double Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk']
+  };
+
+  const standarType = roomTypes.find(rt => rt.id === 'rt-std' || rt.code === 'STD') || {
+    id: 'rt-std',
+    name: 'Standar',
+    code: 'STD',
+    category: 'PENGINAPAN' as const,
+    description: 'Kamar Standar representatif Gedung Mina',
+    default_capacity: 2,
+    capacity: 2,
+    base_rate_per_night: 250000,
+    base_rate: 250000,
+    rate_unit: 'PER_NIGHT' as const,
+    amenities: ['2 Single Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk']
+  };
+
+  const aulaFacility = facilities.find(f => f.id === 'fac-1' || f.name.toLowerCase().includes('aula')) || {
+    id: 'fac-1',
+    name: 'Aula',
+    type: 'AULA' as const,
+    category: 'RUANG_PERTEMUAN' as const,
+    location: 'Gedung Serbaguna',
+    capacity: 300,
+    daily_rate: 3900000,
+    rate_unit: 'PER_DAY' as const,
+    status: 'AVAILABLE' as const,
+    description: 'Aula pertemuan kapasitas s.d 300 orang',
+    amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi']
+  };
+
+  const ruangKelasFacility = facilities.find(f => f.id === 'fac-class' || f.name.toLowerCase().includes('kelas')) || {
+    id: 'fac-class',
+    name: 'Ruang Kelas',
+    type: 'RUANG_RAPAT' as const,
+    category: 'RUANG_PERTEMUAN' as const,
+    location: 'Gedung Diklat & Pembinaan',
+    capacity: 30,
+    daily_rate: 650000,
+    rate_unit: 'PER_DAY' as const,
+    status: 'AVAILABLE' as const,
+    description: 'Ruang kelas diklat & bimbingan kapasitas s.d 30 orang',
+    amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi']
+  };
+
+  // Cost Calculator State
+  const [calcCategory, setCalcCategory] = useState<'PENGINAPAN' | 'RUANG_PERTEMUAN'>('PENGINAPAN');
+  const [calcItemId, setCalcItemId] = useState('rt-sup');
+  const [calcUnitCount, setCalcUnitCount] = useState(1);
+  const [calcDuration, setCalcDuration] = useState(2);
+
+  const calculateTotal = () => {
+    if (calcCategory === 'PENGINAPAN') {
+      const selectedRt = roomTypes.find(r => r.id === calcItemId) || superiorType;
+      const rate = selectedRt.base_rate_per_night || selectedRt.base_rate || 300000;
+      // Formula: Jumlah Malam × Tarif Kamar × Jumlah Kamar
+      return calcDuration * rate * calcUnitCount;
+    } else {
+      const selectedFac = facilities.find(f => f.id === calcItemId) || aulaFacility;
+      const rate = selectedFac.daily_rate || 3900000;
+      // Formula: Jumlah Hari × Tarif Ruangan × Jumlah Unit
+      return calcDuration * rate * calcUnitCount;
+    }
+  };
+
+  const getSelectedRate = () => {
+    if (calcCategory === 'PENGINAPAN') {
+      const selectedRt = roomTypes.find(r => r.id === calcItemId) || superiorType;
+      return selectedRt.base_rate_per_night || selectedRt.base_rate || 300000;
+    } else {
+      const selectedFac = facilities.find(f => f.id === calcItemId) || aulaFacility;
+      return selectedFac.daily_rate || 3900000;
+    }
   };
 
   const handleQuickSearch = (e?: React.FormEvent) => {
@@ -50,11 +144,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     const res = db.lookupAccommodation(queryToSearch);
     setQuickResult(res);
     setIsLookupOpen(true);
-  };
-
-  const calculateTotal = () => {
-    const rate = roomRates[selectedRoomType as keyof typeof roomRates]?.price || 0;
-    return rate * numRooms * numNights;
   };
 
   const scrollToSection = (id: string) => {
@@ -155,8 +244,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
           </nav>
 
-          {/* Action Button: Cek Kamar & Login */}
+          {/* Action Button: Booking Online, Cek Kamar & Login */}
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => openBookingModal('PENGINAPAN', 'rt-sup')}
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-[#1A1410] bg-gradient-to-r from-[#f7cf6e] via-[#c9a961] to-[#d4af37] hover:from-[#fbe29a] hover:to-[#c9a961] border border-[#b8941e] transition-all shadow-[0_2px_8px_rgba(201,169,97,0.35)] whitespace-nowrap cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5 text-[#1A1410] shrink-0" />
+              <span>Booking Mandiri</span>
+            </button>
+
             <button
               onClick={() => setIsLookupOpen(true)}
               className="hidden md:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#8a6d2b] bg-[#fbf8ee] hover:bg-[#f4ebd0] border border-[#e8dfc8] transition-colors shadow-2xs whitespace-nowrap cursor-pointer"
@@ -223,12 +320,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             >
               Kontak & Lokasi
             </button>
-            <div className="pt-2 border-t border-[#e8dfc8] flex gap-2">
+            <div className="pt-2 border-t border-[#e8dfc8] flex flex-col gap-2">
+              <button
+                onClick={() => { openBookingModal('PENGINAPAN', 'rt-sup'); setMobileMenuOpen(false); }}
+                className="w-full py-2.5 rounded-xl text-xs font-black text-[#1A1410] bg-gradient-to-r from-[#f7cf6e] to-[#c9a961] text-center shadow-xs cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Booking Mandiri Online</span>
+              </button>
               <button
                 onClick={() => { setIsLookupOpen(true); setMobileMenuOpen(false); }}
-                className="flex-1 py-2 rounded-xl text-xs font-bold text-[#8a6d2b] bg-[#fbf8ee] border border-[#e8dfc8] text-center"
+                className="w-full py-2 rounded-xl text-xs font-bold text-[#8a6d2b] bg-[#fbf8ee] border border-[#e8dfc8] text-center"
               >
-                Cek Kamar
+                Cek Kamar (Kiosk)
               </button>
             </div>
           </div>
@@ -266,20 +370,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-2">
                 <button
-                  onClick={onGoToLogin}
-                  className="px-6 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#d8b870] hover:to-[#c9a961] text-white shadow-lg hover:shadow-[#c9a961]/30 transition-all flex items-center gap-2 cursor-pointer"
+                  onClick={() => openBookingModal('PENGINAPAN', 'rt-sup')}
+                  className="px-6 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-[#f7cf6e] via-[#c9a961] to-[#d4af37] hover:from-[#fbe29a] hover:to-[#c9a961] text-[#1A1410] shadow-[0_4px_16px_rgba(201,169,97,0.4)] transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <LogIn className="w-4 h-4" />
-                  <span>{currentUser ? 'Masuk ke Dashboard Sistem' : 'Masuk ke Portal Sistem'}</span>
+                  <Calendar className="w-4 h-4 text-[#1A1410]" />
+                  <span>Booking Kamar / Aula Mandiri</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <button
+                  onClick={onGoToLogin}
+                  className="px-5 py-3.5 rounded-xl font-bold text-sm bg-white/10 hover:bg-white/20 text-white border border-[#c9a961]/40 shadow-sm hover:shadow-[#c9a961]/30 transition-all flex items-center gap-2 cursor-pointer backdrop-blur-xs"
+                >
+                  <LogIn className="w-4 h-4 text-[#c9a961]" />
+                  <span>{currentUser ? 'Dashboard Petugas' : 'Portal Login'}</span>
+                </button>
+
+                <button
                   onClick={() => setIsLookupOpen(true)}
-                  className="px-5 py-3.5 rounded-xl font-bold text-sm bg-white/10 hover:bg-white/15 text-white border border-[#c9a961]/30 transition-all flex items-center gap-2 cursor-pointer backdrop-blur-xs"
+                  className="px-4 py-3.5 rounded-xl font-bold text-sm bg-white/10 hover:bg-white/15 text-white border border-[#c9a961]/30 transition-all flex items-center gap-2 cursor-pointer backdrop-blur-xs"
                 >
                   <Search className="w-4 h-4 text-[#c9a961]" />
-                  <span>Cek Kamar Jemaah Mandiri</span>
+                  <span>Cek Kamar Jemaah</span>
                 </button>
 
                 <button
@@ -287,7 +399,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   className="px-4 py-3.5 rounded-xl font-bold text-sm text-[#c9a961] hover:text-white transition-colors flex items-center gap-1.5"
                 >
                   <BookOpen className="w-4 h-4 text-[#c9a961]" />
-                  <span>Buku Panduan & SOP</span>
+                  <span>SOP & Panduan</span>
                 </button>
               </div>
 
@@ -470,47 +582,65 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Card 1: Kamar Superior */}
           <div className="bg-white rounded-3xl border border-[#e8dfc8] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
             <div className="h-44 bg-gradient-to-tr from-[#1A1410] via-[#2A2018] to-[#382b20] relative p-6 flex flex-col justify-between text-white">
               <div className="flex justify-between items-start">
                 <span className="bg-[#c9a961] text-[#1A1410] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">
-                  Tersedia 2 Kamar Saja
+                  Tersedia 2 Kamar
                 </span>
                 <span className="text-[11px] font-bold text-[#c9a961]">Kode PNBP 425111</span>
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">Kamar Superior</h3>
-                <p className="text-xs text-[#FAF9F5]/80">Gedung Mina &bull; Kapasitas 2 Orang</p>
+                <h3 className="text-xl font-black text-white">{superiorType.name}</h3>
+                <p className="text-xs text-[#FAF9F5]/80">Gedung Mina &bull; Kapasitas {superiorType.capacity || superiorType.default_capacity} Orang</p>
               </div>
             </div>
             <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
               <div className="space-y-3">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-black text-[#1A1410]">Rp 300.000</span>
-                  <span className="text-xs text-stone-500 font-medium">/ hari</span>
+                  <span className="text-2xl font-black text-[#1A1410]">{formatCurrency(superiorType.base_rate || superiorType.base_rate_per_night)}</span>
+                  <span className="text-xs text-stone-500 font-medium">/ malam</span>
                 </div>
                 <div className="text-[11px] font-semibold text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-1 rounded-lg border border-[#e8dfc8]">
                   Check-in: 14.00 WIT &bull; Check-out: 12.00 WIT
                 </div>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Kamar superior representatif eksklusif hanya tersedia 2 unit di Lantai 1 Gedung Mina (M101 & M102). Dilengkapi fasilitas premium untuk tamu VIP, pejabat instansi, atau keluarga.
+                  Kamar superior representatif eksklusif hanya tersedia 2 unit di Lantai 1 Gedung Mina (M101 & M102). Cocok untuk tamu VIP, pejabat instansi, atau keluarga.
                 </p>
                 <div className="pt-2 border-t border-[#e8dfc8] space-y-2 text-xs text-stone-700">
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Tersedia 2 Kamar Saja (M101 & M102)</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> King Size / Twin Bed Berkualitas Tinggi</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> AC Dual-Inverter & Smart TV LED 43"</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Kamar Mandi Dalam & Water Heater</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Meja Kerja, Lemari & Wi-Fi Berkecepatan Tinggi</div>
+                  {superiorType.amenities.map((amenity, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                      <span>{amenity}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                    <span>2 Unit Fisik (M101, M102)</span>
+                  </div>
                 </div>
               </div>
-              <button 
-                onClick={() => { setSelectedRoomType('superior'); scrollToSection('kalkulator'); }}
-                className="w-full py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer"
-              >
-                Simulasikan Biaya &rarr;
-              </button>
+              <div className="space-y-2">
+                <button 
+                  onClick={() => openBookingModal('PENGINAPAN', superiorType.id, 1, 1)}
+                  className="w-full py-2.5 rounded-xl font-black text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Booking Mandiri Online</span>
+                </button>
+                <button 
+                  onClick={() => { 
+                    setCalcCategory('PENGINAPAN'); 
+                    setCalcItemId(superiorType.id); 
+                    scrollToSection('kalkulator'); 
+                  }}
+                  className="w-full py-2 rounded-xl font-bold text-xs bg-[#FAF9F5] hover:bg-[#fbf8ee] text-stone-700 border border-[#e8dfc8] transition-all text-center cursor-pointer"
+                >
+                  Simulasikan Biaya
+                </button>
+              </div>
             </div>
           </div>
 
@@ -527,15 +657,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-[11px] font-bold text-[#c9a961]">Kode PNBP 425111</span>
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">Kamar Standar</h3>
-                <p className="text-xs text-[#FAF9F5]/80">Gedung Mina &bull; Kapasitas 2 Orang</p>
+                <h3 className="text-xl font-black text-white">{standarType.name}</h3>
+                <p className="text-xs text-[#FAF9F5]/80">Gedung Mina &bull; Kapasitas {standarType.capacity || standarType.default_capacity} Orang</p>
               </div>
             </div>
             <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
               <div className="space-y-3">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-black text-[#1A1410]">Rp 250.000</span>
-                  <span className="text-xs text-stone-500 font-medium">/ hari</span>
+                  <span className="text-2xl font-black text-[#1A1410]">{formatCurrency(standarType.base_rate || standarType.base_rate_per_night)}</span>
+                  <span className="text-xs text-stone-500 font-medium">/ malam</span>
                 </div>
                 <div className="text-[11px] font-semibold text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-1 rounded-lg border border-[#e8dfc8]">
                   Check-in: 14.00 WIT &bull; Check-out: 12.00 WIT
@@ -544,62 +674,159 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   Akomodasi standar hotel yang nyaman dan higienis. Tersedia 30 unit di Lantai 1 & Lantai 2 Gedung Mina untuk tamu kedinasan, diklat, bimbingan, maupun umum.
                 </p>
                 <div className="pt-2 border-t border-[#e8dfc8] space-y-2 text-xs text-stone-700">
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Tersedia 30 Kamar (14 di Lt 1 & 16 di Lt 2)</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> 2 Unit Single Bed (Twin Share) Nyaman</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> AC Individual & Smart TV LED 32"</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Kamar Mandi Dalam Bersih & Higienis</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Meja Kerja, Lemari & Wi-Fi Kecepatan Tinggi</div>
+                  {standarType.amenities.map((amenity, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                      <span>{amenity}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                    <span>30 Unit Fisik (M103-M116 & M201-M216)</span>
+                  </div>
                 </div>
               </div>
-              <button 
-                onClick={() => { setSelectedRoomType('standar'); scrollToSection('kalkulator'); }}
-                className="w-full py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer"
-              >
-                Simulasikan Biaya &rarr;
-              </button>
+              <div className="space-y-2">
+                <button 
+                  onClick={() => openBookingModal('PENGINAPAN', standarType.id, 1, 1)}
+                  className="w-full py-2.5 rounded-xl font-black text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Booking Mandiri Online</span>
+                </button>
+                <button 
+                  onClick={() => { 
+                    setCalcCategory('PENGINAPAN'); 
+                    setCalcItemId(standarType.id); 
+                    scrollToSection('kalkulator'); 
+                  }}
+                  className="w-full py-2 rounded-xl font-bold text-xs bg-[#FAF9F5] hover:bg-[#fbf8ee] text-stone-700 border border-[#e8dfc8] transition-all text-center cursor-pointer"
+                >
+                  Simulasikan Biaya
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Card 3: Aula Utama Cenderawasih */}
+          {/* Card 3: Aula */}
           <div className="bg-white rounded-3xl border border-[#e8dfc8] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
             <div className="h-44 bg-gradient-to-tr from-[#1A1410] via-[#2A2018] to-[#1A1410] relative p-6 flex flex-col justify-between text-white">
               <div className="flex justify-between items-start">
                 <span className="bg-[#c9a961]/20 text-[#c9a961] border border-[#c9a961]/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
-                  Fasilitas Gedung MICE
+                  Ruang Pertemuan
                 </span>
                 <span className="text-[11px] font-bold text-stone-300">Kode PNBP 425112</span>
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">Aula Utama Cenderawasih</h3>
-                <p className="text-xs text-stone-300">Kapasitas s.d 1.000 Orang &bull; Tarif Harian</p>
+                <h3 className="text-xl font-black text-white">{aulaFacility.name}</h3>
+                <p className="text-xs text-stone-300">Kapasitas Maksimal {aulaFacility.capacity} Orang &bull; Tarif Harian</p>
               </div>
             </div>
             <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
               <div className="space-y-3">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-black text-[#1A1410]">Rp 5.000.000</span>
+                  <span className="text-2xl font-black text-[#1A1410]">{formatCurrency(aulaFacility.daily_rate)}</span>
                   <span className="text-xs text-stone-500 font-medium">/ hari</span>
                 </div>
                 <div className="text-[11px] font-semibold text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-1 rounded-lg border border-[#e8dfc8]">
                   Sewa Fasilitas MICE &bull; PP No. 59/2020
                 </div>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Gedung serbaguna megah untuk konvensi akbar, pelepasan jemaah haji, resepsi, wisuda, rapat akbar dinas, dan pameran.
+                  Gedung serbaguna megah untuk konvensi, pelepasan jemaah haji, resepsi, wisuda, rapat akbar dinas, bimbingan teknis, dan pameran.
                 </p>
                 <div className="pt-2 border-t border-[#e8dfc8] space-y-2 text-xs text-stone-700">
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Full AC Central & Sound System Standard MICE</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Panggung Utama, Podium & Ruang VIP</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Kursi Banquet + Meja Seminar Lengkap</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Layar Videotron / Proyektor High-Res</div>
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-[#c9a961] shrink-0" /> Area Parkir Luas & Keamanan 24 Jam</div>
+                  {aulaFacility.amenities.map((amenity, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                      <span>{amenity}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                    <span>Kapasitas s.d {aulaFacility.capacity} Orang</span>
+                  </div>
                 </div>
               </div>
-              <button 
-                onClick={() => { setSelectedRoomType('aula'); scrollToSection('kalkulator'); }}
-                className="w-full py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer"
-              >
-                Simulasikan Biaya &rarr;
-              </button>
+              <div className="space-y-2">
+                <button 
+                  onClick={() => openBookingModal('RUANG_PERTEMUAN', aulaFacility.id, 1, 1)}
+                  className="w-full py-2.5 rounded-xl font-black text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Booking Aula Online</span>
+                </button>
+                <button 
+                  onClick={() => { 
+                    setCalcCategory('RUANG_PERTEMUAN'); 
+                    setCalcItemId(aulaFacility.id); 
+                    scrollToSection('kalkulator'); 
+                  }}
+                  className="w-full py-2 rounded-xl font-bold text-xs bg-[#FAF9F5] hover:bg-[#fbf8ee] text-stone-700 border border-[#e8dfc8] transition-all text-center cursor-pointer"
+                >
+                  Simulasikan Biaya
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4: Ruang Kelas */}
+          <div className="bg-white rounded-3xl border border-[#e8dfc8] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
+            <div className="h-44 bg-gradient-to-tr from-[#2A2018] via-[#1A1410] to-[#2A2018] relative p-6 flex flex-col justify-between text-white">
+              <div className="flex justify-between items-start">
+                <span className="bg-[#c9a961]/20 text-[#c9a961] border border-[#c9a961]/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                  Ruang Pertemuan
+                </span>
+                <span className="text-[11px] font-bold text-stone-300">Kode PNBP 425112</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-white">{ruangKelasFacility.name}</h3>
+                <p className="text-xs text-stone-300">Kapasitas Maksimal {ruangKelasFacility.capacity} Orang &bull; Tarif Harian</p>
+              </div>
+            </div>
+            <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
+              <div className="space-y-3">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-black text-[#1A1410]">{formatCurrency(ruangKelasFacility.daily_rate)}</span>
+                  <span className="text-xs text-stone-500 font-medium">/ hari</span>
+                </div>
+                <div className="text-[11px] font-semibold text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-1 rounded-lg border border-[#e8dfc8]">
+                  Sewa Fasilitas Diklat &bull; PP No. 59/2020
+                </div>
+                <p className="text-xs text-stone-600 leading-relaxed">
+                  Ruang kelas representatif untuk kegiatan bimbingan manasik, diklat kedinasan, pelatihan instansi, dan rapat komite terfokus.
+                </p>
+                <div className="pt-2 border-t border-[#e8dfc8] space-y-2 text-xs text-stone-700">
+                  {ruangKelasFacility.amenities.map((amenity, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                      <span>{amenity}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                    <span>Kapasitas s.d {ruangKelasFacility.capacity} Peserta</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <button 
+                  onClick={() => openBookingModal('RUANG_PERTEMUAN', ruangKelasFacility.id, 1, 1)}
+                  className="w-full py-2.5 rounded-xl font-black text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Booking Ruang Kelas Online</span>
+                </button>
+                <button 
+                  onClick={() => { 
+                    setCalcCategory('RUANG_PERTEMUAN'); 
+                    setCalcItemId(ruangKelasFacility.id); 
+                    scrollToSection('kalkulator'); 
+                  }}
+                  className="w-full py-2 rounded-xl font-bold text-xs bg-[#FAF9F5] hover:bg-[#fbf8ee] text-stone-700 border border-[#e8dfc8] transition-all text-center cursor-pointer"
+                >
+                  Simulasikan Biaya
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -614,10 +841,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 Kalkulator Transparan
               </span>
               <h2 className="text-2xl sm:text-3xl font-black">
-                Simulasi Estimasi Biaya Penginapan
+                Simulasi Estimasi Biaya Sewa
               </h2>
               <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
-                Hitung estimasi penerimaan negara bukan pajak (PNBP) untuk kebutuhan instansi atau rombongan Anda secara akurat sebelum membuat Surat Pesanan / SPK.
+                Hitung estimasi penerimaan negara bukan pajak (PNBP) untuk kebutuhan instansi atau rombongan Anda secara akurat sesuai rumus resmi yang berlaku.
               </p>
               <div className="p-4 rounded-2xl bg-white/5 border border-[#c9a961]/20 text-xs space-y-2">
                 <div className="flex items-center gap-2 text-[#c9a961] font-bold">
@@ -631,42 +858,90 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div className="lg:col-span-7 bg-white text-stone-800 rounded-3xl p-6 sm:p-8 shadow-xl border border-[#e8dfc8]">
+              {/* Category Tab Selector */}
+              <div className="flex gap-2 p-1 bg-stone-100 rounded-2xl mb-4 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCalcCategory('PENGINAPAN');
+                    setCalcItemId(superiorType.id);
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    calcCategory === 'PENGINAPAN'
+                      ? 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-white shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  <BedDouble className="w-3.5 h-3.5" />
+                  <span>Penginapan Kamar (Per Malam)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCalcCategory('RUANG_PERTEMUAN');
+                    setCalcItemId(aulaFacility.id);
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    calcCategory === 'RUANG_PERTEMUAN'
+                      ? 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-white shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  <Landmark className="w-3.5 h-3.5" />
+                  <span>Ruang Pertemuan (Per Hari)</span>
+                </button>
+              </div>
+
               <div className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1.5">Pilih Tipe Kamar / Fasilitas</label>
+                  <label className="block font-bold text-stone-700 mb-1.5">
+                    {calcCategory === 'PENGINAPAN' ? 'Pilih Jenis Kamar' : 'Pilih Ruangan Pertemuan'}
+                  </label>
                   <select
-                    value={selectedRoomType}
-                    onChange={(e) => setSelectedRoomType(e.target.value)}
+                    value={calcItemId}
+                    onChange={(e) => setCalcItemId(e.target.value)}
                     className="w-full p-2.5 bg-[#FAF9F5] border border-[#e8dfc8] rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#c9a961]"
                   >
-                    <option value="superior">Kamar Superior (Gedung Mina - 2 Kamar Saja) - Rp 300.000 / hari</option>
-                    <option value="standar">Kamar Standar (Gedung Mina - 30 Kamar) - Rp 250.000 / hari</option>
-                    <option value="aula">Aula Utama Cenderawasih - Rp 5.000.000 / hari</option>
+                    {calcCategory === 'PENGINAPAN' ? (
+                      roomTypes.map((rt) => (
+                        <option key={rt.id} value={rt.id}>
+                          {rt.name} - {formatCurrency(rt.base_rate_per_night || rt.base_rate || 250000)} / malam (Kapasitas: {rt.default_capacity || rt.capacity || 2} orang)
+                        </option>
+                      ))
+                    ) : (
+                      facilities.map((fac) => (
+                        <option key={fac.id} value={fac.id}>
+                          {fac.name} - {formatCurrency(fac.daily_rate)} / hari (Kapasitas: {fac.capacity} orang)
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block font-bold text-stone-700 mb-1.5">
-                      {selectedRoomType === 'aula' ? 'Jumlah Hari Sewa' : 'Jumlah Kamar'}
+                      {calcCategory === 'PENGINAPAN' ? 'Jumlah Kamar' : 'Jumlah Unit Ruangan'}
                     </label>
                     <input
                       type="number"
                       min="1"
                       max="100"
-                      value={numRooms}
-                      onChange={(e) => setNumRooms(Math.max(1, parseInt(e.target.value) || 1))}
+                      value={calcUnitCount}
+                      onChange={(e) => setCalcUnitCount(Math.max(1, parseInt(e.target.value) || 1))}
                       className="w-full p-2.5 bg-[#FAF9F5] border border-[#e8dfc8] rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#c9a961]"
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-stone-700 mb-1.5">Durasi (Malam / Hari)</label>
+                    <label className="block font-bold text-stone-700 mb-1.5">
+                      {calcCategory === 'PENGINAPAN' ? 'Jumlah Malam' : 'Jumlah Hari'}
+                    </label>
                     <input
                       type="number"
                       min="1"
                       max="30"
-                      value={numNights}
-                      onChange={(e) => setNumNights(Math.max(1, parseInt(e.target.value) || 1))}
+                      value={calcDuration}
+                      onChange={(e) => setCalcDuration(Math.max(1, parseInt(e.target.value) || 1))}
                       className="w-full p-2.5 bg-[#FAF9F5] border border-[#e8dfc8] rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#c9a961]"
                     />
                   </div>
@@ -676,11 +951,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="mt-5 p-4 bg-[#fbf8ee] rounded-2xl border border-[#e8dfc8] space-y-2">
                   <div className="flex justify-between items-center text-stone-600">
                     <span>Tarif Satuan Resmi:</span>
-                    <strong className="text-stone-900">{formatCurrency(roomRates[selectedRoomType as keyof typeof roomRates].price)}</strong>
+                    <strong className="text-stone-900">
+                      {formatCurrency(getSelectedRate())} {calcCategory === 'PENGINAPAN' ? '/ malam' : '/ hari'}
+                    </strong>
+                  </div>
+                  <div className="flex justify-between items-center text-stone-600">
+                    <span>Rumus Perhitungan:</span>
+                    <strong className="text-stone-800 text-[11px]">
+                      {calcCategory === 'PENGINAPAN' 
+                        ? `${calcDuration} Malam × ${formatCurrency(getSelectedRate())} × ${calcUnitCount} Kamar`
+                        : `${calcDuration} Hari × ${formatCurrency(getSelectedRate())} × ${calcUnitCount} Unit`
+                      }
+                    </strong>
                   </div>
                   <div className="flex justify-between items-center text-stone-600">
                     <span>Akun PNBP:</span>
-                    <strong className="text-[#8a6d2b]">{roomRates[selectedRoomType as keyof typeof roomRates].pnbpCode} (Layanan Sewa Aset)</strong>
+                    <strong className="text-[#8a6d2b]">
+                      {calcCategory === 'PENGINAPAN' ? '425111 (Jasa Penginapan & Asrama)' : '425112 (Sewa Fasilitas & Ruangan)'}
+                    </strong>
                   </div>
                   <div className="pt-2 border-t border-[#e8dfc8] flex justify-between items-center text-sm">
                     <span className="font-bold text-stone-900">Total Estimasi PNBP:</span>
@@ -688,22 +976,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-2 flex flex-col sm:flex-row gap-2">
-                  <a
-                    href="https://wa.me/6281248001234?text=Halo%20Front%20Desk%20SIMAHA%20Papua,%20saya%20ingin%20reservasi%20penginapan"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-1 py-2.5 bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white rounded-xl font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_2px_8px_rgba(201,169,97,0.3)]"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>Hubungi Front Desk WhatsApp</span>
-                  </a>
+                <div className="pt-2 flex flex-col gap-2">
                   <button
-                    onClick={onGoToLogin}
-                    className="py-2.5 px-4 bg-[#FAF9F5] hover:bg-[#fbf8ee] border border-[#e8dfc8] text-stone-800 rounded-xl font-bold transition-colors cursor-pointer"
+                    type="button"
+                    onClick={() => openBookingModal(calcCategory, calcItemId, calcUnitCount, calcDuration)}
+                    className="w-full py-3 bg-gradient-to-r from-[#f7cf6e] via-[#c9a961] to-[#b8941e] hover:from-[#fbe29a] hover:to-[#c9a961] text-[#1A1410] rounded-xl font-black text-xs text-center transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_12px_rgba(201,169,97,0.35)]"
                   >
-                    Petugas POS Kasir &rarr;
+                    <Calendar className="w-4 h-4 text-[#1A1410]" />
+                    <span>Lanjutkan ke Formulir Booking Mandiri Online &rarr;</span>
                   </button>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <a
+                      href="https://wa.me/6281248001234?text=Halo%20Front%20Desk%20SIMAHA%20Papua,%20saya%20ingin%20reservasi%20penginapan"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 py-2 bg-[#FAF9F5] hover:bg-[#fbf8ee] border border-[#e8dfc8] text-stone-700 rounded-xl font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Hubungi Front Desk WhatsApp</span>
+                    </a>
+                    <button
+                      onClick={onGoToLogin}
+                      className="py-2 px-4 bg-[#FAF9F5] hover:bg-[#fbf8ee] border border-[#e8dfc8] text-stone-700 rounded-xl font-bold transition-colors cursor-pointer text-xs"
+                    >
+                      Portal Petugas &rarr;
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -945,6 +1243,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         isOpen={isLookupOpen}
         onClose={() => setIsLookupOpen(false)}
         initialQuery={quickQuery}
+      />
+
+      {/* Public Online Self-Booking Modal */}
+      <PublicSelfBookingModal
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        initialCategory={bookingCategory}
+        initialItemId={bookingItemId}
+        initialUnitCount={bookingUnitCount}
+        initialDuration={bookingDuration}
       />
 
       {/* SOP & Help Guide Modal */}

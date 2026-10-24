@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Receipt, Plus, Search, Filter, CheckCircle2, XCircle, Edit, Trash2 } from 'lucide-react';
+import { Receipt, Plus, Search, Filter, CheckCircle2, XCircle, Edit, Trash2, History, Clock, AlertCircle } from 'lucide-react';
 import { db } from '../../db/database';
-import { RateItem } from '../../types';
+import { RateItem, RateHistory } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { formatCurrency, formatDateIndo } from '../../utils/formatters';
+import { formatCurrency, formatDateIndo, formatDateTimeIndo } from '../../utils/formatters';
 
 export const RatesPage: React.FC = () => {
   const { currentUser } = useAuth();
   const toast = useToast();
 
   const [rates, setRates] = useState<RateItem[]>([]);
+  const [rateHistories, setRateHistories] = useState<RateHistory[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [editingRate, setEditingRate] = useState<RateItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<RateItem | null>(null);
 
@@ -26,14 +28,17 @@ export const RatesPage: React.FC = () => {
     name: '',
     category: 'KAMAR' as RateItem['category'],
     user_type: 'Umum / Instansi',
-    unit: 'PER_ROOM' as RateItem['unit'],
+    unit: 'PER_NIGHT' as RateItem['unit'],
     rate: 350000,
+    effective_date: new Date().toISOString().split('T')[0],
+    reason: '',
     description: '',
     is_active: true,
   });
 
   const loadData = () => {
     setRates(db.getRates());
+    setRateHistories(db.getRateHistories());
   };
 
   useEffect(() => {
@@ -49,6 +54,8 @@ export const RatesPage: React.FC = () => {
         user_type: rate.user_type,
         unit: rate.unit,
         rate: rate.rate,
+        effective_date: rate.effective_date || new Date().toISOString().split('T')[0],
+        reason: '',
         description: rate.description || '',
         is_active: rate.is_active,
       });
@@ -58,8 +65,10 @@ export const RatesPage: React.FC = () => {
         name: '',
         category: 'KAMAR',
         user_type: 'Umum / Instansi',
-        unit: 'PER_ROOM',
-        rate: 350000,
+        unit: 'PER_NIGHT',
+        rate: 250000,
+        effective_date: new Date().toISOString().split('T')[0],
+        reason: 'Penambahan tarif baru',
         description: '',
         is_active: true,
       });
@@ -74,21 +83,50 @@ export const RatesPage: React.FC = () => {
       return;
     }
 
-    db.saveRate({
-      id: editingRate?.id,
-      name: formData.name,
-      category: formData.category,
-      user_type: formData.user_type,
-      unit: formData.unit,
-      rate: Number(formData.rate),
-      description: formData.description,
-      is_active: formData.is_active,
-    }, currentUser || undefined);
+    if (editingRate && currentUser) {
+      // Check if price changed
+      if (Number(formData.rate) !== editingRate.rate) {
+        db.updateRateWithHistory(
+          editingRate.id,
+          Number(formData.rate),
+          formData.effective_date,
+          formData.reason || 'Pembaruan tarif via formulir Master Tarif',
+          currentUser
+        );
+      }
+      
+      // Update other attributes
+      db.saveRate({
+        id: editingRate.id,
+        name: formData.name,
+        category: formData.category,
+        user_type: formData.user_type,
+        unit: formData.unit,
+        rate: Number(formData.rate),
+        description: formData.description,
+        is_active: formData.is_active,
+        effective_date: formData.effective_date,
+      }, currentUser);
 
-    toast.success(
-      editingRate ? 'Tarif Diperbarui' : 'Tarif Ditambahkan',
-      `Tarif ${formData.name} berhasil disimpan.`
-    );
+      toast.success(
+        'Tarif Berhasil Diperbarui',
+        `Perubahan tarif ${formData.name} telah disimpan. Transaksi lama tetap menggunakan tarif saat reservasi dibuat.`
+      );
+    } else {
+      db.saveRate({
+        name: formData.name,
+        category: formData.category,
+        user_type: formData.user_type,
+        unit: formData.unit,
+        rate: Number(formData.rate),
+        description: formData.description,
+        is_active: formData.is_active,
+        effective_date: formData.effective_date,
+      }, currentUser || undefined);
+
+      toast.success('Tarif Ditambahkan', `Tarif baru ${formData.name} berhasil disimpan.`);
+    }
+
     setIsModalOpen(false);
     loadData();
   };
@@ -137,14 +175,24 @@ export const RatesPage: React.FC = () => {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => handleOpenModal()}
-          icon={<Plus className="w-4 h-4" />}
-        >
-          Tambah Tarif Baru
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => setIsHistoryModalOpen(true)}
+            icon={<History className="w-4 h-4 text-[#8a6d2b]" />}
+          >
+            Riwayat Perubahan Tarif ({rateHistories.length})
+          </Button>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => handleOpenModal()}
+            icon={<Plus className="w-4 h-4" />}
+          >
+            Tambah Tarif Baru
+          </Button>
+        </div>
       </div>
 
       {/* Filter and Search */}
@@ -297,11 +345,44 @@ export const RatesPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, unit: e.target.value as any })}
                 className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#c9a961]"
               >
-                <option value="PER_ROOM">PER ROOM (Per Kamar/Malam)</option>
+                <option value="PER_NIGHT">PER NIGHT (Per Malam - Penginapan)</option>
+                <option value="PER_DAY">PER DAY (Per Hari - Aula & Ruang Pertemuan)</option>
+                <option value="PER_ROOM">PER ROOM (Per Kamar)</option>
+                <option value="PER_EVENT">PER EVENT (Per Acara)</option>
                 <option value="PER_PERSON">PER PERSON (Per Orang)</option>
-                <option value="PER_EVENT">PER EVENT (Per Acara/Hari)</option>
                 <option value="PER_HOUR">PER HOUR (Per Jam)</option>
               </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Tanggal Mulai Berlaku *</label>
+              <input
+                type="date"
+                required
+                value={formData.effective_date}
+                onChange={(e) => setFormData({ ...formData, effective_date: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Alasan Penyesuaian</label>
+              <input
+                type="text"
+                placeholder="Contoh: SK Tarif Resmi Kemenhaj"
+                value={formData.reason}
+                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961]"
+              />
+            </div>
+          </div>
+
+          <div className="p-3 bg-amber-50 rounded-xl border border-amber-200/80 text-[11px] text-amber-900 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+            <div>
+              <strong className="block font-bold">Perlindungan Transaksi Historis:</strong>
+              Semua reservasi dan invoice terdahulu tetap menggunakan harga saat reservasi dibuat (<em>Price Snapshot</em>). Perubahan tarif hanya berlaku untuk pemesanan baru.
             </div>
           </div>
 
@@ -363,6 +444,72 @@ export const RatesPage: React.FC = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Modal: Rate History Log */}
+      <Modal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        title="Riwayat Perubahan Tarif Resmi (Rate History)"
+        maxWidth="xl"
+      >
+        <div className="space-y-4 text-xs">
+          <p className="text-slate-500">
+            Catatan kronologis perubahan standar tarif layanan, kamar, dan aula di lingkungan Asrama Haji Papua. Setiap transaksi historis terkunci menggunakan tarif saat reservasi diterbitkan.
+          </p>
+
+          <div className="border border-slate-200 rounded-2xl overflow-hidden max-h-96 overflow-y-auto">
+            {rateHistories.length === 0 ? (
+              <div className="p-8 text-center text-slate-400">
+                <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p>Belum ada riwayat perubahan tarif.</p>
+              </div>
+            ) : (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th className="py-2.5 px-3">Tanggal Ubah</th>
+                    <th className="py-2.5 px-3">Nama Tarif</th>
+                    <th className="py-2.5 px-3">Tarif Lama ➔ Baru</th>
+                    <th className="py-2.5 px-3">Mulai Berlaku</th>
+                    <th className="py-2.5 px-3">Petugas</th>
+                    <th className="py-2.5 px-3">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {rateHistories.map((h) => (
+                    <tr key={h.id} className="hover:bg-slate-50/60">
+                      <td className="py-2.5 px-3 text-slate-500 whitespace-nowrap">
+                        {formatDateTimeIndo(h.changed_at)}
+                      </td>
+                      <td className="py-2.5 px-3 font-bold text-slate-800">{h.rate_name}</td>
+                      <td className="py-2.5 px-3 font-mono">
+                        <span className="text-slate-400 line-through mr-1">
+                          {formatCurrency(h.previous_rate)}
+                        </span>
+                        ➔{' '}
+                        <span className="font-bold text-[#8a6d2b]">
+                          {formatCurrency(h.new_rate)}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-700 whitespace-nowrap">
+                        {formatDateIndo(h.effective_date)}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-600">{h.changed_by}</td>
+                      <td className="py-2.5 px-3 text-slate-500 italic">{h.reason || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <Button variant="secondary" onClick={() => setIsHistoryModalOpen(false)}>
+              Tutup
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Confirmation Dialog Delete */}

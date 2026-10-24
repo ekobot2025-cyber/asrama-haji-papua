@@ -379,6 +379,7 @@ export const RoomStatusBoardPage: React.FC<RoomStatusBoardPageProps> = ({ onNavi
                     RESERVED: { border: 'border-slate-200/80 hover:border-amber-400', bg: 'bg-white hover:bg-amber-50/20', text: 'text-amber-700', topAccent: 'bg-amber-500' },
                     CLEANING: { border: 'border-slate-200/80 hover:border-orange-400', bg: 'bg-white hover:bg-orange-50/20', text: 'text-orange-700', topAccent: 'bg-orange-500' },
                     MAINTENANCE: { border: 'border-slate-200/80 hover:border-rose-400', bg: 'bg-white hover:bg-rose-50/20', text: 'text-rose-700', topAccent: 'bg-rose-500' },
+                    INACTIVE: { border: 'border-slate-300 hover:border-slate-400', bg: 'bg-slate-50 hover:bg-slate-100', text: 'text-slate-600', topAccent: 'bg-slate-400' },
                   };
 
                   const currentStyle = statusStyles[r.status];

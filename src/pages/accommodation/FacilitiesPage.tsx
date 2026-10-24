@@ -24,13 +24,16 @@ export const FacilitiesPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     type: 'AULA' as Facility['type'],
+    category: 'RUANG_PERTEMUAN' as Facility['category'],
+    rate_unit: 'PER_DAY' as Facility['rate_unit'],
     location: '',
     capacity: 100,
-    daily_rate: 3500000,
+    daily_rate: 3900000,
     hourly_rate: 500000,
     status: 'AVAILABLE' as Facility['status'],
     description: '',
-    amenities: 'Sound System Wireless, Proyektor LCD & Screen, Podium, AC Standing, Meja & Kursi',
+    amenities: 'Sound System, Infocus / Proyektor, AC, Kursi',
+    image_url: '',
   });
 
   const loadData = () => {
@@ -52,6 +55,8 @@ export const FacilitiesPage: React.FC = () => {
       setFormData({
         name: fac.name,
         type: fac.type,
+        category: fac.category || 'RUANG_PERTEMUAN',
+        rate_unit: fac.rate_unit || 'PER_DAY',
         location: fac.location,
         capacity: fac.capacity,
         daily_rate: fac.daily_rate,
@@ -59,19 +64,23 @@ export const FacilitiesPage: React.FC = () => {
         status: fac.status,
         description: fac.description,
         amenities: fac.amenities.join(', '),
+        image_url: fac.image_url || '',
       });
     } else {
       setEditingFacility(null);
       setFormData({
         name: '',
         type: 'AULA',
+        category: 'RUANG_PERTEMUAN',
+        rate_unit: 'PER_DAY',
         location: 'Kompleks Asrama Haji Papua',
         capacity: 100,
-        daily_rate: 3000000,
-        hourly_rate: 400000,
+        daily_rate: 3900000,
+        hourly_rate: 500000,
         status: 'AVAILABLE',
         description: '',
-        amenities: 'Sound System, Proyektor LCD, Kursi Futura, AC Central',
+        amenities: 'Sound System, Infocus / Proyektor, AC, Kursi',
+        image_url: '',
       });
     }
     setIsModalOpen(true);
@@ -116,6 +125,8 @@ export const FacilitiesPage: React.FC = () => {
       id: editingFacility?.id,
       name: formData.name,
       type: formData.type,
+      category: formData.category,
+      rate_unit: formData.rate_unit,
       location: formData.location,
       capacity: Number(formData.capacity),
       daily_rate: Number(formData.daily_rate),
@@ -123,6 +134,7 @@ export const FacilitiesPage: React.FC = () => {
       status: formData.status,
       description: formData.description,
       amenities: amenitiesList,
+      image_url: formData.image_url || undefined,
     }, currentUser || undefined);
 
     toast.success(
@@ -388,6 +400,7 @@ export const FacilitiesPage: React.FC = () => {
                 <option value="AVAILABLE">AVAILABLE (Tersedia & Bersih)</option>
                 <option value="OCCUPIED">OCCUPIED (Sedang Digunakan)</option>
                 <option value="MAINTENANCE">MAINTENANCE (Pemeliharaan / Perbaikan)</option>
+                <option value="INACTIVE">INACTIVE (Nonaktif / Tidak Disewakan)</option>
               </select>
             </div>
           </div>
@@ -446,9 +459,25 @@ export const FacilitiesPage: React.FC = () => {
             <input
               type="text"
               readOnly={isHousekeeping}
-              placeholder="Sound System Wireless, Proyektor LCD, AC Standing, Meja & Kursi"
+              placeholder="Sound System, Infocus / Proyektor, AC, Kursi"
               value={formData.amenities}
               onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
+              className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
+                isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+              }`}
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">
+              Foto / URL Gambar Fasilitas (Opsional)
+            </label>
+            <input
+              type="url"
+              readOnly={isHousekeeping}
+              placeholder="https://images.unsplash.com/..."
+              value={formData.image_url}
+              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
               className={`w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#c9a961] ${
                 isHousekeeping ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
               }`}

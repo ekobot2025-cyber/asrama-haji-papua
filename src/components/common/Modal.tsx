@@ -8,6 +8,7 @@ interface ModalProps {
   subtitle?: string;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
   footer?: React.ReactNode;
 }
 
@@ -18,6 +19,7 @@ export const Modal: React.FC<ModalProps> = ({
   subtitle,
   children,
   maxWidth = 'lg',
+  size,
   footer,
 }) => {
   useEffect(() => {
@@ -35,6 +37,8 @@ export const Modal: React.FC<ModalProps> = ({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const effectiveMaxWidth = size || maxWidth || 'lg';
 
   const maxWidthClasses = {
     sm: 'max-w-sm',
@@ -57,7 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
 
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <div 
-          className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full ${maxWidthClasses[maxWidth]} border border-slate-200 animate-in zoom-in-95 duration-200`}
+          className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full ${maxWidthClasses[effectiveMaxWidth]} border border-slate-200 animate-in zoom-in-95 duration-200`}
         >
           {/* Header */}
           <div className="flex items-start justify-between border-b border-slate-100 px-6 py-4 bg-slate-50/50">
