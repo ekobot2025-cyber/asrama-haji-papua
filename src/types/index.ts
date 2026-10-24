@@ -235,6 +235,8 @@ export interface Checkout {
   checkout_by: string;
   room_condition_notes: string;
   deposit_returned: boolean;
+  clearance_slip_no?: string;
+  deposit_amount?: number;
   notes?: string;
 }
 
@@ -336,7 +338,7 @@ export interface Payment {
   reservation_id: string;
   amount: number;
   payment_date: string;
-  payment_method: 'CASH' | 'TRANSFER_BPD_PAPUA' | 'TRANSFER_BSI' | 'TRANSFER_BRI' | 'QRIS';
+  payment_method: 'CASH' | 'TRANSFER_BPD_PAPUA' | 'TRANSFER_BSI' | 'TRANSFER_BRI' | 'QRIS' | 'SIMPONI_MPN_G3' | 'DEBIT_EDC';
   terbilang: string;
   received_from: string;
   for_purpose: string;

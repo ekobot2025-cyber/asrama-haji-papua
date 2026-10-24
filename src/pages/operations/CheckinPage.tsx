@@ -225,10 +225,20 @@ export const CheckinPage: React.FC<CheckinPageProps> = ({ initialReservationId, 
                     </div>
 
                     <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
-                      <span className="text-slate-500">Status Pembayaran:</span>
-                      <span className={`font-semibold ${rsv.payment_status === 'PAID' ? 'text-[#8a6d2b]' : 'text-amber-700'}`}>
-                        {rsv.payment_status === 'PAID' ? 'Lunas' : formatCurrency(rsv.remaining_amount)}
-                      </span>
+                      <span className="text-slate-500 font-medium">Status Pembayaran:</span>
+                      {rsv.remaining_amount === 0 ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1">
+                          ✓ LUNAS (Rp 0)
+                        </span>
+                      ) : rsv.paid_amount > 0 ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 inline-flex items-center gap-1">
+                          Kurang: {formatCurrency(rsv.remaining_amount)}
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 inline-flex items-center gap-1">
+                          Belum Bayar: {formatCurrency(rsv.remaining_amount)}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

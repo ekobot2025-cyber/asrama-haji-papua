@@ -1575,19 +1575,23 @@ class DatabaseService {
   }
 
   // --- Check-out Operations ---
-  public checkoutReservation(reservationId: string, conditionNotes: string, returnDeposit: boolean, notes: string, user: User): boolean {
+  public checkoutReservation(reservationId: string, conditionNotes: string, returnDeposit: boolean, notes: string, user: User, depositAmount: number = 0): boolean {
     const rsv = this.reservations.find(r => r.id === reservationId);
     if (!rsv) return false;
 
-    const checkoutNo = `COUT/${new Date().getFullYear()}/${(this.checkouts.length + 1).toString().padStart(4, '0')}`;
+    const seq = (this.checkouts.length + 1).toString().padStart(4, '0');
+    const checkoutNo = `COUT/${new Date().getFullYear()}/${seq}`;
+    const clearanceSlipNo = `SLIP/CLR/${new Date().getFullYear()}/${seq}`;
     const checkoutRecord: Checkout = {
       id: `co-${Date.now()}`,
       reservation_id: reservationId,
       checkout_no: checkoutNo,
+      clearance_slip_no: clearanceSlipNo,
       checkout_time: new Date().toISOString(),
       checkout_by: user.name,
       room_condition_notes: conditionNotes,
       deposit_returned: returnDeposit,
+      deposit_amount: depositAmount,
       notes,
     };
 

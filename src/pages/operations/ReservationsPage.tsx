@@ -389,9 +389,19 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
                     <td className="py-3 px-4">
                       <div className="flex flex-col gap-1">
                         <Badge status={rsv.status} size="sm" />
-                        <span className={`text-[10px] font-semibold ${rsv.payment_status === 'PAID' ? 'text-[#8a6d2b]' : 'text-amber-700'}`}>
-                          {rsv.payment_status === 'PAID' ? 'Lunas' : `Sisa: ${formatCurrency(rsv.remaining_amount)}`}
-                        </span>
+                        {rsv.remaining_amount === 0 ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
+                            ✓ LUNAS
+                          </span>
+                        ) : rsv.paid_amount > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-full border border-amber-300">
+                            Kurang: {formatCurrency(rsv.remaining_amount)}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-800 bg-rose-100/90 px-2 py-0.5 rounded-full border border-rose-300">
+                            Belum Bayar: {formatCurrency(rsv.remaining_amount)}
+                          </span>
+                        )}
                       </div>
                     </td>
 
