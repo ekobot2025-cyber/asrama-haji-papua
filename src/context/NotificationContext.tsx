@@ -21,6 +21,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   useEffect(() => {
     refreshNotifications();
+    const unsub = db.onSync(() => {
+      refreshNotifications();
+    });
+    return unsub;
   }, [refreshNotifications]);
 
   const markAsRead = (id: string) => {

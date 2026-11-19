@@ -93,11 +93,13 @@ try {
   assert(supRooms.length === 4, `Unit Superior harus tepat 4 kamar (M209, M211, M213, M215), terdeteksi: ${supRooms.length}`);
   assert(stdRooms.length === 32, `Unit Standar harus tepat 32 kamar, terdeteksi: ${stdRooms.length}`);
 
-  // Test inactive rooms (M117 & M217)
+  // Test inactive rooms (M117, M217 & M218)
   const m117 = rooms.find(r => r.room_number === 'M117');
   const m217 = rooms.find(r => r.room_number === 'M217');
+  const m218 = rooms.find(r => r.room_number === 'M218');
   assert(!!m117 && m117.status === 'INACTIVE', 'Kamar M117 harus berstatus INACTIVE (Kosong / tidak tersedia)');
   assert(!!m217 && m217.status === 'INACTIVE', 'Kamar M217 harus berstatus INACTIVE (Kosong / tidak tersedia)');
+  assert(!!m218 && m218.status === 'INACTIVE', 'Kamar M218 harus berstatus INACTIVE (Kosong / tidak tersedia)');
 
   // Verify Superior beds are 1 bed each, Standar beds are 2 beds each
   assert(supRooms.every(r => r.total_beds === 1), 'Seluruh Kamar Superior harus memiliki 1 Bed');
@@ -407,20 +409,32 @@ try {
 // -------------------------------------------------------------
 try {
   console.log('TEST 10: Regression Testing (Check-in, Check-out, Invoices, POS & Data Existing)...');
-  // 1. Existing initial reservations preserved
-  const reservations = db.getReservations();
-  assert(reservations.length > 0, 'Data reservasi lama tetap utuh di database');
-
-  // 2. Existing initial users preserved
+  // 1. Existing initial users preserved
   const users = db.getUsers();
   assert(users.length >= 4, 'Data akun pengguna dan hak akses peran tetap utuh');
 
-  // 3. Existing initial invoices & payments preserved
-  const invoices = db.getInvoices();
-  assert(invoices.length > 0, 'Data invoice & transaksi lama tetap utuh');
+  // 2. Create clean reservation to test operational cycle
+  const testGuest = db.saveGuest({
+    name: 'Tamu Uji Regresi',
+    nik: '9171012304950001',
+    phone: '081234567800',
+    type: 'UMUM'
+  }, mockAdminUser);
+  const testRoom = db.getRooms().find(r => r.status === 'AVAILABLE')!;
+  const createdRes = db.createReservation({
+    guest_id: testGuest.id,
+    room_id: testRoom.id,
+    check_in_date: '2026-11-20',
+    check_out_date: '2026-11-22',
+    status: 'CONFIRMED',
+    total_amount: 500000,
+    paid_amount: 500000,
+    payment_status: 'PAID'
+  }, mockAdminUser);
+  assert(createdRes.success && !!createdRes.reservation, `Reservasi baru berhasil dibuat: ${createdRes.message}`);
+  const existingRsv = createdRes.reservation!;
 
-  // 4. Test Check-in and Check-out via checkinReservation and checkoutReservation
-  const existingRsv = reservations.find(r => r.status === 'CONFIRMED') || reservations[0];
+  // 3. Test Check-in and Check-out via checkinReservation and checkoutReservation
   const initialCheckinCount = db.getCheckins().length;
   const initialCheckoutCount = db.getCheckouts().length;
 

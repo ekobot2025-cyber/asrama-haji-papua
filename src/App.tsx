@@ -53,6 +53,14 @@ const AppContent: React.FC = () => {
     return 'dashboard';
   });
   const [targetId, setTargetId] = useState<string | undefined>(undefined);
+  const [syncRevision, setSyncRevision] = useState(0);
+
+  React.useEffect(() => {
+    const unsub = db.onSync(() => {
+      setSyncRevision(v => v + 1);
+    });
+    return unsub;
+  }, []);
 
   const canAccessRole = (role: UserRole, page: string): boolean => {
     if (role === 'SUPER_ADMIN') return true;
@@ -233,7 +241,9 @@ const AppContent: React.FC = () => {
 
   return (
     <AppLayout currentPage={currentPage} onNavigate={handleNavigate}>
-      {renderPage()}
+      <React.Fragment key={syncRevision}>
+        {renderPage()}
+      </React.Fragment>
     </AppLayout>
   );
 };

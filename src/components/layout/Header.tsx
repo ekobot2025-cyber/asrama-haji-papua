@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, Search, Bell, Clock, ChevronDown, CheckCircle, 
-  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield, BookOpen, Receipt, Compass
+  RotateCcw, Sparkles, LogOut, User as UserIcon, Shield, BookOpen, Receipt, Compass, Cloud, RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
@@ -32,52 +32,43 @@ export const Header: React.FC<HeaderProps> = ({
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMunakosahOpen, setIsMunakosahOpen] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<'SYNCED' | 'SYNCING' | 'OFFLINE' | 'ERROR'>(db.cloudSyncStatus);
+  const [lastSyncTime, setLastSyncTime] = useState<string>('Baru saja');
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
-  // Update clock in Asia/Jayapura (WIT)
+  // Subscribe to realtime cloud synchronization
   useEffect(() => {
-    const updateTime = () => {
+    const unsub = db.onSync(() => {
+      setCloudStatus(db.cloudSyncStatus);
       const now = new Date();
-      // Formatted in Indonesian with WIT
-      const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-      
-      const dayName = days[now.getDay()];
-      const day = now.getDate();
-      const month = months[now.getMonth()];
-      const year = now.getFullYear();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-
-      setCurrentTime(`${dayName}, ${day} ${month} ${year} • ${hours}:${minutes}:${seconds} WIT`);
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
+      setLastSyncTime(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} WIT`);
+    });
+    return unsub;
   }, []);
 
-  // Close menus on outside click
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
-        setShowNotifMenu(false);
-      }
-      if (userRef.current && !userRef.current.contains(e.target as Node)) {
-        setShowUserMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const handleManualSync = async () => {
+    setIsManualSyncing(true);
+    try {
+      await db.fetchFromCloud();
+      setCloudStatus('SYNCED');
+      refreshNotifications();
+      toast.success('Cloud Tersinkron', 'Data telah disinkronkan secara real-time dengan seluruh perangkat.');
+    } catch {
+      setCloudStatus('OFFLINE');
+      toast.error('Gagal Sinkronisasi', 'Tidak dapat terhubung ke server cloud.');
+    } finally {
+      setIsManualSyncing(false);
+    }
+  };
 
-  const handleResetData = () => {
-    if (confirm('Muat ulang seluruh DATA DEMO SIMAHA Papua?\n\nSistem akan memuat:\n• Reservasi aktif kamar Gedung Mina (Superior & Standar)\n• Jadwal Check-out hari ini (Lunas & Kurang Bayar)\n• Tamu siap Check-in hari ini\n• Pemakaian Aula & Ruang Kelas\n• Laporan Keuangan & PNBP SAP PP 71/2010')) {
+  const handleResetData = async () => {
+    if (confirm('Kosongkan data operasional (Mulai dari Kondisi Bersih / Standar)?\n\nSistem akan:\n• Menghapus seluruh data reservasi, check-in, check-out, dan invoice uji coba\n• Mempertahankan master 36 kamar Gedung Mina (4 Superior & 32 Standar)\n• Mengatur seluruh 33 kamar aktif siap pakai (AVAILABLE / READY)\n• Menyinkronkan kondisi bersih ini ke Cloud Real-time')) {
       db.resetDemoData();
       refreshNotifications();
-      toast.success('Data Demo Berhasil Dimuat Ulang', 'Reservasi aktif, kamar terisi, jadwal check-out hari ini, dan laporan keuangan telah disegarkan.');
+      await db.pushToCloud();
+      toast.success('Database Dibersihkan', 'Seluruh data dummy telah dikosongkan dan tersinkronkan ke cloud.');
       setTimeout(() => {
         window.location.reload();
       }, 400);
@@ -139,6 +130,39 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Area: Time, Reseed Button, Notifications, User Menu */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        {/* Realtime Cloud Sync Multi-Device Status */}
+        <button
+          onClick={handleManualSync}
+          disabled={isManualSyncing}
+          title={`Status Cloud Real-Time: ${
+            cloudStatus === 'SYNCED'
+              ? 'Tersinkron Otomatis Antar Perangkat (' + lastSyncTime + ')'
+              : cloudStatus === 'SYNCING'
+              ? 'Sedang Menyinkronkan...'
+              : 'Mode Offline / Terhubung Lokal'
+          }. Klik untuk sinkronisasi manual sekarang.`}
+          className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-xl border transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer ${
+            cloudStatus === 'SYNCED'
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+              : cloudStatus === 'SYNCING' || isManualSyncing
+              ? 'bg-amber-50 text-amber-800 border-amber-300 animate-pulse'
+              : 'bg-stone-100 text-stone-600 border-stone-300 hover:bg-stone-200'
+          }`}
+        >
+          <span className="relative flex h-2 w-2">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+              cloudStatus === 'SYNCED' ? 'bg-emerald-400' : 'bg-amber-400'
+            }`}></span>
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${
+              cloudStatus === 'SYNCED' ? 'bg-emerald-600' : 'bg-amber-500'
+            }`}></span>
+          </span>
+          <Cloud className={`w-3.5 h-3.5 ${isManualSyncing ? 'animate-spin' : ''}`} />
+          <span className="hidden md:inline">
+            {cloudStatus === 'SYNCED' ? 'Cloud Realtime' : cloudStatus === 'SYNCING' ? 'Sinkron...' : 'Offline'}
+          </span>
+        </button>
+
         {/* WIT Clock with Live Pulse */}
         <div className="hidden xl:flex items-center gap-2 text-xs text-stone-600 bg-[#fbf8ee] px-3 py-1.5 rounded-xl border border-[#e8dfc8] font-medium whitespace-nowrap shrink-0">
           <span className="relative flex h-2 w-2">
@@ -180,15 +204,17 @@ export const Header: React.FC<HeaderProps> = ({
           <span>Panduan SOP</span>
         </button>
 
-        {/* Demo Data Reload Button */}
-        <button
-          onClick={handleResetData}
-          title="Muat ulang seluruh data demo (reservasi aktif, kamar terisi, check-out hari ini & laporan)"
-          className="flex items-center gap-1.5 text-xs font-semibold text-amber-900 hover:text-amber-950 bg-amber-100/90 hover:bg-amber-200 border border-amber-300 px-2.5 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
-        >
-          <RotateCcw className="w-3.5 h-3.5 text-amber-800 shrink-0" />
-          <span className="hidden sm:inline">Reload Demo</span>
-        </button>
+        {/* Reset / Bersihkan Data Operasional Button */}
+        {['SUPER_ADMIN', 'ADMIN_PENGINAPAN'].includes(currentRole) && (
+          <button
+            onClick={handleResetData}
+            title="Kosongkan seluruh data dummy/operasional dan sinkronkan database bersih ke Cloud"
+            className="flex items-center gap-1.5 text-xs font-semibold text-stone-700 hover:text-stone-900 bg-stone-100/90 hover:bg-stone-200 border border-stone-300 px-2.5 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-stone-600 shrink-0" />
+            <span className="hidden sm:inline">Reset Bersih</span>
+          </button>
+        )}
 
         {/* Notification Bell */}
         <div className="relative" ref={notifRef}>

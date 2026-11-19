@@ -14,7 +14,7 @@ import {
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v5.3_gedung_mina_36kamar_resmi';
+const DB_VERSION = 'simaha_papua_v6.0_realtime_clean_state';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -44,17 +44,31 @@ class DatabaseService {
   private auditLogs: AuditLog[] = [];
   private settings: AppSettings = initialSettings;
 
+  // Real-time Cloud Synchronization State
+  private isPushingToCloud = false;
+  private lastCloudVersion = 0;
+  private lastCloudUpdatedAt: string | null = null;
+  private syncListeners: (() => void)[] = [];
+  private syncIntervalId: any = null;
+  private broadcastChannel: any = null;
+  public cloudSyncStatus: 'SYNCED' | 'SYNCING' | 'OFFLINE' | 'ERROR' = 'SYNCED';
+
   constructor() {
     this.initialize();
   }
 
   public initialize(forceReset = false): void {
-    const currentVersion = localStorage.getItem(`${STORAGE_PREFIX}initialized`);
+    const currentVersion = typeof localStorage !== 'undefined' ? localStorage.getItem(`${STORAGE_PREFIX}initialized`) : null;
 
     if (!currentVersion || currentVersion !== DB_VERSION || forceReset) {
       this.seedDatabase();
     } else {
       this.loadFromStorage();
+    }
+
+    // Start background real-time cloud sync in browser
+    if (typeof window !== 'undefined') {
+      this.startRealtimeSync();
     }
   }
 
@@ -82,191 +96,242 @@ class DatabaseService {
     this.auditLogs = [...initialAuditLogs];
     this.settings = { ...initialSettings };
 
-    // Initial assignments for checked-in rooms (Gedung Mina)
-    this.roomAssignments = [
-      {
-        id: 'ra-01',
-        reservation_id: 'rsv-003',
-        guest_id: 'gst-001',
-        room_id: 'room-027', // M209 (Superior - Lantai 2)
-        bed_id: 'bed-room-027-1',
-        assigned_at: getRelativeIso(-2, 14, 0),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-02',
-        reservation_id: 'rsv-008',
-        guest_id: 'gst-002',
-        room_id: 'room-029', // M211 (Superior - Lantai 2 - Ready Checkout Lunas)
-        bed_id: 'bed-room-029-1',
-        assigned_at: getRelativeIso(-2, 14, 15),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-03',
-        reservation_id: 'rsv-004',
-        guest_id: 'gst-010',
-        room_id: 'room-001', // M101 (Standar - Lantai 1)
-        bed_id: 'bed-room-001-1',
-        assigned_at: getRelativeIso(-1, 14, 15),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-04',
-        reservation_id: 'rsv-009',
-        guest_id: 'gst-008',
-        room_id: 'room-002', // M102 (Standar - Lantai 1 - Ready Checkout Kurang Bayar)
-        bed_id: 'bed-room-002-1',
-        assigned_at: getRelativeIso(-3, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-05',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-005',
-        room_id: 'room-019', // M201 (Standar - Lantai 2)
-        bed_id: 'bed-room-019-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-06',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-006',
-        room_id: 'room-020', // M202 (Standar - Lantai 2)
-        bed_id: 'bed-room-020-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-07',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-007',
-        room_id: 'room-021', // M203 (Standar - Lantai 2)
-        bed_id: 'bed-room-021-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-08',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-003',
-        room_id: 'room-022', // M204 (Standar - Lantai 2)
-        bed_id: 'bed-room-022-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-    ];
-
-    this.checkins = [
-      {
-        id: 'chk-01',
-        reservation_id: 'rsv-001',
-        checkin_no: 'CIN/2026/0001',
-        checkin_time: getRelativeIso(-2, 14, 30),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 8,
-        deposit_amount: 500000,
-        notes: 'Check-in rombongan Jamaah Haji Kloter 1 Kab. Jayapura (4 Kamar)',
-      },
-      {
-        id: 'chk-02',
-        reservation_id: 'rsv-003',
-        checkin_no: 'CIN/2026/0002',
-        checkin_time: getRelativeIso(-2, 14, 0),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Tamu VIP Kemenag RI (Kamar Superior M209)',
-      },
-      {
-        id: 'chk-03',
-        reservation_id: 'rsv-008',
-        checkin_no: 'CIN/2026/0003',
-        checkin_time: getRelativeIso(-2, 14, 15),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Dra. Hj. Maryam Kogoya (Kamar Superior M211)',
-      },
-      {
-        id: 'chk-04',
-        reservation_id: 'rsv-004',
-        checkin_no: 'CIN/2026/0004',
-        checkin_time: getRelativeIso(-1, 14, 15),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Tim Medis PPIH Embarkasi (Kamar Standar M101)',
-      },
-      {
-        id: 'chk-05',
-        reservation_id: 'rsv-009',
-        checkin_no: 'CIN/2026/0005',
-        checkin_time: getRelativeIso(-3, 14, 30),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Pendamping Internal Keagamaan (Kamar Standar M102)',
-      },
-    ];
-
-    this.checkouts = [
-      {
-        id: 'co-01',
-        reservation_id: 'rsv-007',
-        checkout_no: 'COUT/2026/0001',
-        clearance_slip_no: 'SLIP/CLR/2026/0001',
-        checkout_time: getRelativeIso(0, 8, 30),
-        checkout_by: 'Resepsionis',
-        room_condition_notes: 'Kamar M104 rapi, kunci kartu lengkap dikembalikan',
-        deposit_returned: true,
-        deposit_amount: 100000,
-        notes: 'Selesai menginap dan telah diterbitkan surat bebas beban resmi',
-      },
-    ];
+    // Clean operational data (no dummy reservations / checkins)
+    this.roomAssignments = [];
+    this.checkins = [];
+    this.checkouts = [];
+    this.facilityReservations = [];
 
     this.saveAll();
-    localStorage.setItem(`${STORAGE_PREFIX}initialized`, DB_VERSION);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(`${STORAGE_PREFIX}initialized`, DB_VERSION);
+    }
   }
 
   public resetDemoData(): void {
     this.seedDatabase();
   }
 
-  private saveAll(): void {
-    localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(this.users));
-    localStorage.setItem(`${STORAGE_PREFIX}buildings`, JSON.stringify(this.buildings));
-    localStorage.setItem(`${STORAGE_PREFIX}floors`, JSON.stringify(this.floors));
-    localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
-    localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
-    localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
-    localStorage.setItem(`${STORAGE_PREFIX}institutions`, JSON.stringify(this.institutions));
-    localStorage.setItem(`${STORAGE_PREFIX}guests`, JSON.stringify(this.guests));
-    localStorage.setItem(`${STORAGE_PREFIX}groups`, JSON.stringify(this.groups));
-    localStorage.setItem(`${STORAGE_PREFIX}reservations`, JSON.stringify(this.reservations));
-    localStorage.setItem(`${STORAGE_PREFIX}roomAssignments`, JSON.stringify(this.roomAssignments));
-    localStorage.setItem(`${STORAGE_PREFIX}checkins`, JSON.stringify(this.checkins));
-    localStorage.setItem(`${STORAGE_PREFIX}checkouts`, JSON.stringify(this.checkouts));
-    localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
-    localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
-    localStorage.setItem(`${STORAGE_PREFIX}rateHistories`, JSON.stringify(this.rateHistories));
-    localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
-    localStorage.setItem(`${STORAGE_PREFIX}invoiceItems`, JSON.stringify(this.invoiceItems));
-    localStorage.setItem(`${STORAGE_PREFIX}payments`, JSON.stringify(this.payments));
-    localStorage.setItem(`${STORAGE_PREFIX}housekeepingTasks`, JSON.stringify(this.housekeepingTasks));
-    localStorage.setItem(`${STORAGE_PREFIX}maintenanceRequests`, JSON.stringify(this.maintenanceRequests));
-    localStorage.setItem(`${STORAGE_PREFIX}notifications`, JSON.stringify(this.notifications));
-    localStorage.setItem(`${STORAGE_PREFIX}auditLogs`, JSON.stringify(this.auditLogs));
-    localStorage.setItem(`${STORAGE_PREFIX}settings`, JSON.stringify(this.settings));
+  public exportFullState(): Record<string, any> {
+    return {
+      version: DB_VERSION,
+      timestamp: new Date().toISOString(),
+      users: this.users,
+      buildings: this.buildings,
+      floors: this.floors,
+      roomTypes: this.roomTypes,
+      rooms: this.rooms,
+      beds: this.beds,
+      institutions: this.institutions,
+      guests: this.guests,
+      groups: this.groups,
+      reservations: this.reservations,
+      roomAssignments: this.roomAssignments,
+      checkins: this.checkins,
+      checkouts: this.checkouts,
+      facilities: this.facilities,
+      facilityReservations: this.facilityReservations,
+      rates: this.rates,
+      rateHistories: this.rateHistories,
+      invoices: this.invoices,
+      invoiceItems: this.invoiceItems,
+      payments: this.payments,
+      housekeepingTasks: this.housekeepingTasks,
+      maintenanceRequests: this.maintenanceRequests,
+      notifications: this.notifications,
+      auditLogs: this.auditLogs,
+      settings: this.settings,
+    };
+  }
+
+  public applyCloudPayload(payload: any, version?: number, updatedAt?: string): boolean {
+    if (!payload || typeof payload !== 'object') return false;
+
+    if (Array.isArray(payload.users)) this.users = payload.users;
+    if (Array.isArray(payload.buildings)) this.buildings = payload.buildings;
+    if (Array.isArray(payload.floors)) this.floors = payload.floors;
+    if (Array.isArray(payload.roomTypes)) this.roomTypes = payload.roomTypes;
+    if (Array.isArray(payload.rooms)) this.rooms = payload.rooms;
+    if (Array.isArray(payload.beds)) this.beds = payload.beds;
+    if (Array.isArray(payload.institutions)) this.institutions = payload.institutions;
+    if (Array.isArray(payload.guests)) this.guests = payload.guests;
+    if (Array.isArray(payload.groups)) this.groups = payload.groups;
+    if (Array.isArray(payload.reservations)) this.reservations = payload.reservations;
+    if (Array.isArray(payload.roomAssignments)) this.roomAssignments = payload.roomAssignments;
+    if (Array.isArray(payload.checkins)) this.checkins = payload.checkins;
+    if (Array.isArray(payload.checkouts)) this.checkouts = payload.checkouts;
+    if (Array.isArray(payload.facilities)) this.facilities = payload.facilities;
+    if (Array.isArray(payload.facilityReservations)) this.facilityReservations = payload.facilityReservations;
+    if (Array.isArray(payload.rates)) this.rates = payload.rates;
+    if (Array.isArray(payload.rateHistories)) this.rateHistories = payload.rateHistories;
+    if (Array.isArray(payload.invoices)) this.invoices = payload.invoices;
+    if (Array.isArray(payload.invoiceItems)) this.invoiceItems = payload.invoiceItems;
+    if (Array.isArray(payload.payments)) this.payments = payload.payments;
+    if (Array.isArray(payload.housekeepingTasks)) this.housekeepingTasks = payload.housekeepingTasks;
+    if (Array.isArray(payload.maintenanceRequests)) this.maintenanceRequests = payload.maintenanceRequests;
+    if (Array.isArray(payload.notifications)) this.notifications = payload.notifications;
+    if (Array.isArray(payload.auditLogs)) this.auditLogs = payload.auditLogs;
+    if (payload.settings && typeof payload.settings === 'object') this.settings = payload.settings;
+
+    if (version) this.lastCloudVersion = version;
+    if (updatedAt) this.lastCloudUpdatedAt = updatedAt;
+
+    this.saveAll(false); // save locally without triggering loop push
+    this.notifySyncListeners();
+    return true;
+  }
+
+  public async pushToCloud(): Promise<boolean> {
+    if (typeof window === 'undefined' || typeof fetch !== 'function' || this.isPushingToCloud) return false;
+    this.isPushingToCloud = true;
+    this.cloudSyncStatus = 'SYNCING';
+
+    try {
+      const payload = this.exportFullState();
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload }),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.version) this.lastCloudVersion = json.version;
+        if (json.updated_at) this.lastCloudUpdatedAt = json.updated_at;
+        this.cloudSyncStatus = 'SYNCED';
+        this.notifySyncListeners();
+        return true;
+      } else {
+        this.cloudSyncStatus = 'ERROR';
+      }
+    } catch (_) {
+      this.cloudSyncStatus = 'OFFLINE';
+    } finally {
+      this.isPushingToCloud = false;
+    }
+    return false;
+  }
+
+  public async fetchFromCloud(): Promise<boolean> {
+    if (typeof window === 'undefined' || typeof fetch !== 'function') return false;
+
+    try {
+      const res = await fetch('/api/sync?t=' + Date.now());
+      if (!res.ok) return false;
+
+      const json = await res.json();
+      if (json.success && json.exists && json.payload) {
+        const cloudVersion = json.version || 1;
+        const cloudUpdatedAt = json.updated_at;
+
+        if (cloudVersion !== this.lastCloudVersion || cloudUpdatedAt !== this.lastCloudUpdatedAt) {
+          this.applyCloudPayload(json.payload, cloudVersion, cloudUpdatedAt);
+          this.cloudSyncStatus = 'SYNCED';
+          return true;
+        }
+      } else if (json.success && !json.exists) {
+        await this.pushToCloud();
+      }
+      this.cloudSyncStatus = 'SYNCED';
+    } catch (_) {
+      this.cloudSyncStatus = 'OFFLINE';
+    }
+    return false;
+  }
+
+  public startRealtimeSync(): void {
+    if (typeof window === 'undefined') return;
+
+    this.fetchFromCloud();
+
+    if (!this.syncIntervalId) {
+      this.syncIntervalId = setInterval(() => {
+        if (typeof document !== 'undefined' && !document.hidden) {
+          this.fetchFromCloud();
+        }
+      }, 3000);
+    }
+
+    window.addEventListener('focus', () => {
+      this.fetchFromCloud();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.fetchFromCloud();
+      }
+    });
+
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        this.broadcastChannel = new BroadcastChannel('simaha_sync_bc');
+        this.broadcastChannel.onmessage = (event) => {
+          if (event.data?.type === 'STATE_UPDATED') {
+            this.fetchFromCloud();
+          }
+        };
+      }
+    } catch (_) {}
+  }
+
+  public onSync(callback: () => void): () => void {
+    this.syncListeners.push(callback);
+    return () => {
+      this.syncListeners = this.syncListeners.filter(cb => cb !== callback);
+    };
+  }
+
+  private notifySyncListeners(): void {
+    this.syncListeners.forEach(cb => {
+      try { cb(); } catch (e) { console.error(e); }
+    });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('simaha_state_changed'));
+    }
+
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({ type: 'STATE_UPDATED', timestamp: Date.now() });
+      } catch (_) {}
+    }
+  }
+
+  private saveAll(triggerCloudPush = true): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(this.users));
+        localStorage.setItem(`${STORAGE_PREFIX}buildings`, JSON.stringify(this.buildings));
+        localStorage.setItem(`${STORAGE_PREFIX}floors`, JSON.stringify(this.floors));
+        localStorage.setItem(`${STORAGE_PREFIX}roomTypes`, JSON.stringify(this.roomTypes));
+        localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
+        localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
+        localStorage.setItem(`${STORAGE_PREFIX}institutions`, JSON.stringify(this.institutions));
+        localStorage.setItem(`${STORAGE_PREFIX}guests`, JSON.stringify(this.guests));
+        localStorage.setItem(`${STORAGE_PREFIX}groups`, JSON.stringify(this.groups));
+        localStorage.setItem(`${STORAGE_PREFIX}reservations`, JSON.stringify(this.reservations));
+        localStorage.setItem(`${STORAGE_PREFIX}roomAssignments`, JSON.stringify(this.roomAssignments));
+        localStorage.setItem(`${STORAGE_PREFIX}checkins`, JSON.stringify(this.checkins));
+        localStorage.setItem(`${STORAGE_PREFIX}checkouts`, JSON.stringify(this.checkouts));
+        localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
+        localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
+        localStorage.setItem(`${STORAGE_PREFIX}rateHistories`, JSON.stringify(this.rateHistories));
+        localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
+        localStorage.setItem(`${STORAGE_PREFIX}invoiceItems`, JSON.stringify(this.invoiceItems));
+        localStorage.setItem(`${STORAGE_PREFIX}payments`, JSON.stringify(this.payments));
+        localStorage.setItem(`${STORAGE_PREFIX}housekeepingTasks`, JSON.stringify(this.housekeepingTasks));
+        localStorage.setItem(`${STORAGE_PREFIX}maintenanceRequests`, JSON.stringify(this.maintenanceRequests));
+        localStorage.setItem(`${STORAGE_PREFIX}notifications`, JSON.stringify(this.notifications));
+        localStorage.setItem(`${STORAGE_PREFIX}auditLogs`, JSON.stringify(this.auditLogs));
+        localStorage.setItem(`${STORAGE_PREFIX}settings`, JSON.stringify(this.settings));
+      }
+    } catch (e) {
+      console.warn('Local storage write warning:', e);
+    }
+
+    if (triggerCloudPush && typeof window !== 'undefined' && typeof fetch === 'function') {
+      this.pushToCloud();
+    }
   }
 
   private loadFromStorage(): void {

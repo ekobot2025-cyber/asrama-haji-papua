@@ -14,5 +14,12 @@ export default defineConfig({
     port: 5173,
     open: false,
     host: true,
+    proxy: {
+      '/api': {
+        target: 'https://asrama-haji-papua.vercel.app',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
   },
 });

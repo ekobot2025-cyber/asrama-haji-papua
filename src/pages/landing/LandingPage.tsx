@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Compass, LogIn, ArrowRight, ArrowLeft, Search, Building, BedDouble, 
   Calendar, CheckCircle2, ShieldCheck, MapPin, Phone, Mail, Clock, 
@@ -45,8 +45,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [hasSearched, setHasSearched] = useState(false);
 
   // Dynamic Master Data from Database
-  const [roomTypes] = useState<RoomType[]>(() => db.getRoomTypes());
-  const [facilities] = useState<Facility[]>(() => db.getFacilities());
+  const [roomTypes, setRoomTypes] = useState<RoomType[]>(() => db.getRoomTypes());
+  const [facilities, setFacilities] = useState<Facility[]>(() => db.getFacilities());
+
+  useEffect(() => {
+    const unsub = db.onSync(() => {
+      setRoomTypes(db.getRoomTypes());
+      setFacilities(db.getFacilities());
+    });
+    return unsub;
+  }, []);
 
   const superiorType = roomTypes.find(rt => rt.id === 'rt-sup' || rt.code === 'SUP') || {
     id: 'rt-sup',
