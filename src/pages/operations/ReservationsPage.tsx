@@ -93,6 +93,13 @@ export const ReservationsPage: React.FC<ReservationsPageProps> = ({ onNavigate, 
 
   useEffect(() => {
     loadData();
+    const unsub = db.onSync(() => {
+      loadData();
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
     if (initialTargetId === 'new') {
       setIsNewModalOpen(true);
     }

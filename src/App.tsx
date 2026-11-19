@@ -241,9 +241,9 @@ const AppContent: React.FC = () => {
 
   return (
     <AppLayout currentPage={currentPage} onNavigate={handleNavigate}>
-      <React.Fragment key={syncRevision}>
+      <div key={syncRevision} className="w-full">
         {renderPage()}
-      </React.Fragment>
+      </div>
     </AppLayout>
   );
 };

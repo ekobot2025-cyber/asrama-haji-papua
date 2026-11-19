@@ -14,7 +14,7 @@ import {
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v6.0_realtime_clean_state';
+const DB_VERSION = 'simaha_papua_v6.1_live_operational_sync';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -46,6 +46,8 @@ class DatabaseService {
 
   // Real-time Cloud Synchronization State
   private isPushingToCloud = false;
+  private pendingPush = false;
+  private pushTimer: any = null;
   private lastCloudVersion = 0;
   private lastCloudUpdatedAt: string | null = null;
   private syncListeners: (() => void)[] = [];
@@ -61,7 +63,7 @@ class DatabaseService {
     const currentVersion = typeof localStorage !== 'undefined' ? localStorage.getItem(`${STORAGE_PREFIX}initialized`) : null;
 
     if (!currentVersion || currentVersion !== DB_VERSION || forceReset) {
-      this.seedDatabase();
+      this.seedDatabase(false);
     } else {
       this.loadFromStorage();
     }
@@ -72,7 +74,7 @@ class DatabaseService {
     }
   }
 
-  public seedDatabase(): void {
+  public seedDatabase(triggerPush = false): void {
     const { rooms, beds } = generateSeedRoomsAndBeds();
 
     this.users = [...initialUsers];
@@ -96,20 +98,185 @@ class DatabaseService {
     this.auditLogs = [...initialAuditLogs];
     this.settings = { ...initialSettings };
 
-    // Clean operational data (no dummy reservations / checkins)
-    this.roomAssignments = [];
-    this.checkins = [];
-    this.checkouts = [];
+    // Initial assignments for checked-in rooms (Gedung Mina)
+    this.roomAssignments = [
+      {
+        id: 'ra-01',
+        reservation_id: 'rsv-003',
+        guest_id: 'gst-001',
+        room_id: 'room-027', // M209 (Superior - Lantai 2)
+        bed_id: 'bed-room-027-1',
+        assigned_at: getRelativeIso(-2, 14, 0),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-02',
+        reservation_id: 'rsv-008',
+        guest_id: 'gst-002',
+        room_id: 'room-029', // M211 (Superior - Lantai 2)
+        bed_id: 'bed-room-029-1',
+        assigned_at: getRelativeIso(-2, 14, 15),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-03',
+        reservation_id: 'rsv-004',
+        guest_id: 'gst-010',
+        room_id: 'room-001', // M101 (Standar - Lantai 1)
+        bed_id: 'bed-room-001-1',
+        assigned_at: getRelativeIso(-1, 14, 15),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-04',
+        reservation_id: 'rsv-009',
+        guest_id: 'gst-008',
+        room_id: 'room-002', // M102 (Standar - Lantai 1)
+        bed_id: 'bed-room-002-1',
+        assigned_at: getRelativeIso(-3, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-05',
+        reservation_id: 'rsv-001',
+        guest_id: 'gst-005',
+        room_id: 'room-019', // M201 (Standar - Lantai 2)
+        bed_id: 'bed-room-019-1',
+        assigned_at: getRelativeIso(-2, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-06',
+        reservation_id: 'rsv-001',
+        guest_id: 'gst-006',
+        room_id: 'room-020', // M202 (Standar - Lantai 2)
+        bed_id: 'bed-room-020-1',
+        assigned_at: getRelativeIso(-2, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-07',
+        reservation_id: 'rsv-001',
+        guest_id: 'gst-007',
+        room_id: 'room-021', // M203 (Standar - Lantai 2)
+        bed_id: 'bed-room-021-1',
+        assigned_at: getRelativeIso(-2, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-08',
+        reservation_id: 'rsv-001',
+        guest_id: 'gst-003',
+        room_id: 'room-022', // M204 (Standar - Lantai 2)
+        bed_id: 'bed-room-022-1',
+        assigned_at: getRelativeIso(-2, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+    ];
+
+    this.checkins = [
+      {
+        id: 'chk-01',
+        reservation_id: 'rsv-001',
+        checkin_no: 'CIN/2026/0001',
+        checkin_time: getRelativeIso(-2, 14, 30),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 8,
+        deposit_amount: 500000,
+        notes: 'Check-in rombongan Jamaah Haji Kloter 1 Kab. Jayapura (4 Kamar)',
+      },
+      {
+        id: 'chk-02',
+        reservation_id: 'rsv-003',
+        checkin_no: 'CIN/2026/0002',
+        checkin_time: getRelativeIso(-2, 14, 0),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 1,
+        deposit_amount: 100000,
+        notes: 'Tamu VIP Kemenag RI (Kamar Superior M209)',
+      },
+      {
+        id: 'chk-03',
+        reservation_id: 'rsv-008',
+        checkin_no: 'CIN/2026/0003',
+        checkin_time: getRelativeIso(-2, 14, 15),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 1,
+        deposit_amount: 100000,
+        notes: 'Dra. Hj. Maryam Kogoya (Kamar Superior M211)',
+      },
+      {
+        id: 'chk-04',
+        reservation_id: 'rsv-004',
+        checkin_no: 'CIN/2026/0004',
+        checkin_time: getRelativeIso(-1, 14, 15),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 1,
+        deposit_amount: 100000,
+        notes: 'Tim Medis PPIH Embarkasi (Kamar Standar M101)',
+      },
+      {
+        id: 'chk-05',
+        reservation_id: 'rsv-009',
+        checkin_no: 'CIN/2026/0005',
+        checkin_time: getRelativeIso(-3, 14, 30),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 1,
+        deposit_amount: 100000,
+        notes: 'Pendamping Internal Keagamaan (Kamar Standar M102)',
+      },
+    ];
+
+    this.checkouts = [
+      {
+        id: 'co-01',
+        reservation_id: 'rsv-007',
+        checkout_no: 'COUT/2026/0001',
+        clearance_slip_no: 'SLIP/CLR/2026/0001',
+        checkout_time: getRelativeIso(0, 8, 30),
+        checkout_by: 'Resepsionis',
+        room_condition_notes: 'Kamar M104 rapi, kunci kartu lengkap dikembalikan',
+        deposit_returned: true,
+        deposit_amount: 100000,
+        notes: 'Selesai menginap dan telah diterbitkan surat bebas beban resmi',
+      },
+    ];
+
     this.facilityReservations = [];
 
-    this.saveAll();
+    // Update rooms and beds for initial checked in assignments
+    const occupiedRoomIds = new Set(this.roomAssignments.filter(a => a.status === 'CHECKED_IN').map(a => a.room_id));
+    this.rooms = this.rooms.map(r => {
+      if (occupiedRoomIds.has(r.id)) {
+        return { ...r, status: 'OCCUPIED' as RoomStatus, occupied_beds: r.total_beds };
+      }
+      return r;
+    });
+
+    const occupiedBedIds = new Set(this.roomAssignments.filter(a => a.status === 'CHECKED_IN').map(a => a.bed_id));
+    this.beds = this.beds.map(b => {
+      if (occupiedBedIds.has(b.id)) {
+        return { ...b, status: 'OCCUPIED' };
+      }
+      return b;
+    });
+
+    this.saveAll(triggerPush);
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(`${STORAGE_PREFIX}initialized`, DB_VERSION);
     }
   }
 
   public resetDemoData(): void {
-    this.seedDatabase();
+    this.seedDatabase(true);
   }
 
   public exportFullState(): Record<string, any> {
@@ -181,8 +348,20 @@ class DatabaseService {
     return true;
   }
 
+  public scheduleCloudPush(): void {
+    if (typeof window === 'undefined' || typeof fetch !== 'function') return;
+    if (this.pushTimer) clearTimeout(this.pushTimer);
+    this.pushTimer = setTimeout(() => {
+      this.pushToCloud();
+    }, 150);
+  }
+
   public async pushToCloud(): Promise<boolean> {
-    if (typeof window === 'undefined' || typeof fetch !== 'function' || this.isPushingToCloud) return false;
+    if (typeof window === 'undefined' || typeof fetch !== 'function') return false;
+    if (this.isPushingToCloud) {
+      this.pendingPush = true;
+      return false;
+    }
     this.isPushingToCloud = true;
     this.cloudSyncStatus = 'SYNCING';
 
@@ -208,6 +387,10 @@ class DatabaseService {
       this.cloudSyncStatus = 'OFFLINE';
     } finally {
       this.isPushingToCloud = false;
+      if (this.pendingPush) {
+        this.pendingPush = false;
+        this.scheduleCloudPush();
+      }
     }
     return false;
   }
@@ -297,7 +480,7 @@ class DatabaseService {
     }
   }
 
-  private saveAll(triggerCloudPush = true): void {
+  public saveAll(triggerCloudPush = true): void {
     try {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(this.users));
@@ -314,6 +497,7 @@ class DatabaseService {
         localStorage.setItem(`${STORAGE_PREFIX}checkins`, JSON.stringify(this.checkins));
         localStorage.setItem(`${STORAGE_PREFIX}checkouts`, JSON.stringify(this.checkouts));
         localStorage.setItem(`${STORAGE_PREFIX}facilities`, JSON.stringify(this.facilities));
+        localStorage.setItem(`${STORAGE_PREFIX}facilityReservations`, JSON.stringify(this.facilityReservations));
         localStorage.setItem(`${STORAGE_PREFIX}rates`, JSON.stringify(this.rates));
         localStorage.setItem(`${STORAGE_PREFIX}rateHistories`, JSON.stringify(this.rateHistories));
         localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
@@ -330,7 +514,7 @@ class DatabaseService {
     }
 
     if (triggerCloudPush && typeof window !== 'undefined' && typeof fetch === 'function') {
-      this.pushToCloud();
+      this.scheduleCloudPush();
     }
   }
 
@@ -1190,6 +1374,8 @@ class DatabaseService {
     this.guests = this.guests.filter(g => g.id !== id);
     localStorage.setItem(`${STORAGE_PREFIX}guests`, JSON.stringify(this.guests));
     if (user) this.logAudit(user.name, user.role, 'DELETE_GUEST', 'Buku Tamu', `Menghapus tamu ${guest.full_name}`, id);
+    this.saveAll(true);
+    this.notifySyncListeners();
     return { success: true, message: `Data tamu ${guest.full_name} berhasil dihapus.` };
   }
 
@@ -1198,6 +1384,8 @@ class DatabaseService {
     if (guestData.id) {
       this.guests = this.guests.map(g => g.id === guestData.id ? { ...g, ...guestData } as Guest : g);
       localStorage.setItem(`${STORAGE_PREFIX}guests`, JSON.stringify(this.guests));
+      this.saveAll(true);
+      this.notifySyncListeners();
       return this.guests.find(g => g.id === guestData.id)!;
     } else {
       const newId = `gst-${Date.now()}`;
@@ -1219,6 +1407,8 @@ class DatabaseService {
       };
       this.guests.unshift(newGuest);
       localStorage.setItem(`${STORAGE_PREFIX}guests`, JSON.stringify(this.guests));
+      this.saveAll(true);
+      this.notifySyncListeners();
       return newGuest;
     }
   }
@@ -1228,6 +1418,8 @@ class DatabaseService {
     if (groupData.id) {
       this.groups = this.groups.map(g => g.id === groupData.id ? { ...g, ...groupData } as Group : g);
       localStorage.setItem(`${STORAGE_PREFIX}groups`, JSON.stringify(this.groups));
+      this.saveAll(true);
+      this.notifySyncListeners();
       return this.groups.find(g => g.id === groupData.id)!;
     } else {
       const newId = `grp-${Date.now()}`;
@@ -1249,6 +1441,8 @@ class DatabaseService {
       };
       this.groups.unshift(newGroup);
       localStorage.setItem(`${STORAGE_PREFIX}groups`, JSON.stringify(this.groups));
+      this.saveAll(true);
+      this.notifySyncListeners();
       return newGroup;
     }
   }
@@ -1539,6 +1733,9 @@ class DatabaseService {
       newReservation.id
     );
 
+    this.saveAll(true);
+    this.notifySyncListeners();
+
     return { 
       success: true, 
       message: `Reservasi ${reservationNo} berhasil dibuat (${duration} ${durationUnit} x Rp ${snapshotRate.toLocaleString('id-ID')} = Rp ${finalTotal.toLocaleString('id-ID')}).`, 
@@ -1575,6 +1772,9 @@ class DatabaseService {
       rsv.id
     );
 
+    this.saveAll(true);
+    this.notifySyncListeners();
+
     return true;
   }
 
@@ -1604,6 +1804,8 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
 
     this.logAudit(user.name, user.role, 'ASSIGN_BED', 'Penempatan Kamar', `Menempatkan tamu pada Bed ${bedId}`, reservationId);
+    this.saveAll(true);
+    this.notifySyncListeners();
     return true;
   }
 
@@ -1617,6 +1819,8 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}roomAssignments`, JSON.stringify(this.roomAssignments));
     localStorage.setItem(`${STORAGE_PREFIX}beds`, JSON.stringify(this.beds));
     this.logAudit(user.name, user.role, 'REMOVE_ASSIGNMENT', 'Penempatan Kamar', `Membatalkan penempatan kamar untuk bed ${assign.bed_id}`, assign.reservation_id);
+    this.saveAll(true);
+    this.notifySyncListeners();
   }
 
   // Auto assign beds for reservation
@@ -1662,6 +1866,8 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
 
     this.logAudit(user.name, user.role, 'AUTO_ASSIGN_ROOMS', 'Penempatan Kamar', `Auto assign ${assigned} tempat tidur untuk reservasi ${rsv.reservation_no}`, reservationId);
+    this.saveAll(true);
+    this.notifySyncListeners();
 
     return { assignedCount: assigned, message: `Berhasil menempatkan ${assigned} tamu secara otomatis.` };
   }
@@ -1713,6 +1919,8 @@ class DatabaseService {
 
     this.logAudit(user.name, user.role, 'CHECKIN', 'Check-in', `Proses check-in reservasi ${rsv.reservation_no}, nomor registrasi ${checkinNo}`, reservationId);
     this.addNotification('Tamu Telah Check-in', `Reservasi ${rsv.reservation_no} telah check-in oleh ${user.name}.`, 'CHECKIN', 'checkin', reservationId);
+    this.saveAll(true);
+    this.notifySyncListeners();
 
     return true;
   }
@@ -1791,6 +1999,8 @@ class DatabaseService {
 
     this.logAudit(user.name, user.role, 'CHECKOUT', 'Check-out', `Proses checkout ${rsv.reservation_no}, nomor checkout ${checkoutNo}. Kamar dialihkan ke Housekeeping (DIRTY).`, reservationId);
     this.addNotification('Tamu Telah Checkout', `Reservasi ${rsv.reservation_no} telah checkout. Kamar dialihkan ke tim Housekeeping.`, 'CHECKOUT', 'housekeeping', reservationId);
+    this.saveAll(true);
+    this.notifySyncListeners();
 
     return true;
   }
@@ -1856,6 +2066,8 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}rooms`, JSON.stringify(this.rooms));
 
     this.logAudit(user.name, user.role, 'UPDATE_HOUSEKEEPING', 'Housekeeping', `Update status kebersihan kamar ${room?.room_number || ''} menjadi ${status} (${room?.status || ''})`, taskId);
+    this.saveAll(true);
+    this.notifySyncListeners();
 
     return true;
   }
@@ -1894,6 +2106,8 @@ class DatabaseService {
 
       this.logAudit(user.name, user.role, 'CREATE_MAINTENANCE', 'Maintenance', `Laporan kerusakan baru tiket ${ticketNo}`, newReq.id);
       this.addNotification('Tiket Perbaikan Baru', `Laporan kerusakan ${ticketNo} dilaporkan untuk segera ditangani.`, 'MAINTENANCE', 'maintenance', newReq.id);
+      this.saveAll(true);
+      this.notifySyncListeners();
 
       return newReq;
     }
@@ -1918,6 +2132,8 @@ class DatabaseService {
 
     localStorage.setItem(`${STORAGE_PREFIX}maintenanceRequests`, JSON.stringify(this.maintenanceRequests));
     this.logAudit(user.name, user.role, 'COMPLETE_MAINTENANCE', 'Maintenance', `Menyelesaikan tiket perbaikan ${req.ticket_no}`, ticketId);
+    this.saveAll(true);
+    this.notifySyncListeners();
 
     return true;
   }
@@ -1987,6 +2203,8 @@ class DatabaseService {
 
     this.logAudit(user.name, user.role, 'CREATE_PAYMENT', 'Keuangan', `Menerbitkan pembayaran ${paymentNo} / Kwitansi ${receiptNo} sebesar Rp ${amount.toLocaleString('id-ID')}`, newPayment.id);
     this.addNotification('Pembayaran Diterima', `Pembayaran ${receiptNo} senilai Rp ${amount.toLocaleString('id-ID')} telah dicatat oleh ${user.name}.`, 'PAYMENT', 'payments', newPayment.id);
+    this.saveAll(true);
+    this.notifySyncListeners();
 
     return newPayment;
   }
@@ -2044,6 +2262,8 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}reservations`, JSON.stringify(this.reservations));
 
     this.logAudit(user.name, user.role, 'POST_FOLIO_CHARGE', 'Keuangan', `Posting biaya layanan hotel "${description}" sebesar Rp ${totalPrice.toLocaleString('id-ID')} pada invoice ${invoice.invoice_no}`, invoice.id);
+    this.saveAll(true);
+    this.notifySyncListeners();
     return { success: true, item: newItem, invoice };
   }
 
@@ -2237,6 +2457,8 @@ class DatabaseService {
 
     this.logAudit(user.name, user.role, 'WALK_IN_CHECKIN', 'Front Desk', `Check-in langsung tamu walk-in ${gData.fullName} di kamar ${room.room_number} (${nights} malam)`, newRsv.id);
     this.addNotification('Tamu Walk-In Berhasil Check-in', `Tamu ${gData.fullName} berhasil check-in di Kamar ${room.room_number}.`, 'CHECKIN', 'checkin', newRsv.id);
+    this.saveAll(true);
+    this.notifySyncListeners();
 
     return {
       success: true,
