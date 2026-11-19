@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, Landmark, Building, Phone, Mail, UserCheck } from 'lucide-react';
+import { Settings, Save, Landmark, Building, Phone, Mail, UserCheck, RotateCcw, Database, CheckCircle2 } from 'lucide-react';
 import { db } from '../../db/database';
 import { AppSettings } from '../../types';
 import { Button } from '../../components/common/Button';
@@ -176,6 +176,53 @@ export const SettingsPage: React.FC = () => {
                 onChange={(e) => setSettings({ ...settings, bank_bri: e.target.value })}
                 className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Manajemen Data Demo Siap Pakai */}
+        <div className="bg-gradient-to-br from-amber-50/80 via-white to-amber-50/50 p-6 rounded-2xl border border-amber-200/80 shadow-xs space-y-4 text-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-amber-100">
+            <div>
+              <h3 className="text-sm font-bold text-amber-950 flex items-center gap-2">
+                <Database className="w-4 h-4 text-[#8a6d2b]" />
+                Manajemen Data Demo Operasional Siap Pakai
+              </h3>
+              <p className="text-xs text-amber-800/80 mt-1">
+                Gunakan fitur ini untuk memuat ulang seluruh data simulasi: reservasi aktif kamar Gedung Mina (Superior & Standar), jadwal check-out hari ini (lunas & kurang bayar), sewa Aula dan Ruang Kelas, tugas housekeeping, serta 8 laporan akuntansi SAP PP 71/2010.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              type="button"
+              size="sm"
+              icon={<RotateCcw className="w-3.5 h-3.5 text-amber-700" />}
+              onClick={() => {
+                if (confirm('Muat ulang data demo SIMAHA Papua?\n\nSemua perubahan data lokal akan disegarkan kembali ke preset operasional lengkap.')) {
+                  db.resetDemoData();
+                  toast.success('Data Demo Berhasil Dimuat Ulang', 'Seluruh data kamar, reservasi, jadwal hari ini, dan laporan keuangan telah disegarkan.');
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 400);
+                }
+              }}
+              className="bg-white border-amber-300 text-amber-900 hover:bg-amber-100/60 font-bold shrink-0"
+            >
+              Muat Ulang Data Demo
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-amber-900/90 font-medium pt-1">
+            <div className="flex items-center gap-2 bg-white/80 p-2.5 rounded-xl border border-amber-200/50">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>5 Kamar In-House Terisi (M101 - M104, M201-M202)</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/80 p-2.5 rounded-xl border border-amber-200/50">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Jadwal Check-out Hari Ini (1 Lunas, 1 Kurang Bayar)</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/80 p-2.5 rounded-xl border border-amber-200/50">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Sewa Aula & Ruang Kelas Aktif + SIMPONI MPN-G3</span>
             </div>
           </div>
         </div>

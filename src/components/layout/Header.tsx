@@ -74,11 +74,13 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const handleResetData = () => {
-    if (confirm('Apakah Anda yakin ingin memuat ulang DEMO DATA awal UPT Asrama Haji Papua? Seluruh data perubahan akan di-reset ke nilai default.')) {
-      db.initialize(true);
+    if (confirm('Muat ulang seluruh DATA DEMO SIMAHA Papua?\n\nSistem akan memuat:\n• Reservasi aktif kamar Gedung Mina (Superior & Standar)\n• Jadwal Check-out hari ini (Lunas & Kurang Bayar)\n• Tamu siap Check-in hari ini\n• Pemakaian Aula & Ruang Kelas\n• Laporan Keuangan & PNBP SAP PP 71/2010')) {
+      db.resetDemoData();
       refreshNotifications();
-      toast.success('Database Berhasil Direset', 'Semua data kamar, rombongan, reservasi, dan transaksi dikembalikan ke seed data.');
-      window.location.reload();
+      toast.success('Data Demo Berhasil Dimuat Ulang', 'Reservasi aktif, kamar terisi, jadwal check-out hari ini, dan laporan keuangan telah disegarkan.');
+      setTimeout(() => {
+        window.location.reload();
+      }, 400);
     }
   };
 
@@ -178,17 +180,15 @@ export const Header: React.FC<HeaderProps> = ({
           <span>Panduan SOP</span>
         </button>
 
-        {/* Demo Data Reset Button (Super Admin Only) */}
-        {currentRole === 'SUPER_ADMIN' && (
-          <button
-            onClick={handleResetData}
-            title="Reset database ke Demo Seed Data (Super Admin Only)"
-            className="hidden lg:flex items-center gap-1.5 text-xs font-medium text-amber-800 hover:text-amber-900 bg-amber-50/80 hover:bg-amber-100/80 border border-amber-200/70 px-2.5 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-            <span>Reset Demo</span>
-          </button>
-        )}
+        {/* Demo Data Reload Button */}
+        <button
+          onClick={handleResetData}
+          title="Muat ulang seluruh data demo (reservasi aktif, kamar terisi, check-out hari ini & laporan)"
+          className="flex items-center gap-1.5 text-xs font-semibold text-amber-900 hover:text-amber-950 bg-amber-100/90 hover:bg-amber-200 border border-amber-300 px-2.5 py-1.5 rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+        >
+          <RotateCcw className="w-3.5 h-3.5 text-amber-800 shrink-0" />
+          <span className="hidden sm:inline">Reload Demo</span>
+        </button>
 
         {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
@@ -323,6 +323,17 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
 
               <div className="my-1.5 border-t border-[#e8dfc8]/60" />
+
+              <button
+                onClick={() => {
+                  setShowUserMenu(false);
+                  handleResetData();
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-amber-800 hover:bg-amber-50 flex items-center gap-2 transition-colors cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4 text-amber-700" />
+                <span>Muat Ulang / Reset Data Demo</span>
+              </button>
 
               <button
                 onClick={() => {

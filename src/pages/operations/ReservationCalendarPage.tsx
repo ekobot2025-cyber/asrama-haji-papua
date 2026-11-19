@@ -25,10 +25,14 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
   const [activeTab, setActiveTab] = useState<'tape_chart' | 'month'>('tape_chart');
 
   // Month Calendar Date State
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 8, 26)); // September 2026
+  const [currentDate, setCurrentDate] = useState(() => new Date());
 
   // Hotel Tape Chart / Room Rack Timeline Start Date (14 days window)
-  const [tapeStartDate, setTapeStartDate] = useState(new Date(2026, 8, 25)); // Starts 25 Sep 2026
+  const [tapeStartDate, setTapeStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 2);
+    return d;
+  });
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('all');
 
   // Modals
@@ -126,7 +130,8 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
     const dateStr = `${yStr}-${mStr}-${dayStr}`;
 
     const daysShort = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-    const isToday = dateStr === '2026-09-26';
+    const todayIso = new Date().toISOString().split('T')[0];
+    const isToday = dateStr === todayIso;
 
     tapeDates.push({
       dateObj: d,
@@ -150,7 +155,11 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
   };
 
   const handleResetToToday = () => {
-    setTapeStartDate(new Date(2026, 8, 25));
+    const now = new Date();
+    setCurrentDate(now);
+    const d = new Date();
+    d.setDate(d.getDate() - 2);
+    setTapeStartDate(d);
   };
 
   const filteredRooms = rooms.filter((r) => {
@@ -553,7 +562,8 @@ export const ReservationCalendarPage: React.FC<{ onNavigate: (page: string, targ
 
                 const dayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayEvents = events.filter((e) => e.date === dayString);
-                const isToday = day === 26 && month === 8 && year === 2026;
+                const now = new Date();
+                const isToday = day === now.getDate() && month === now.getMonth() && year === now.getFullYear();
 
                 return (
                   <div

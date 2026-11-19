@@ -44,16 +44,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const occupancyRate = totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0;
 
   // Today operations
-  const today = '2026-09-26'; // Match simulated system date
+  const today = new Date().toISOString().split('T')[0];
   const todayCheckins = reservations.filter(
-    (r) => (r.checkin_date === today || r.status === 'CONFIRMED') && r.status !== 'CHECKED_OUT' && r.status !== 'CANCELLED'
+    (r) => (r.checkin_date === today || (r.status === 'CONFIRMED' && r.checkin_date <= today)) && r.status !== 'CHECKED_IN' && r.status !== 'CHECKED_OUT' && r.status !== 'CANCELLED'
   );
   const todayCheckouts = reservations.filter(
-    (r) => r.checkout_date === today || r.status === 'CHECKED_OUT'
+    (r) => (r.checkout_date === today && r.status === 'CHECKED_IN') || (r.status === 'CHECKED_OUT' && r.checkout_date === today)
   );
   const pendingReservations = reservations.filter((r) => r.status === 'PENDING');
   const upcomingReservations = reservations.filter(
-    (r) => r.status === 'CONFIRMED' || r.status === 'VERIFIED'
+    (r) => (r.status === 'CONFIRMED' || r.status === 'VERIFIED') && r.checkin_date > today
   );
 
   return (

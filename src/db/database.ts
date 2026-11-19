@@ -9,11 +9,12 @@ import {
   initialInstitutions, initialGuests, initialGroups, initialReservations, 
   initialHousekeepingTasks, initialMaintenanceRequests, initialInvoices, 
   initialInvoiceItems, initialPayments, initialRates, initialNotifications, 
-  initialAuditLogs, initialSettings, initialFacilities, generateSeedRoomsAndBeds 
+  initialAuditLogs, initialSettings, initialFacilities, generateSeedRoomsAndBeds,
+  getRelativeDate, getRelativeIso
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v4.0_gedung_mina_32kamar';
+const DB_VERSION = 'simaha_papua_v5.2_active_dynamic_reservations';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -89,37 +90,77 @@ class DatabaseService {
         guest_id: 'gst-001',
         room_id: 'room-001', // M101 (Superior)
         bed_id: 'bed-room-001-1',
-        assigned_at: '2026-09-25T14:00:00Z',
+        assigned_at: getRelativeIso(-2, 14, 0),
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
       {
         id: 'ra-02',
-        reservation_id: 'rsv-004',
-        guest_id: 'gst-010',
-        room_id: 'room-003', // M103 (Standar)
-        bed_id: 'bed-room-003-1',
-        assigned_at: '2026-09-25T14:15:00Z',
+        reservation_id: 'rsv-008',
+        guest_id: 'gst-002',
+        room_id: 'room-002', // M102 (Superior - Ready Checkout Lunas)
+        bed_id: 'bed-room-002-1',
+        assigned_at: getRelativeIso(-2, 14, 15),
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
       {
         id: 'ra-03',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-005',
-        room_id: 'room-004', // M104 (Standar)
-        bed_id: 'bed-room-004-1',
-        assigned_at: '2026-09-25T14:30:00Z',
+        reservation_id: 'rsv-004',
+        guest_id: 'gst-010',
+        room_id: 'room-003', // M103 (Standar)
+        bed_id: 'bed-room-003-1',
+        assigned_at: getRelativeIso(-1, 14, 15),
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
       {
         id: 'ra-04',
+        reservation_id: 'rsv-009',
+        guest_id: 'gst-008',
+        room_id: 'room-004', // M104 (Standar - Ready Checkout Kurang Bayar)
+        bed_id: 'bed-room-004-1',
+        assigned_at: getRelativeIso(-3, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-05',
         reservation_id: 'rsv-001',
-        guest_id: 'gst-006',
+        guest_id: 'gst-005',
         room_id: 'room-017', // M201 (Standar)
         bed_id: 'bed-room-017-1',
-        assigned_at: '2026-09-25T14:30:00Z',
+        assigned_at: getRelativeIso(-2, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-06',
+        reservation_id: 'rsv-001',
+        guest_id: 'gst-006',
+        room_id: 'room-018', // M202 (Standar)
+        bed_id: 'bed-room-018-1',
+        assigned_at: getRelativeIso(-2, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-07',
+        reservation_id: 'rsv-001',
+        guest_id: 'gst-007',
+        room_id: 'room-019', // M203 (Standar)
+        bed_id: 'bed-room-019-1',
+        assigned_at: getRelativeIso(-2, 14, 30),
+        assigned_by: 'Resepsionis',
+        status: 'CHECKED_IN',
+      },
+      {
+        id: 'ra-08',
+        reservation_id: 'rsv-001',
+        guest_id: 'gst-003',
+        room_id: 'room-020', // M204 (Standar)
+        bed_id: 'bed-room-020-1',
+        assigned_at: getRelativeIso(-2, 14, 30),
         assigned_by: 'Resepsionis',
         status: 'CHECKED_IN',
       },
@@ -130,21 +171,51 @@ class DatabaseService {
         id: 'chk-01',
         reservation_id: 'rsv-001',
         checkin_no: 'CIN/2026/0001',
-        checkin_time: '2026-09-25T14:30:00Z',
+        checkin_time: getRelativeIso(-2, 14, 30),
         checkin_by: 'Resepsionis',
         card_keys_issued: 8,
         deposit_amount: 500000,
-        notes: 'Check-in rombongan Jamaah Haji Kloter 1 Kab. Jayapura',
+        notes: 'Check-in rombongan Jamaah Haji Kloter 1 Kab. Jayapura (4 Kamar)',
       },
       {
         id: 'chk-02',
         reservation_id: 'rsv-003',
         checkin_no: 'CIN/2026/0002',
-        checkin_time: '2026-09-25T15:00:00Z',
+        checkin_time: getRelativeIso(-2, 14, 0),
         checkin_by: 'Resepsionis',
         card_keys_issued: 1,
         deposit_amount: 100000,
-        notes: 'Tamu VIP Kemenag Papua (Kamar Superior M101)',
+        notes: 'Tamu VIP Kemenag RI (Kamar Superior M101)',
+      },
+      {
+        id: 'chk-03',
+        reservation_id: 'rsv-008',
+        checkin_no: 'CIN/2026/0003',
+        checkin_time: getRelativeIso(-2, 14, 15),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 1,
+        deposit_amount: 100000,
+        notes: 'Dra. Hj. Maryam Kogoya (Kamar Superior M102)',
+      },
+      {
+        id: 'chk-04',
+        reservation_id: 'rsv-004',
+        checkin_no: 'CIN/2026/0004',
+        checkin_time: getRelativeIso(-1, 14, 15),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 1,
+        deposit_amount: 100000,
+        notes: 'Tim Medis PPIH Embarkasi (Kamar Standar M103)',
+      },
+      {
+        id: 'chk-05',
+        reservation_id: 'rsv-009',
+        checkin_no: 'CIN/2026/0005',
+        checkin_time: getRelativeIso(-3, 14, 30),
+        checkin_by: 'Resepsionis',
+        card_keys_issued: 1,
+        deposit_amount: 100000,
+        notes: 'Pendamping Internal Keagamaan (Kamar Standar M104)',
       },
     ];
 
@@ -153,16 +224,22 @@ class DatabaseService {
         id: 'co-01',
         reservation_id: 'rsv-007',
         checkout_no: 'COUT/2026/0001',
-        checkout_time: '2026-09-26T11:45:00Z',
+        clearance_slip_no: 'SLIP/CLR/2026/0001',
+        checkout_time: getRelativeIso(0, 8, 30),
         checkout_by: 'Resepsionis',
         room_condition_notes: 'Kamar M106 rapi, kunci kartu lengkap dikembalikan',
         deposit_returned: true,
-        notes: 'Selesai menginap',
+        deposit_amount: 100000,
+        notes: 'Selesai menginap dan telah diterbitkan surat bebas beban resmi',
       },
     ];
 
     this.saveAll();
     localStorage.setItem(`${STORAGE_PREFIX}initialized`, DB_VERSION);
+  }
+
+  public resetDemoData(): void {
+    this.seedDatabase();
   }
 
   private saveAll(): void {
@@ -1182,12 +1259,13 @@ class DatabaseService {
     excludeReservationId?: string
   ): { available: boolean; conflictingReservation?: Reservation; message: string } {
     const normalizeFacilityId = (id?: string) => {
-      if (!id) return 'fac-01';
+      if (!id) return '';
       if (id === 'fac-1') return 'fac-01';
       if (id === 'fac-class') return 'fac-07';
       return id;
     };
     const fId = normalizeFacilityId(facilityId);
+    if (!fId) return { available: false, message: 'ID Fasilitas tidak valid.' };
     const facility = this.facilities.find(f => normalizeFacilityId(f.id) === fId);
     if (!facility) return { available: false, message: 'Ruang pertemuan / fasilitas tidak ditemukan.' };
 
@@ -1198,7 +1276,7 @@ class DatabaseService {
     const conflict = this.reservations.find(r => {
       if (excludeReservationId && r.id === excludeReservationId) return false;
       if (r.status === 'CANCELLED' || r.status === 'REJECTED' || r.status === 'CHECKED_OUT') return false;
-      if (normalizeFacilityId(r.facility_id) !== fId) return false;
+      if (!r.facility_id || normalizeFacilityId(r.facility_id) !== fId) return false;
 
       const rCheckin = r.checkin_date;
       const rCheckout = r.checkout_date;
@@ -1268,7 +1346,7 @@ class DatabaseService {
       // For meeting room, if same day checkin & checkout, it counts as 1 day
       duration = checkinDate === checkoutDate ? 1 : daysDiff;
       const normalizeFacilityId = (id?: string) => {
-        if (!id) return 'fac-01';
+        if (!id) return '';
         if (id === 'fac-1') return 'fac-01';
         if (id === 'fac-class') return 'fac-07';
         return id;
