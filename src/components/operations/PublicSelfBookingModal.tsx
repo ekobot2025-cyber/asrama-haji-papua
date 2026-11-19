@@ -306,14 +306,14 @@ export const PublicSelfBookingModal: React.FC<PublicSelfBookingModalProps> = ({
       `-----------------------------------------\n` +
       `No. Reservasi: *${createdReservation.reservation_no}*\n` +
       `No. SPMA: *${createdReservation.spma_no}*\n` +
-      `Kode Billing SIMPONI: *${createdReservation.simponi_billing_code}*\n` +
       `Nama Pemesan: *${registeredGuest?.full_name || guestName}*\n` +
       `Layanan: *${itemName}* (${unitCount} Unit)\n` +
       `Jadwal: ${formatDateIndo(checkinDate)} s.d ${formatDateIndo(checkoutDate)} (${duration} ${durationUnit})\n` +
       `Total Biaya: *${formatCurrency(createdReservation.total_amount)}*\n` +
-      `Akun PNBP: ${rentalCategory === 'PENGINAPAN' ? '425111' : '425112'}\n` +
+      `Metode Pembayaran: *CASH / TUNAI* di Kasir Front Desk saat Check-in\n` +
       `-----------------------------------------\n` +
-      `Mohon tunjukkan bukti ini saat check-in di Front Desk Asrama Haji Transit Jayapura.`;
+      `Mohon tunjukkan bukti ini saat check-in di Front Desk Asrama Haji Jayapura.\n` +
+      `Customer Service CS WhatsApp: +62 812-4898-4433`;
     
     const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
     window.open(waUrl, '_blank');
@@ -989,8 +989,9 @@ export const PublicSelfBookingModal: React.FC<PublicSelfBookingModalProps> = ({
                 </span>
               </div>
               <p className="text-stone-600 text-[10px] leading-relaxed pt-1 border-t border-[#e8dfc8]">
-                &bull; Tunjukkan bukti ini atau sebutkan <strong>No. Reservasi ({createdReservation.reservation_no})</strong> atau <strong>No. HP ({registeredGuest?.phone || phone})</strong> di Front Desk Asrama Haji Jayapura saat kedatangan.<br />
-                &bull; Anda juga dapat melakukan pengecekan penempatan kamar kapan saja melalui Anjungan Mandiri (Munakosah Papua) di beranda website.
+                &bull; <strong>Metode Pembayaran:</strong> Khusus <strong>CASH / TUNAI</strong> langsung di Kasir Front Desk Asrama Haji Papua saat check-in.<br />
+                &bull; Tunjukkan bukti ini atau sebutkan <strong>No. Reservasi ({createdReservation.reservation_no})</strong> atau <strong>No. HP ({registeredGuest?.phone || phone})</strong> di Front Desk saat kedatangan.<br />
+                &bull; Butuh bantuan? Hubungi CS WhatsApp di <strong>+62 812-4898-4433</strong> atau gunakan menu Cek Kamar di website.
               </p>
             </div>
           </div>

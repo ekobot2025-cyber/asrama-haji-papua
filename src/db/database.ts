@@ -14,7 +14,7 @@ import {
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v6.2_clean_live';
+const DB_VERSION = 'simaha_papua_v6.3_aula_cash';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -424,16 +424,47 @@ class DatabaseService {
           }
         });
 
-        // 2. Facilities: Aula (300 pax, Rp3.900.000) & Ruang Kelas (30 pax, Rp650.000)
-        const aulaFac = this.facilities.find(f => f.id === 'fac-01' || f.name.toLowerCase().includes('aula'));
+        // 2. Facilities: Aula Kegiatan Umum (Rp3.900.000), Aula Pernikahan (Rp5.000.000) & Ruang Kelas (Rp650.000)
+        const aulaFac = this.facilities.find(f => f.id === 'fac-01' || (f.name.toLowerCase().includes('aula') && !f.name.toLowerCase().includes('pernikahan')));
         if (aulaFac) {
-          aulaFac.name = 'Aula';
+          aulaFac.name = 'Aula (Kegiatan Umum)';
           aulaFac.category = 'RUANG_PERTEMUAN';
           aulaFac.capacity = 300;
           aulaFac.daily_rate = 3900000;
           aulaFac.rate_unit = 'PER_DAY';
+          aulaFac.description = 'Aula pertemuan serbaguna untuk pemakaian kegiatan umum, seminar, rapat dinas, diklat, wisuda, dan manasik berkapasitas maksimal 300 orang.';
           aulaFac.amenities = ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi'];
           if (!aulaFac.image_url) aulaFac.image_url = 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600';
+          needsSave = true;
+        }
+
+        const weddingFac = this.facilities.find(f => f.id === 'fac-01-wedding' || f.name.toLowerCase().includes('pernikahan'));
+        if (weddingFac) {
+          weddingFac.name = 'Aula (Acara Pernikahan)';
+          weddingFac.category = 'RUANG_PERTEMUAN';
+          weddingFac.capacity = 300;
+          weddingFac.daily_rate = 5000000;
+          weddingFac.rate_unit = 'PER_DAY';
+          weddingFac.description = 'Sewa Aula representatif untuk resepsi dan akad acara pernikahan (wedding) berkapasitas maksimal 300–500 tamu.';
+          weddingFac.amenities = ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi', 'Area Pelaminan & Resepsi'];
+          if (!weddingFac.image_url) weddingFac.image_url = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600';
+          needsSave = true;
+        } else {
+          this.facilities.push({
+            id: 'fac-01-wedding',
+            name: 'Aula (Acara Pernikahan)',
+            type: 'AULA',
+            category: 'RUANG_PERTEMUAN',
+            location: 'Gedung Serbaguna Lantai 1',
+            capacity: 300,
+            daily_rate: 5000000,
+            hourly_rate: 700000,
+            rate_unit: 'PER_DAY',
+            status: 'AVAILABLE',
+            description: 'Sewa Aula representatif untuk resepsi dan akad acara pernikahan (wedding) berkapasitas maksimal 300–500 tamu.',
+            amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi', 'Area Pelaminan & Resepsi'],
+            image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600',
+          });
           needsSave = true;
         }
 
@@ -456,13 +487,36 @@ class DatabaseService {
           needsSave = true;
         }
 
-        // 3. Rates: Update Aula rate to 3.900.000, add Ruang Kelas rate if missing
-        const aulaRate = this.rates.find(r => r.id === 'rate-03' || r.name.toLowerCase().includes('aula'));
+        // 3. Rates: Update Aula Kegiatan Umum (3.900.000), Aula Pernikahan (5.000.000) & Ruang Kelas (650.000)
+        const aulaRate = this.rates.find(r => r.id === 'rate-03' || (r.name.toLowerCase().includes('aula') && !r.name.toLowerCase().includes('pernikahan')));
         if (aulaRate) {
-          aulaRate.name = 'Tarif Sewa Aula';
+          aulaRate.name = 'Tarif Sewa Aula - Kegiatan Umum';
           aulaRate.rate = 3900000;
           aulaRate.unit = 'PER_DAY';
-          aulaRate.description = 'Tarif sewa Aula resmi brosur per hari (Kapasitas maks 300 orang, Sound System, Infocus/Proyektor, AC, Kursi)';
+          aulaRate.description = 'Tarif sewa Aula resmi untuk pemakaian kegiatan umum per hari (Kapasitas maks 300 orang, Sound System, Infocus/Proyektor, AC, Kursi)';
+          needsSave = true;
+        }
+
+        const weddingRate = this.rates.find(r => r.id === 'rate-03b' || r.name.toLowerCase().includes('pernikahan'));
+        if (weddingRate) {
+          weddingRate.name = 'Tarif Sewa Aula - Acara Pernikahan';
+          weddingRate.rate = 5000000;
+          weddingRate.unit = 'PER_DAY';
+          weddingRate.description = 'Tarif sewa Aula resmi untuk acara pernikahan (wedding) per hari (Kapasitas maks 300–500 orang, Sound System, Infocus/Proyektor, AC, Kursi, Area Pelaminan)';
+          needsSave = true;
+        } else {
+          this.rates.push({
+            id: 'rate-03b',
+            name: 'Tarif Sewa Aula - Acara Pernikahan',
+            category: 'FASILITAS',
+            target_id: 'fac-01-wedding',
+            user_type: 'Masyarakat Umum / Wedding',
+            unit: 'PER_DAY',
+            rate: 5000000,
+            description: 'Tarif sewa Aula resmi untuk acara pernikahan (wedding) per hari (Kapasitas maks 300–500 orang, Sound System, Infocus/Proyektor, AC, Kursi, Area Pelaminan)',
+            is_active: true,
+            effective_date: '2026-01-01',
+          });
           needsSave = true;
         }
 

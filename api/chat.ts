@@ -4,8 +4,8 @@ const MODEL = 'google/gemini-1.5-flash';
 const GATEWAY_URL = 'https://ai-gateway.vercel.sh/v1/chat/completions';
 
 const CONTACT = {
-  wa: 'https://wa.me/6281248001234',
-  waText: '0812-4800-1234',
+  wa: 'https://wa.me/6281248984433',
+  waText: '+62 812-4898-4433',
   phone: '(0967) 581-229',
   address: 'Jl. Raya Kotaraja No. 8, Wai Mhorock, Kec. Abepura, Kota Jayapura, Provinsi Papua 99225',
 };
@@ -47,31 +47,35 @@ const STATIC_KB = `
 INFORMASI UMUM:
 - Nama layanan: SIMAHA Papua - Sistem Informasi Manajemen Asrama Haji, UPT Asrama Haji Papua, Kementerian Haji dan Umrah Republik Indonesia.
 - Alamat: ${CONTACT.address}
-- Telepon kantor: ${CONTACT.phone}. WhatsApp Front Desk: ${CONTACT.waText} (${CONTACT.wa}).
+- Telepon kantor: ${CONTACT.phone}. WhatsApp Customer Service (CS): ${CONTACT.waText} (${CONTACT.wa}).
 - Check-in pukul 14.00 WIT, check-out pukul 12.00 WIT.
 - Gedung penginapan: Gedung Mina (Lantai 1 dan Lantai 2, total 36 kamar).
   * Kamar Standar: 2 Single Bed, Rp 250.000 / malam, AC, kamar mandi dalam.
   * Kamar Superior: 1 Double Bed, Rp 300.000 / malam, AC, kamar mandi dalam.
   * Kamar M117, M217, dan M218 saat ini tidak tersedia / kosong.
-- Fasilitas kegiatan: Aula Pertemuan (kapasitas hingga 500 orang), Ruang Kelas/Rapat (30-50 orang), dan Fasilitas Simulasi Manasik Haji (Miniatur Ka'bah & lintasan sa'i).
-- Penerimaan pembayaran: Resmi masuk ke Kas Negara sebagai PNBP (Penerimaan Negara Bukan Pajak) Kementerian Haji dan Umrah melalui Kode Billing SIMPONI.
+- TARIF RESMI PENGGUNAAN AULA:
+  * Pemakaian Kegiatan Umum (seminar, rapat kerja dinas, wisuda, bimtek, manasik, MICE): Rp 3.900.000 / hari (kapasitas s.d 300 orang, ber-AC, proyektor, sound system, kursi).
+  * Acara Pernikahan (Wedding): Rp 5.000.000 / hari (sewa aula lengkap untuk acara resepsi & akad pernikahan).
+- Fasilitas lain: Ruang Kelas / Rapat (30-50 orang) Rp 650.000 / hari, Fasilitas Simulasi Manasik Haji (Miniatur Ka'bah & lintasan sa'i).
+- KETENTUAN PEMBAYARAN: Khusus pembayaran CASH / TUNAI saja langsung di Front Desk / Kasir Asrama Haji Papua saat kedatangan / check-in.
 
 CARA BOOKING ONLINE:
 1. Buka halaman utama website SIMAHA Papua, klik tombol "Booking Online".
-2. Pilih Penginapan atau Ruang Pertemuan, tanggal check-in & check-out, serta tipe kamar.
+2. Pilih Penginapan atau Ruang Pertemuan (Aula Kegiatan Umum / Aula Acara Pernikahan / Ruang Kelas), dan tentukan tanggal.
 3. Masukkan data tamu pemesan (Nama, NIK, No. HP/WhatsApp, Instansi/Jamaah).
-4. Klik "Kirim Reservasi" -> Sistem langsung menerbitkan Nomor Reservasi dan Kode Billing SIMPONI.
-5. Pembayaran dilakukan lewat bank (Teller, ATM, Mobile Banking: Mandiri, BRI, BNI, BSI, dll.) atau Kantor Pos menggunakan kode billing SIMPONI.
-6. Status kamar dan pembayaran dapat dicek sewaktu-waktu melalui tombol "Cek Kamar" di website.
+4. Klik "Kirim Reservasi" -> Sistem langsung menerbitkan bukti reservasi resmi dan nomor reservasi.
+5. Pembayaran dilakukan secara CASH / TUNAI di Front Desk saat kedatangan / check-in.
+6. Status kamar dan pemesanan dapat dicek sewaktu-waktu melalui tombol "Cek Kamar" di website atau hubungi CS WhatsApp ${CONTACT.waText}.
 `;
 
 const SYSTEM_PROMPT = (live: string) => `Anda adalah "Asisten SIMAHA Papua", chatbot resmi layanan Asrama Haji Papua (Kementerian Haji dan Umrah RI), aktif 24/7.
 Aturan:
 - Jawab dalam Bahasa Indonesia yang ramah, sopan, ringkas, dan jelas.
-- Hanya jawab berdasarkan INFORMASI di bawah. Jangan mengarang tarif atau kebijakan yang tidak ada.
-- Jangan meminta data rahasia pengunjung (password, PIN).
-- Anda TIDAK dapat mengubah database langsung dari percakapan ini. Arahkan pengguna ke tombol "Booking Online" atau "Cek Kamar".
-- Jika pertanyaan di luar topik atau butuh penanganan khusus, arahkan dengan sopan ke WhatsApp Front Desk ${CONTACT.waText} (${CONTACT.wa}) atau telepon ${CONTACT.phone}.
+- Hanya jawab berdasarkan INFORMASI di bawah.
+- Selalu tegaskan bahwa untuk pembayaran HANYA menggunakan CASH / TUNAI di Front Desk saat check-in.
+- Untuk pertanyaan kontak / bantuan diarahkan ke WhatsApp CS ${CONTACT.waText} (${CONTACT.wa}).
+- Tarif Aula: Rp 3.900.000/hari untuk kegiatan umum, dan Rp 5.000.000/hari untuk acara pernikahan.
+- Tolak permintaan yang tidak berkaitan dengan Asrama Haji Papua/Kemenhaj secara sopan.
 ${STATIC_KB}
 ${live}`;
 
@@ -80,52 +84,52 @@ export function answerKnowledgeBase(q: string): string {
 
   // Salam / Greeting
   if (/^(halo|hai|hi|hey|hello|assalamu|assalam|pagi|siang|sore|malam)/.test(s)) {
-    return `Assalamu'alaikum & Salam Hangat!\nSaya Asisten SIMAHA Papua, siap melayani informasi Asrama Haji Papua (Kementerian Haji & Umrah RI) 24/7.\n\nAnda dapat menanyakan:\n• Tarif kamar & fasilitas\n• Cara booking online & cek kamar\n• Jam check-in / check-out\n• Fasilitas aula & manasik haji\n• Lokasi & kontak pengelola`;
+    return `Assalamu'alaikum & Salam Hangat!\nSaya Asisten SIMAHA Papua, siap melayani informasi Asrama Haji Papua (Kementerian Haji & Umrah RI) 24/7.\n\nAnda dapat menanyakan:\n• Tarif kamar & aula (Kegiatan umum Rp 3,9 jt / Pernikahan Rp 5 jt)\n• Metode pembayaran (Khusus CASH / TUNAI)\n• Cara booking online & cek kamar\n• Jam check-in / check-out\n• Kontak Customer Service (CS) WhatsApp: ${CONTACT.waText}`;
   }
 
   // Terima kasih
   if (/(terima kasih|makasih|thanks|syukran|matur nuwun)/.test(s)) {
-    return `Sama-sama! Senang dapat membantu Anda. Jika ada hal lain yang ingin ditanyakan seputar Asrama Haji Papua, jangan ragu untuk bertanya kembali. Semoga hari Anda berkah dan lancar!`;
+    return `Sama-sama! Senang dapat membantu Anda. Jika ada hal lain yang ingin ditanyakan atau ingin koordinasi pemesanan, silakan hubungi CS WhatsApp kami di ${CONTACT.waText} (${CONTACT.wa}). Semoga berkah selalu!`;
+  }
+
+  // Aula / Sewa gedung pertemuan / Pernikahan / Wedding
+  if (/(aula|gedung pertemuan|pernikahan|wedding|nikah|resepsi|rapat|sewa aula)/.test(s)) {
+    return `Tarif Resmi Penggunaan Aula Asrama Haji Papua:\n\n• Pemakaian Kegiatan Umum: Rp 3.900.000 / hari\n  (Untuk seminar, rapat kedinasan, bimbingan teknis, wisuda, manasik, kapasitas s.d 300 orang, AC, proyektor, sound system, kursi)\n\n• Acara Pernikahan (Wedding): Rp 5.000.000 / hari\n  (Sewa aula lengkap untuk acara resepsi & akad pernikahan)\n\nPembayaran dilakukan secara CASH / TUNAI di Front Desk. Untuk cek jadwal aula & booking, silakan hubungi CS WhatsApp kami di ${CONTACT.waText} (${CONTACT.wa}) atau klik tombol Booking Online di website.`;
   }
 
   // Tarif kamar
-  if (/(tarif|harga|biaya|permalam|per malam|standar|superior|kamar berapa)/.test(s) && !/(aula|gedung pertemuan|ruang kelas|sewa aula)/.test(s)) {
-    return `Tarif resmi penginapan Gedung Mina Asrama Haji Papua:\n\n• Kamar Standar: Rp 250.000 / malam (2 Single Bed, kapasitas 2 orang, AC, kamar mandi dalam)\n• Kamar Superior: Rp 300.000 / malam (1 Bed King/Queen, kapasitas 2 orang, AC, kamar mandi dalam)\n\nSemua pembayaran disetor resmi ke Kas Negara sebagai PNBP Kemenhaj RI via SIMPONI. Untuk booking langsung, silakan klik tombol "Booking Online" di halaman utama website.`;
+  if (/(tarif|harga|biaya|permalam|per malam|standar|superior|kamar berapa)/.test(s)) {
+    return `Tarif resmi penginapan Gedung Mina Asrama Haji Papua:\n\n• Kamar Standar: Rp 250.000 / malam (2 Single Bed, kapasitas 2 orang, AC, kamar mandi dalam)\n• Kamar Superior: Rp 300.000 / malam (1 Bed King/Queen, kapasitas 2 orang, AC, kamar mandi dalam)\n\nPembayaran dilakukan secara CASH / TUNAI di Front Desk saat check-in. Untuk booking langsung, silakan klik tombol "Booking Online" di website atau hubungi CS di ${CONTACT.waText}.`;
   }
 
-  // Aula / Fasilitas pertemuan / Manasik
-  if (/(aula|gedung pertemuan|ruang rapat|ruang kelas|manasik|kabah|ka'bah|pertemuan)/.test(s)) {
-    return `Fasilitas Kegiatan & Pertemuan UPT Asrama Haji Papua:\n\n1. Aula Pertemuan Utama: Kapasitas s.d 500 orang, ber-AC, sound system, panggung, dan kursi.\n2. Ruang Kelas / Rapat: Kapasitas 30–50 orang untuk bimbingan, pelatihan, atau rapat dinas.\n3. Fasilitas Manasik Haji: Miniatur Ka'bah & lintasan sa'i untuk latihan manasik jamaah, sekolah/madrasah, dan KBIHU.\n\nSimulasi tarif sewa aula/ruang kelas dapat Anda coba langsung di menu "Kalkulator Tarif" pada halaman utama, atau hubungi Front Desk: ${CONTACT.waText}.`;
+  // Fasilitas umum / manasik / kabah
+  if (/(manasik|kabah|ka'bah|fasilitas|parkir|ac|wifi)/.test(s)) {
+    return `Fasilitas UPT Asrama Haji Papua:\n\n1. Penginapan Gedung Mina (36 kamar AC, kamar mandi dalam)\n2. Aula Serbaguna (Kegiatan Umum Rp 3,9 jt & Pernikahan Rp 5 jt)\n3. Ruang Kelas / Rapat (kapasitas 30–50 orang, Rp 650.000/hari)\n4. Fasilitas Simulasi Manasik Haji (Miniatur Ka'bah & lintasan sa'i)\n5. Masjid/Musholla di lingkungan asrama\n6. Area parkir luas & keamanan 24 jam.`;
   }
 
-  // Fasilitas umum / kamar mandi / AC / Wifi / Parkir
-  if (/(fasilitas|ac|wifi|parkir|kamar mandi|makan|sarapan)/.test(s)) {
-    return `Fasilitas UPT Asrama Haji Papua:\n\n• Penginapan ber-AC dengan kamar mandi dalam bersih\n• Miniatur Ka'bah & lintasan simulasi manasik haji\n• Aula pertemuan besar & ruang kelas/rapat\n• Masjid/Musholla di lingkungan asrama\n• Area parkir kendaraan roda 4 dan roda 2 yang luas dan terjaga 24 jam\n• Akses listrik genset cadangan & air bersih PDAM`;
+  // Metode pembayaran / CASH / TUNAI
+  if (/(bayar|pembayaran|cash|tunai|transfer|rekening|metode|bni|bri|mandiri|bsi|pos|qris)/.test(s)) {
+    return `Ketentuan Metode Pembayaran:\n\nUntuk pembayaran reservasi penginapan maupun sewa aula di Asrama Haji Papua saat ini menggunakan CASH / TUNAI saja.\n\nPembayaran tunai diserahkan langsung di Meja Kasir Front Desk Asrama Haji Papua pada saat Anda tiba / melakukan proses check-in. Bukti kuitansi resmi akan langsung diserahkan oleh petugas.`;
   }
 
   // Cara booking online / pesan kamar
   if (/(booking|cara pesan|cara booking|reservasi|daftar kamar|sewa kamar)/.test(s)) {
-    return `Cara Booking Online di Website SIMAHA Papua:\n\n1. Klik tombol "Booking Online" pada menu atas atau halaman utama.\n2. Pilih jenis layanan (Penginapan atau Ruang Pertemuan) dan tentukan tanggal.\n3. Masukkan data tamu (Nama, NIK, No. HP/WhatsApp, Instansi/KBIHU).\n4. Klik "Kirim Reservasi" -> Anda langsung memperoleh Nomor Reservasi dan Kode Billing SIMPONI.\n5. Lakukan pembayaran melalui bank/pos, lalu cek status kamar Anda melalui tombol "Cek Kamar".`;
+    return `Cara Booking Online di Website SIMAHA Papua:\n\n1. Klik tombol "Booking Online" pada menu atas atau halaman utama.\n2. Pilih jenis layanan (Penginapan Kamar atau Ruang Pertemuan/Aula) dan tentukan tanggal.\n3. Masukkan data tamu pemesan (Nama, NIK, No. HP/WhatsApp, Instansi).\n4. Klik "Kirim Reservasi" -> Anda langsung memperoleh bukti reservasi & nomor reservasi resmi.\n5. Pembayaran dilakukan secara CASH / TUNAI di Front Desk saat check-in.`;
   }
 
   // Cek kamar / cek reservasi
   if (/(cek kamar|cek status|status reservasi|nomor reservasi|bukti booking)/.test(s)) {
-    return `Untuk mengecek status reservasi Anda:\n\n1. Buka menu "Cek Kamar" di bar navigasi atas website.\n2. Masukkan NIK, Nama Lengkap, No. WhatsApp, atau Nomor Reservasi Anda.\n3. Sistem akan langsung menampilkan detail pesanan, status verifikasi, dan nomor kamar yang dialokasikan.`;
+    return `Untuk mengecek status reservasi Anda:\n\n1. Buka menu "Cek Kamar" di bar navigasi atas website.\n2. Masukkan NIK, Nama Lengkap, No. WhatsApp, atau Nomor Reservasi Anda.\n3. Sistem akan langsung menampilkan detail pesanan dan nomor kamar yang dialokasikan.\nBila ada kendala, hubungi CS WhatsApp di ${CONTACT.waText}.`;
   }
 
   // Jam check-in & check-out
   if (/(check.?in|check.?out|jam berapa|waktu datang|pukul)/.test(s)) {
-    return `Ketentuan Waktu Check-In & Check-Out:\n\n• Check-In: Mulai pukul 14.00 WIT\n• Check-Out: Maksimal pukul 12.00 WIT\n\nPetugas Front Desk dan keamanan bertugas 24 jam. Jika Anda tiba lebih awal (early check-in) atau memerlukan perpanjangan waktu, mohon konfirmasi terlebih dahulu dengan petugas di ${CONTACT.waText}.`;
-  }
-
-  // Cara pembayaran / SIMPONI / Rekening / Transfer
-  if (/(bayar|pembayaran|simponi|transfer|rekening|metode|bni|bri|mandiri|bsi|pos)/.test(s)) {
-    return `Sistem Pembayaran Resmi (PNBP - SIMPONI):\n\nPembayaran tidak melalui rekening pribadi perorangan, melainkan menggunakan Kode Billing SIMPONI Kementerian Haji & Umrah RI yang terbit otomatis saat reservasi.\n\nCara bayar:\n• ATM / Teller Bank (Mandiri, BRI, BNI, BSI, BCA, Bank Papua, dll.)\n• Mobile Banking (menu Pembayaran PNBP/Penerimaan Negara)\n• Kantor Pos Indonesia\n\nSetelah dibayar, sistem akan memvalidasi NTPN (Nomor Transaksi Penerimaan Negara).`;
+    return `Ketentuan Waktu Check-In & Check-Out:\n\n• Check-In: Mulai pukul 14.00 WIT\n• Check-Out: Maksimal pukul 12.00 WIT\n\nPetugas Front Desk dan keamanan bertugas 24 jam. Jika memerlukan early check-in atau konfirmasi kedatangan, silakan hubungi CS di ${CONTACT.waText}.`;
   }
 
   // Syarat menginap / Tamu umum
   if (/(syarat|masyarakat umum|umum boleh|jamaah|aturan|ktp)/.test(s)) {
-    return `Ketentuan & Syarat Menginap:\n\n• Asrama Haji Papua melayani jamaah haji/umrah, kementerian/lembaga, instansi kedinasan, swasta, dan masyarakat umum di luar musim operasional haji.\n• Tamu wajib menunjukkan identitas diri resmi (KTP/SIM/Paspor) saat check-in di Front Desk.\n• Menjaga ketertiban, kebersihan, dan norma kesopanan di lingkungan UPT Asrama Haji Papua.`;
+    return `Ketentuan & Syarat Menginap:\n\n• Asrama Haji Papua terbuka melayani jamaah haji/umrah, kementerian/lembaga, instansi kedinasan, swasta, dan masyarakat umum di luar musim operasional haji.\n• Tamu wajib menunjukkan identitas diri resmi (KTP/SIM/Paspor) saat check-in di Front Desk.\n• Pembayaran dilakukan secara CASH / TUNAI di kasir Front Desk.`;
   }
 
   // Alamat & Lokasi
@@ -133,18 +137,18 @@ export function answerKnowledgeBase(q: string): string {
     return `Lokasi UPT Asrama Haji Papua:\n\n${CONTACT.address}\n\nLokasi strategis di kawasan Kotaraja - Abepura, Kota Jayapura, mudah dijangkau dari pusat kota Jayapura maupun dari Bandara Sentani.`;
   }
 
-  // Kontak & WhatsApp
-  if (/(kontak|wa|whatsapp|telepon|no hp|nomor telp|hubungi|call center|pengelola)/.test(s)) {
-    return `Kontak Layanan UPT Asrama Haji Papua:\n\n• WhatsApp Front Desk: ${CONTACT.waText} (${CONTACT.wa})\n• Telepon Kantor: ${CONTACT.phone}\n• Pelayanan: 24 Jam Setiap Hari\n• Email/Web: Sistem SIMAHA Papua Online`;
+  // Kontak & WhatsApp CS
+  if (/(kontak|wa|whatsapp|telepon|no hp|nomor telp|hubungi|call center|pengelola|cs|customer service)/.test(s)) {
+    return `Kontak Resmi Layanan Customer Service (CS) UPT Asrama Haji Papua:\n\n• WhatsApp CS: ${CONTACT.waText} (${CONTACT.wa})\n• Telepon Kantor: ${CONTACT.phone}\n• Pelayanan: 24 Jam Setiap Hari\n\nSilakan klik tautan WhatsApp di atas untuk langsung terhubung dengan CS kami.`;
   }
 
   // Pembatalan / Reschedule
   if (/(batal|cancel|reschedule|ganti tanggal|ubah jadwal)/.test(s)) {
-    return `Untuk pembatalan atau perubahan jadwal (reschedule) reservasi:\n\nSilakan hubungi petugas Front Desk melalui WhatsApp di ${CONTACT.waText} (${CONTACT.wa}) dengan menyertakan Nomor Reservasi dan NIK pemesan agar dapat dibantu penyesuaian jadwal sesuai ketersediaan kamar.`;
+    return `Untuk pembatalan atau perubahan jadwal (reschedule) reservasi:\n\nSilakan langsung hubungi Customer Service (CS) via WhatsApp di ${CONTACT.waText} (${CONTACT.wa}) dengan menyertakan Nomor Reservasi dan nama pemesan agar segera dibantu penyesuaian jadwal.`;
   }
 
   // Fallback default
-  return `Terima kasih atas pertanyaan Anda. Untuk informasi lebih mendalam atau bantuan khusus mengenai hal ini, Anda dapat langsung menghubungi Petugas Front Desk Asrama Haji Papua via WhatsApp di ${CONTACT.waText} (${CONTACT.wa}) atau telepon ${CONTACT.phone}. Kami siap melayani Anda 24 jam!`;
+  return `Terima kasih atas pertanyaan Anda. Untuk informasi lebih lanjut atau bantuan langsung dari petugas, silakan hubungi Customer Service (CS) Asrama Haji Papua via WhatsApp di ${CONTACT.waText} (${CONTACT.wa}) atau telepon ${CONTACT.phone}. Kami siap melayani Anda 24 jam!`;
 }
 
 export default async function handler(req: any, res: any) {

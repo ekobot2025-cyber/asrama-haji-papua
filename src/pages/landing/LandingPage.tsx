@@ -84,9 +84,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     amenities: ['2 Single Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk']
   };
 
-  const aulaFacility = facilities.find(f => f.id === 'fac-1' || f.name.toLowerCase().includes('aula')) || {
-    id: 'fac-1',
-    name: 'Aula',
+  const aulaFacility = facilities.find(f => f.id === 'fac-01' || (f.name.toLowerCase().includes('aula') && !f.name.toLowerCase().includes('pernikahan'))) || {
+    id: 'fac-01',
+    name: 'Aula (Kegiatan Umum)',
     type: 'AULA' as const,
     category: 'RUANG_PERTEMUAN' as const,
     location: 'Gedung Serbaguna',
@@ -94,8 +94,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     daily_rate: 3900000,
     rate_unit: 'PER_DAY' as const,
     status: 'AVAILABLE' as const,
-    description: 'Aula pertemuan kapasitas s.d 300 orang',
+    description: 'Aula pertemuan serbaguna untuk pemakaian kegiatan umum kapasitas s.d 300 orang',
     amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi']
+  };
+
+  const aulaWeddingFacility = facilities.find(f => f.id === 'fac-01-wedding' || f.name.toLowerCase().includes('pernikahan')) || {
+    id: 'fac-01-wedding',
+    name: 'Aula (Acara Pernikahan)',
+    type: 'AULA' as const,
+    category: 'RUANG_PERTEMUAN' as const,
+    location: 'Gedung Serbaguna',
+    capacity: 300,
+    daily_rate: 5000000,
+    rate_unit: 'PER_DAY' as const,
+    status: 'AVAILABLE' as const,
+    description: 'Sewa Aula lengkap untuk resepsi & akad acara pernikahan (wedding) kapasitas s.d 300–500 tamu',
+    amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi', 'Area Pelaminan & Resepsi']
   };
 
   const ruangKelasFacility = facilities.find(f => f.id === 'fac-class' || f.name.toLowerCase().includes('kelas')) || {
@@ -721,48 +735,79 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="h-44 bg-gradient-to-tr from-[#1A1410] via-[#2A2018] to-[#1A1410] relative p-6 flex flex-col justify-between text-white">
               <div className="flex justify-between items-start">
                 <span className="bg-[#c9a961]/20 text-[#c9a961] border border-[#c9a961]/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
-                  Ruang Pertemuan
+                  Gedung Serbaguna
                 </span>
-                <span className="text-[11px] font-bold text-stone-300">Kode PNBP 425112</span>
+                <span className="text-[11px] font-bold text-stone-300">PP No. 59/2020</span>
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">{aulaFacility.name}</h3>
-                <p className="text-xs text-stone-300">Kapasitas Maksimal {aulaFacility.capacity} Orang &bull; Tarif Harian</p>
+                <h3 className="text-xl font-black text-white">Aula Utama Serbaguna</h3>
+                <p className="text-xs text-stone-300">Kapasitas Maksimal 300–500 Orang &bull; Tarif Harian</p>
               </div>
             </div>
-            <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
+            <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
               <div className="space-y-3">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-black text-[#1A1410]">{formatCurrency(aulaFacility.daily_rate)}</span>
-                  <span className="text-xs text-stone-500 font-medium">/ hari</span>
+                {/* Two Rates Box */}
+                <div className="space-y-2 p-3 rounded-2xl bg-[#fbf8ee] border border-[#e8dfc8]">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-stone-800 block">Pemakaian Kegiatan Umum</span>
+                      <span className="text-[10px] text-stone-500">Seminar, Rapat Dinas, Bimtek, Wisuda, Manasik</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-base font-black text-[#8a6d2b]">Rp 3.900.000</span>
+                      <span className="text-[10px] text-stone-500 block">/ hari</span>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-[#e8dfc8] flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-stone-800 block">Acara Pernikahan (Wedding)</span>
+                      <span className="text-[10px] text-stone-500">Resepsi, Akad Nikah & Pelaminan</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-base font-black text-[#b8941e]">Rp 5.000.000</span>
+                      <span className="text-[10px] text-stone-500 block">/ hari</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-[11px] font-semibold text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-1 rounded-lg border border-[#e8dfc8]">
-                  Sewa Fasilitas MICE &bull; PP No. 59/2020
+
+                <div className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                  💵 Pembayaran Khusus CASH / TUNAI di Front Desk
                 </div>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Gedung serbaguna megah untuk konvensi, pelepasan jemaah haji, resepsi, wisuda, rapat akbar dinas, bimbingan teknis, dan pameran.
+                  Gedung serbaguna representatif ber-AC dengan kapasitas s.d 300–500 orang, sound system lengkap, infocus/proyektor, panggung, dan kursi.
                 </p>
                 <div className="pt-2 border-t border-[#e8dfc8] space-y-2 text-xs text-stone-700">
-                  {aulaFacility.amenities.map((amenity, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
-                      <span>{amenity}</span>
-                    </div>
-                  ))}
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
-                    <span>Kapasitas s.d {aulaFacility.capacity} Orang</span>
+                    <span>Sound System & Mikrofon Wireless</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                    <span>Infocus / Proyektor & Layar Besar</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#c9a961] shrink-0" />
+                    <span>AC Central & Kursi Kapasitas 300 Orang</span>
                   </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <button 
-                  onClick={() => openBookingModal('RUANG_PERTEMUAN', aulaFacility.id, 1, 1)}
-                  className="w-full py-2.5 rounded-xl font-black text-xs bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-[0_2px_8px_rgba(201,169,97,0.3)] cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>Booking Aula Online</span>
-                </button>
+              <div className="space-y-2 pt-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => openBookingModal('RUANG_PERTEMUAN', aulaFacility.id, 1, 1)}
+                    className="py-2.5 px-2 rounded-xl font-black text-[11px] bg-gradient-to-r from-[#c9a961] to-[#b8941e] hover:from-[#b8941e] hover:to-[#a27f14] text-white transition-all text-center shadow-xs cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>Pesan Umum</span>
+                  </button>
+                  <button 
+                    onClick={() => openBookingModal('RUANG_PERTEMUAN', aulaWeddingFacility.id, 1, 1)}
+                    className="py-2.5 px-2 rounded-xl font-black text-[11px] bg-gradient-to-r from-[#b8941e] to-[#8a6d2b] hover:from-[#8a6d2b] hover:to-[#6d541b] text-white transition-all text-center shadow-xs cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>Pesan Wedding</span>
+                  </button>
+                </div>
                 <button 
                   onClick={() => { 
                     setCalcCategory('RUANG_PERTEMUAN'); 
@@ -771,7 +816,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   }}
                   className="w-full py-2 rounded-xl font-bold text-xs bg-[#FAF9F5] hover:bg-[#fbf8ee] text-stone-700 border border-[#e8dfc8] transition-all text-center cursor-pointer"
                 >
-                  Simulasikan Biaya
+                  Simulasikan Biaya di Kalkulator
                 </button>
               </div>
             </div>
@@ -857,10 +902,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="p-4 rounded-2xl bg-white/5 border border-[#c9a961]/20 text-xs space-y-2">
                 <div className="flex items-center gap-2 text-[#c9a961] font-bold">
                   <CreditCard className="w-4 h-4" />
-                  <span>Kode Billing SIMPONI Resmi</span>
+                  <span>Metode Pembayaran CASH / TUNAI</span>
                 </div>
                 <p className="text-stone-300 text-[11px]">
-                  Pembayaran disetorkan langsung ke Kas Negara menggunakan Surat Setoran Bukan Pajak (SSBP) melalui seluruh Bank Persepsi atau Pos Indonesia.
+                  Pembayaran sewa kamar maupun aula dilakukan secara <strong>CASH / TUNAI</strong> langsung di Kasir Front Desk Asrama Haji Papua saat kedatangan / check-in. Kuitansi resmi diserahkan seketika.
                 </p>
               </div>
             </div>
@@ -995,13 +1040,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </button>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <a
-                      href="https://wa.me/6281248001234?text=Halo%20Front%20Desk%20SIMAHA%20Papua,%20saya%20ingin%20reservasi%20penginapan"
+                      href="https://wa.me/6281248984433?text=Halo%20Customer%20Service%20SIMAHA%20Papua,%20saya%20ingin%20informasi%20dan%20reservasi"
                       target="_blank"
                       rel="noreferrer"
                       className="flex-1 py-2 bg-[#FAF9F5] hover:bg-[#fbf8ee] border border-[#e8dfc8] text-stone-700 rounded-xl font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs"
                     >
                       <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Hubungi Front Desk WhatsApp</span>
+                      <span>Hubungi CS WhatsApp (+62 812-4898-4433)</span>
                     </a>
                     <button
                       onClick={onGoToLogin}
@@ -1175,7 +1220,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="flex items-center gap-3">
                   <Phone className="w-4 h-4 text-[#c9a961] shrink-0" />
-                  <span>Telepon Kantor: (0967) 581-229 &bull; WhatsApp Front Desk: 0812-4800-1234</span>
+                  <span>Telepon Kantor: (0967) 581-229 &bull; WhatsApp CS: +62 812-4898-4433</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-[#c9a961] shrink-0" />

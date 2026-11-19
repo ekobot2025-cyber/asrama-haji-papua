@@ -7,20 +7,19 @@ interface Msg {
   time?: string;
 }
 
-const WA = 'https://wa.me/6281248001234';
+const WA = 'https://wa.me/6281248984433';
 const SUGGESTIONS = [
+  'Harga penggunaan aula?',
+  'Metode pembayaran (CASH/TUNAI)?',
   'Berapa tarif kamar?',
   'Bagaimana cara booking online?',
-  'Fasilitas apa saja yang tersedia?',
   'Jam check-in & check-out?',
-  'Bisa sewa aula pertemuan?',
-  'Metode pembayaran SIMPONI?',
-  'Lokasi & kontak Front Desk?',
+  'Hubungi CS WhatsApp',
 ];
 
 const INITIAL_MSG: Msg = {
   role: 'assistant',
-  content: 'Assalamu\'alaikum! Saya Asisten Virtual SIMAHA Papua, siap membantu 24/7.\n\nAda yang dapat kami bantu seputar tarif kamar Gedung Mina, fasilitas aula, simulasi manasik haji, atau tata cara booking online?',
+  content: 'Assalamu\'alaikum! Saya Asisten Virtual SIMAHA Papua, siap membantu 24/7.\n\nAda yang dapat kami bantu seputar tarif kamar, sewa aula (Umum Rp 3,9 jt / Pernikahan Rp 5 jt), pembayaran CASH/TUNAI, atau cara booking online?',
   time: 'Sekarang',
 };
 
@@ -57,7 +56,7 @@ export const ChatbotWidget: React.FC = () => {
         }),
       });
       const j = await res.json();
-      const replyContent = j?.reply || 'Maaf, belum dapat memproses jawaban saat ini. Silakan hubungi Front Desk via WhatsApp.';
+      const replyContent = j?.reply || 'Maaf, belum dapat memproses jawaban saat ini. Silakan hubungi CS via WhatsApp.';
       const botTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
       setMsgs([...next, { role: 'assistant', content: replyContent, time: botTime }]);
     } catch {
@@ -65,7 +64,7 @@ export const ChatbotWidget: React.FC = () => {
         ...next,
         {
           role: 'assistant',
-          content: 'Maaf, koneksi sedang terganggu. Silakan hubungi langsung Front Desk via WhatsApp di 0812-4800-1234 atau telepon (0967) 581-229.',
+          content: 'Maaf, koneksi sedang terganggu. Silakan hubungi Customer Service (CS) via WhatsApp di +62 812-4898-4433 atau telepon (0967) 581-229.',
           time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -175,7 +174,7 @@ export const ChatbotWidget: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 maxLength={500}
-                placeholder="Ketik pertanyaan seputar asrama haji..."
+                placeholder="Ketik pertanyaan seputar asrama haji & aula..."
                 className="flex-1 text-xs px-3.5 py-2 rounded-xl border border-[#e8dfc8] focus:outline-none focus:ring-2 focus:ring-[#c9a961]/40 bg-[#FAF9F5] focus:bg-white text-stone-800 transition-all placeholder:text-stone-400"
               />
               <button
@@ -193,9 +192,9 @@ export const ChatbotWidget: React.FC = () => {
                 href={WA}
                 target="_blank"
                 rel="noreferrer"
-                className="text-[9.5px] font-medium text-[#8a6d2b] hover:underline"
+                className="text-[9.5px] font-bold text-[#8a6d2b] hover:underline"
               >
-                Bicara dg Petugas (WA)
+                Hubungi CS WhatsApp (+62 812-4898-4433)
               </a>
             </div>
           </div>

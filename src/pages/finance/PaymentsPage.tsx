@@ -32,7 +32,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
   const [isNewPaymentOpen, setIsNewPaymentOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>(initialInvoiceId || '');
   const [amount, setAmount] = useState<number>(0);
-  const [paymentMethod, setPaymentMethod] = useState<Payment['payment_method']>('TRANSFER_BSI');
+  const [paymentMethod, setPaymentMethod] = useState<Payment['payment_method']>('CASH');
   const [receivedFrom, setReceivedFrom] = useState('');
   const [forPurpose, setForPurpose] = useState('');
   const [paymentNotes, setPaymentNotes] = useState('');
@@ -310,11 +310,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ initialInvoiceId, on
                 onChange={(e) => setPaymentMethod(e.target.value as any)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white font-semibold"
               >
-                <option value="TRANSFER_BSI">Transfer Bank Syariah Indonesia (BSI)</option>
-                <option value="TRANSFER_BPD_PAPUA">Transfer Bank Papua (BPD)</option>
-                <option value="TRANSFER_BRI">Transfer Bank BRI</option>
-                <option value="CASH">Kas Tunai (Front Office)</option>
-                <option value="QRIS">QRIS Asrama Haji</option>
+                <option value="CASH">💵 Kas Tunai (CASH / Front Desk)</option>
               </select>
             </div>
           </div>

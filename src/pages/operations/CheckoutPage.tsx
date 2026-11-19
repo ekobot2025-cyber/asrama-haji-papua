@@ -610,11 +610,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ initialReservationId
                           onChange={(e) => setPaymentMethod(e.target.value as any)}
                           className="w-full p-2 bg-white border border-amber-300 rounded-xl text-xs font-semibold"
                         >
-                          <option value="CASH">💵 Uang Tunai (Cash di Front Desk)</option>
-                          <option value="QRIS">📱 QRIS Dinamis</option>
-                          <option value="TRANSFER_BSI">🏦 Transfer Bank BSI (Penampungan PNBP)</option>
-                          <option value="DEBIT_EDC">💳 Kartu Debit / Mesin EDC</option>
-                          <option value="SIMPONI_MPN_G3">🏛️ Setoran SIMPONI MPN-G3 Kemenkeu</option>
+                          <option value="CASH">💵 Uang Tunai (CASH di Front Desk)</option>
                         </select>
                       </div>
 

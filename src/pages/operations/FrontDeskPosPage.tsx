@@ -1180,62 +1180,15 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
               </div>
             </div>
 
-            {/* Payment Method Selector */}
+            {/* Payment Method Selector (CASH / TUNAI Saja) */}
             <div className="space-y-2 pt-1 border-t border-slate-200">
               <label className="block text-xs font-bold text-slate-800">Metode Pembayaran Kasir:</label>
               
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('CASH')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
-                    paymentMethod === 'CASH'
-                      ? 'bg-[#c9a961] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
+              <div className="w-full">
+                <div className="py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-white shadow-xs">
                   <Banknote className="w-4 h-4" />
-                  <span>Tunai (Cash)</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('QRIS')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
-                    paymentMethod === 'QRIS'
-                      ? 'bg-[#c9a961] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  <QrCode className="w-4 h-4" />
-                  <span>QRIS</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('TRANSFER')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
-                    paymentMethod === 'TRANSFER'
-                      ? 'bg-[#c9a961] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  <CreditCard className="w-4 h-4" />
-                  <span>Bank (BSI)</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('SIMPONI')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
-                    paymentMethod === 'SIMPONI'
-                      ? 'bg-[#c9a961] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  <Building className="w-4 h-4" />
-                  <span>SIMPONI</span>
-                </button>
+                  <span>💵 Pembayaran CASH / TUNAI (Kasir Front Desk)</span>
+                </div>
               </div>
 
               {/* Cash Calculator Box if CASH selected */}
