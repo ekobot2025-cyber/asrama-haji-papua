@@ -81,17 +81,27 @@ try {
 }
 
 // -------------------------------------------------------------
-// PENGUJIAN 2: CRUD UNIT FISIK (32 KAMAR GEDUNG MINA)
+// PENGUJIAN 2: CRUD UNIT FISIK (36 KAMAR GEDUNG MINA)
 // -------------------------------------------------------------
 try {
-  console.log('TEST 2: CRUD Unit Fisik Kamar (Gedung Mina 32 Kamar)...');
+  console.log('TEST 2: CRUD Unit Fisik Kamar (Gedung Mina 36 Kamar)...');
   const rooms = db.getRooms();
-  assert(rooms.length === 32, `Total unit fisik kamar harus 32 kamar, terdeteksi: ${rooms.length}`);
+  assert(rooms.length === 36, `Total unit fisik kamar harus 36 kamar, terdeteksi: ${rooms.length}`);
 
   const supRooms = rooms.filter(r => r.room_type_id === 'rt-spr' || r.room_type_id === 'rt-sup');
   const stdRooms = rooms.filter(r => r.room_type_id === 'rt-std');
-  assert(supRooms.length === 2, `Unit Superior harus tepat 2 kamar (M101, M102), terdeteksi: ${supRooms.length}`);
-  assert(stdRooms.length === 30, `Unit Standar harus tepat 30 kamar, terdeteksi: ${stdRooms.length}`);
+  assert(supRooms.length === 4, `Unit Superior harus tepat 4 kamar (M209, M211, M213, M215), terdeteksi: ${supRooms.length}`);
+  assert(stdRooms.length === 32, `Unit Standar harus tepat 32 kamar, terdeteksi: ${stdRooms.length}`);
+
+  // Test inactive rooms (M117 & M217)
+  const m117 = rooms.find(r => r.room_number === 'M117');
+  const m217 = rooms.find(r => r.room_number === 'M217');
+  assert(!!m117 && m117.status === 'INACTIVE', 'Kamar M117 harus berstatus INACTIVE (Kosong / tidak tersedia)');
+  assert(!!m217 && m217.status === 'INACTIVE', 'Kamar M217 harus berstatus INACTIVE (Kosong / tidak tersedia)');
+
+  // Verify Superior beds are 1 bed each, Standar beds are 2 beds each
+  assert(supRooms.every(r => r.total_beds === 1), 'Seluruh Kamar Superior harus memiliki 1 Bed');
+  assert(stdRooms.every(r => r.total_beds === 2), 'Seluruh Kamar Standar harus memiliki 2 Bed');
 
   // Test updating status unit to INACTIVE and back
   const testRoom = rooms[0];
@@ -103,7 +113,7 @@ try {
   // Restore status
   db.saveRoom({ ...testRoom, status: oldStatus }, mockAdminUser);
 
-  console.log('✅ PASS: CRUD Unit Fisik Kamar (32 unit nyata Gedung Mina) terverifikasi.\n');
+  console.log('✅ PASS: CRUD Unit Fisik Kamar (36 unit nyata Gedung Mina: 4 Superior @ 1 Bed, 32 Standar @ 2 Bed, M117 & M217 Inactive) terverifikasi.\n');
   passedTests++;
 } catch (e: any) {
   console.error('Test 2 failed:', e.message);
@@ -292,8 +302,8 @@ try {
     `Pesan penolakan harus jelas, pesan: ${conflictRes.message}`
   );
 
-  // Also test superior room availability overflow (only 2 rooms exist)
-  // Book both rooms
+  // Also test superior room availability overflow (exactly 4 rooms exist: M209, M211, M213, M215)
+  // Book all 4 superior rooms
   const supRes1 = db.createReservation({
     rental_category: 'PENGINAPAN',
     room_type_id: 'rt-sup',
@@ -302,12 +312,12 @@ try {
     guest_type: 'KEDINASAN',
     checkin_date: '2026-12-10',
     checkout_date: '2026-12-12',
-    unit_count: 2, // Take all 2 superior rooms
-    total_guests: 4
+    unit_count: 4, // Take all 4 superior rooms
+    total_guests: 8
   }, mockAdminUser);
-  assert(supRes1.success, 'Pemesanan 2 kamar superior pertama berhasil');
+  assert(supRes1.success, 'Pemesanan 4 kamar superior pertama berhasil');
 
-  // Try to book a 3rd superior room on the same dates
+  // Try to book a 5th superior room on the same dates (should fail because only 4 exist)
   const supRes2 = db.createReservation({
     rental_category: 'PENGINAPAN',
     room_type_id: 'rt-sup',

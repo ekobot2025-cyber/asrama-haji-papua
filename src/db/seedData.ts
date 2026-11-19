@@ -123,7 +123,7 @@ export const initialBuildings: Building[] = [
     code: 'MINA',
     name: 'Gedung Mina',
     total_floors: 2,
-    description: 'Gedung akomodasi utama berkapasitas 32 kamar (2 Kamar Superior & 30 Kamar Standar), Check-in: 14.00 WIT, Check-out: 12.00 WIT',
+    description: 'Gedung akomodasi utama berkapasitas 36 kamar (Lantai 1: M101–M118 dengan M117 Kosong; Lantai 2: M201–M218 dengan 4 Kamar Superior M209, M211, M213, M215 dan M217 Kosong), Check-in: 14.00 WIT, Check-out: 12.00 WIT',
     status: 'ACTIVE',
     created_at: '2026-01-01T00:00:00Z',
   },
@@ -140,11 +140,11 @@ export const initialRoomTypes: RoomType[] = [
     code: 'SUPERIOR',
     name: 'Superior',
     category: 'PENGINAPAN',
-    description: 'Kamar Superior representatif (tersedia 2 kamar: M101 & M102) dengan fasilitas Double Bed, AC, Meja, Lemari, dan Closet Duduk (Check-in: 14.00, Check-out: 12.00 WIT).',
+    description: 'Kamar Superior representatif di Lantai 2 (tersedia 4 kamar: M209, M211, M213, dan M215) dengan fasilitas 1 Bed (Double/King Bed), AC, Meja, Lemari, Smart TV, Water Heater, dan Closet Duduk (Check-in: 14.00, Check-out: 12.00 WIT).',
     default_capacity: 2,
     base_rate_per_night: 300000,
     rate_unit: 'PER_NIGHT',
-    amenities: ['Double Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk', 'Smart TV LED', 'Water Heater', 'WiFi Gratis'],
+    amenities: ['1 Double/King Bed', 'AC', 'Meja', 'Lemari', 'Closet Duduk', 'Smart TV LED', 'Water Heater', 'WiFi Gratis'],
     image_url: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600',
   },
   {
@@ -152,7 +152,7 @@ export const initialRoomTypes: RoomType[] = [
     code: 'STANDAR',
     name: 'Standar',
     category: 'PENGINAPAN',
-    description: 'Kamar Standar nyaman (tersedia 30 kamar: M103–M116 & M201–M216) dengan fasilitas 2 Single Bed, AC, Meja, Lemari, dan Closet Duduk (Check-in: 14.00, Check-out: 12.00 WIT).',
+    description: 'Kamar Standar nyaman (tersedia 32 kamar: Lantai 1 M101–M118 kecuali M117; Lantai 2 M201–M218 kecuali M209, M211, M213, M215 & M217) dengan fasilitas 2 Bed (Single Bed), AC, Meja, Lemari, dan Closet Duduk (Check-in: 14.00, Check-out: 12.00 WIT).',
     default_capacity: 2,
     base_rate_per_night: 250000,
     rate_unit: 'PER_NIGHT',
@@ -218,60 +218,71 @@ export const initialInstitutions: Institution[] = [
   },
 ];
 
-// Helper to generate exactly 32 rooms in Gedung Mina (2 Superior @ Rp 300.000 & 30 Standar @ Rp 250.000)
+// Helper to generate exactly 36 rooms in Gedung Mina:
+// Lantai 1: M101–M118 (18 kamar Standar @ Rp 250.000, 2 Bed; M117 Kosong/Tidak Tersedia)
+// Lantai 2: M201–M218 (4 kamar Superior M209, M211, M213, M215 @ Rp 300.000, 1 Bed; M217 Kosong/Tidak Tersedia; lainnya Standar @ Rp 250.000, 2 Bed)
 export function generateSeedRoomsAndBeds(): { rooms: Room[]; beds: Bed[] } {
   const rooms: Room[] = [];
   const beds: Bed[] = [];
 
   const roomConfig = [
-    // Gedung Mina - Lantai 1 (16 Kamar: 2 Kamar Superior & 14 Kamar Standar)
-    { num: 'M101', bld: 'bld-01', flr: 'flr-01', type: 'rt-spr', cap: 2, rate: 300000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M102', bld: 'bld-01', flr: 'flr-01', type: 'rt-spr', cap: 2, rate: 300000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M103', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M104', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M105', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M106', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'CLEANING' as RoomStatus, hk: 'DIRTY' as HousekeepingStatus },
-    { num: 'M107', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'MAINTENANCE' as RoomStatus, hk: 'IN_CLEANING' as HousekeepingStatus },
-    { num: 'M108', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M109', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M110', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M111', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M112', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M113', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M114', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M115', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M116', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    // Gedung Mina - Lantai 1 (18 Kamar: Seluruhnya Kamar Standar @ Rp 250.000, 2 Bed, Kamar M117 Kosong/Tidak Tersedia)
+    { num: 'M101', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M102', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M103', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M104', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'CLEANING' as RoomStatus, hk: 'DIRTY' as HousekeepingStatus },
+    { num: 'M105', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'MAINTENANCE' as RoomStatus, hk: 'IN_CLEANING' as HousekeepingStatus },
+    { num: 'M106', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M107', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M108', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M109', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M110', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M111', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M112', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M113', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M114', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M115', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M116', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M117', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'INACTIVE' as RoomStatus, hk: 'INSPECTED' as HousekeepingStatus, notes: 'Kamar Kosong / Tidak Tersedia (Lantai 1)' },
+    { num: 'M118', bld: 'bld-01', flr: 'flr-01', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
 
-    // Gedung Mina - Lantai 2 (16 Kamar Standar)
-    { num: 'M201', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M202', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M203', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M204', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M205', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M206', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M207', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M208', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M209', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M210', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M211', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M212', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M213', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M214', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M215', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
-    { num: 'M216', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    // Gedung Mina - Lantai 2 (18 Kamar: M209, M211, M213, M215 Superior @ Rp 300.000 1 Bed; M217 Kosong/Tidak Tersedia; Lainnya Standar @ Rp 250.000 2 Bed)
+    { num: 'M201', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M202', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M203', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M204', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M205', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M206', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M207', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M208', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M209', bld: 'bld-01', flr: 'flr-02', type: 'rt-spr', beds: 1, cap: 2, rate: 300000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M210', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M211', bld: 'bld-01', flr: 'flr-02', type: 'rt-spr', beds: 1, cap: 2, rate: 300000, status: 'OCCUPIED' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M212', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M213', bld: 'bld-01', flr: 'flr-02', type: 'rt-spr', beds: 1, cap: 2, rate: 300000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M214', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M215', bld: 'bld-01', flr: 'flr-02', type: 'rt-spr', beds: 1, cap: 2, rate: 300000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M216', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
+    { num: 'M217', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'INACTIVE' as RoomStatus, hk: 'INSPECTED' as HousekeepingStatus, notes: 'Kamar Kosong / Tidak Tersedia (Lantai 2)' },
+    { num: 'M218', bld: 'bld-01', flr: 'flr-02', type: 'rt-std', beds: 2, cap: 2, rate: 250000, status: 'AVAILABLE' as RoomStatus, hk: 'READY' as HousekeepingStatus },
   ];
 
   roomConfig.forEach((cfg, idx) => {
     const roomId = `room-${(idx + 1).toString().padStart(3, '0')}`;
     let occupiedCount = 0;
+    const isSuperior = cfg.type === 'rt-spr';
+    const isInactive = cfg.status === 'INACTIVE';
+    const bedCount = cfg.beds;
 
     // Generate individual beds
-    for (let b = 1; b <= cfg.cap; b++) {
+    for (let b = 1; b <= bedCount; b++) {
       const bedCode = `${cfg.num}-B0${b}`;
       const bedId = `bed-${roomId}-${b}`;
       let bStatus: 'AVAILABLE' | 'OCCUPIED' | 'RESERVED' | 'MAINTENANCE' = 'AVAILABLE';
 
-      if (cfg.status === 'OCCUPIED') {
+      if (isInactive) {
+        bStatus = 'MAINTENANCE';
+      } else if (cfg.status === 'OCCUPIED') {
         bStatus = 'OCCUPIED';
       } else if (cfg.status === 'RESERVED') {
         bStatus = 'RESERVED';
@@ -291,10 +302,9 @@ export function generateSeedRoomsAndBeds(): { rooms: Room[]; beds: Bed[] } {
       });
     }
 
-    const isSuperior = cfg.type === 'rt-spr';
     const roomAmenities = isSuperior
-      ? ['AC Dual-Inverter', 'WiFi', 'Kamar Mandi Dalam', 'Water Heater', 'Smart TV LED 43"', 'Kulkas Mini', 'Meja Kerja & Lemari']
-      : ['AC Individual', 'WiFi', 'Kamar Mandi Dalam', 'Lemari Pakaian', 'Meja & Kursi'];
+      ? ['1 Double/King Bed', 'AC Dual-Inverter', 'WiFi', 'Kamar Mandi Dalam', 'Water Heater', 'Smart TV LED 43"', 'Kulkas Mini', 'Meja Kerja & Lemari', 'Closet Duduk']
+      : ['2 Single Bed', 'AC Individual', 'WiFi', 'Kamar Mandi Dalam', 'Lemari Pakaian', 'Meja & Kursi', 'Closet Duduk'];
 
     rooms.push({
       id: roomId,
@@ -303,13 +313,13 @@ export function generateSeedRoomsAndBeds(): { rooms: Room[]; beds: Bed[] } {
       floor_id: cfg.flr,
       room_type_id: cfg.type,
       capacity: cfg.cap,
-      total_beds: cfg.cap,
+      total_beds: bedCount,
       occupied_beds: occupiedCount,
       rate_per_night: cfg.rate,
       status: cfg.status,
       housekeeping_status: cfg.hk,
       amenities: roomAmenities,
-      notes: cfg.status === 'MAINTENANCE' ? 'Perbaikan unit AC bocor & stop kontak' : undefined,
+      notes: (cfg as any).notes ? (cfg as any).notes : (cfg.status === 'MAINTENANCE' ? 'Perbaikan unit AC bocor & stop kontak' : undefined),
       created_at: '2026-01-01T00:00:00Z',
       updated_at: '2026-09-26T00:00:00Z',
     });
@@ -758,7 +768,7 @@ export const initialReservations: Reservation[] = [
     total_amount: 900000,
     paid_amount: 900000,
     remaining_amount: 0,
-    notes: 'Kamar Superior M101. Menginap 3 malam (Check-in 14:00, Check-out 12:00 WIT).',
+    notes: 'Kamar Superior M209 (Lantai 2). Menginap 3 malam (Check-in 14:00, Check-out 12:00 WIT).',
     spma_no: 'SPMA/AHP/2026/11/0003',
     simponi_billing_code: '820261119000303',
     package_type: 'REGULER',
@@ -796,7 +806,7 @@ export const initialReservations: Reservation[] = [
     total_amount: 750000,
     paid_amount: 750000,
     remaining_amount: 0,
-    notes: 'Kamar Standar M103. Tim Kesehatan Haji Indonesia.',
+    notes: 'Kamar Standar M101. Tim Kesehatan Haji Indonesia.',
     spma_no: 'SPMA/AHP/2026/11/0004',
     simponi_billing_code: '820261119000404',
     created_by: 'Resepsionis',
@@ -871,7 +881,7 @@ export const initialReservations: Reservation[] = [
     total_amount: 500000,
     paid_amount: 500000,
     remaining_amount: 0,
-    notes: 'Kamar Standar M105 sudah dipersiapkan dan status CLEAN/READY.',
+    notes: 'Kamar Standar M103 sudah dipersiapkan dan status CLEAN/READY.',
     spma_no: 'SPMA/AHP/2026/11/0006',
     simponi_billing_code: '820261119000606',
     created_by: 'Admin Penginapan',
@@ -907,7 +917,7 @@ export const initialReservations: Reservation[] = [
     total_amount: 500000,
     paid_amount: 500000,
     remaining_amount: 0,
-    notes: 'Kamar Standar M106 telah checkout pagi tadi. Status kamar DIRTY/CLEANING.',
+    notes: 'Kamar Standar M104 telah checkout pagi tadi. Status kamar DIRTY/CLEANING.',
     spma_no: 'SPMA/AHP/2026/11/0007',
     simponi_billing_code: '820261119000707',
     created_by: 'Resepsionis',
@@ -944,7 +954,7 @@ export const initialReservations: Reservation[] = [
     total_amount: 600000,
     paid_amount: 600000,
     remaining_amount: 0,
-    notes: 'Kamar Superior M102. Tagihan LUNAS via QRIS Dinamis. Siap checkout langsung (Lunas).',
+    notes: 'Kamar Superior M211 (Lantai 2). Tagihan LUNAS via QRIS Dinamis. Siap checkout langsung (Lunas).',
     spma_no: 'SPMA/AHP/2026/11/0008',
     simponi_billing_code: '820261119000808',
     created_by: 'Resepsionis',
@@ -981,7 +991,7 @@ export const initialReservations: Reservation[] = [
     total_amount: 750000,
     paid_amount: 300000,
     remaining_amount: 450000, // Sisa Rp 450.000!
-    notes: 'Kamar Standar M104. Baru bayar DP Rp 300.000 di kasir, sisa pelunasan Rp 450.000 saat check-out.',
+    notes: 'Kamar Standar M102. Baru bayar DP Rp 300.000 di kasir, sisa pelunasan Rp 450.000 saat check-out.',
     spma_no: 'SPMA/AHP/2026/11/0009',
     simponi_billing_code: '820261119000909',
     created_by: 'Resepsionis',
@@ -1069,7 +1079,7 @@ export const initialReservations: Reservation[] = [
 export const initialHousekeepingTasks: HousekeepingTask[] = [
   {
     id: 'hk-01',
-    room_id: 'room-006', // M106 (checkout today)
+    room_id: 'room-004', // M104 (checkout today)
     task_type: 'POST_CHECKOUT',
     status: 'DIRTY',
     priority: 'HIGH',
@@ -1081,7 +1091,7 @@ export const initialHousekeepingTasks: HousekeepingTask[] = [
   },
   {
     id: 'hk-02',
-    room_id: 'room-007', // M107 (maintenance)
+    room_id: 'room-005', // M105 (maintenance)
     task_type: 'REGULAR_CLEAN',
     status: 'IN_CLEANING',
     priority: 'MEDIUM',
@@ -1092,7 +1102,7 @@ export const initialHousekeepingTasks: HousekeepingTask[] = [
   },
   {
     id: 'hk-03',
-    room_id: 'room-001', // M101 (Superior)
+    room_id: 'room-027', // M209 (Superior Lantai 2)
     task_type: 'INSPECTION',
     status: 'INSPECTED',
     priority: 'LOW',
@@ -1110,21 +1120,21 @@ export const initialMaintenanceRequests: MaintenanceRequest[] = [
   {
     id: 'mnt-01',
     ticket_no: 'MNT/AHP/2026/0001',
-    room_id: 'room-007', // M107
+    room_id: 'room-005', // M105
     issue_category: 'AC_HVAC',
     priority: 'URGENT',
-    description: 'Unit AC kamar M107 meneteskan air deras dan udara tidak dingin. Perlu pembersihan filter & perbaikan pipa pembuangan (drain pipe).',
+    description: 'Unit AC kamar M105 meneteskan air deras dan udara tidak dingin. Perlu pembersihan filter & perbaikan pipa pembuangan (drain pipe).',
     reporter_name: 'Resepsionis',
     assigned_technician: 'Lukas Karoba (Teknisi HVAC)',
     status: 'IN_PROGRESS',
     reported_at: getRelativeIso(0, 8, 30),
     estimated_cost: 350000,
-    notes: 'Kamar M107 dinonaktifkan sementara (Status: MAINTENANCE) hingga pengerjaan selesai.',
+    notes: 'Kamar M105 dinonaktifkan sementara (Status: MAINTENANCE) hingga pengerjaan selesai.',
   },
   {
     id: 'mnt-02',
     ticket_no: 'MNT/AHP/2026/0002',
-    room_id: 'room-002', // M102 (Superior)
+    room_id: 'room-029', // M211 (Superior Lantai 2)
     issue_category: 'PLUMBING',
     priority: 'LOW',
     description: 'Kran wastafel sedikit menetes, perlu pergantian seal karet.',
@@ -1205,7 +1215,7 @@ export const initialInvoices: Invoice[] = [
     pnbp_account_name: 'Pendapatan Sewa Kamar / Asrama / Wisma (PP No. 59/2020)',
     simponi_billing_code: '820261119000303',
     billing_expired_at: getRelativeIso(2, 23, 59),
-    notes: 'Menginap 3 malam Kamar Superior M101 @ Rp 300.000',
+    notes: 'Menginap 3 malam Kamar Superior M209 @ Rp 300.000',
     created_at: getRelativeIso(-4, 13, 30),
   },
   {
@@ -1228,7 +1238,7 @@ export const initialInvoices: Invoice[] = [
     pnbp_account_name: 'Pendapatan Sewa Kamar / Asrama / Wisma (PP No. 59/2020)',
     simponi_billing_code: '820261119000404',
     billing_expired_at: getRelativeIso(3, 23, 59),
-    notes: 'Menginap 3 malam Kamar Standar M103 @ Rp 250.000',
+    notes: 'Menginap 3 malam Kamar Standar M101 @ Rp 250.000',
     created_at: getRelativeIso(-2, 14, 0),
   },
   {
@@ -1274,7 +1284,7 @@ export const initialInvoices: Invoice[] = [
     pnbp_account_name: 'Pendapatan Sewa Kamar / Asrama / Wisma (PP No. 59/2020)',
     simponi_billing_code: '820261119000606',
     billing_expired_at: getRelativeIso(2, 23, 59),
-    notes: 'Kamar Standar M105 (2 Malam @ Rp 250.000)',
+    notes: 'Kamar Standar M103 (2 Malam @ Rp 250.000)',
     created_at: getRelativeIso(-1, 10, 30),
   },
   {
@@ -1297,7 +1307,7 @@ export const initialInvoices: Invoice[] = [
     pnbp_account_name: 'Pendapatan Sewa Kamar / Asrama / Wisma (PP No. 59/2020)',
     simponi_billing_code: '820261119000707',
     billing_expired_at: getRelativeIso(0, 23, 59),
-    notes: 'Kamar Standar M106 (2 Malam @ Rp 250.000) — Checkout selesai',
+    notes: 'Kamar Standar M104 (2 Malam @ Rp 250.000) — Checkout selesai',
     created_at: getRelativeIso(-2, 10, 0),
   },
   {
@@ -1320,7 +1330,7 @@ export const initialInvoices: Invoice[] = [
     pnbp_account_name: 'Pendapatan Sewa Kamar / Asrama / Wisma (PP No. 59/2020)',
     simponi_billing_code: '820261119000808',
     billing_expired_at: getRelativeIso(1, 23, 59),
-    notes: 'Kamar Superior M102 (2 Malam @ Rp 300.000) — LUNAS siap check-out',
+    notes: 'Kamar Superior M211 (2 Malam @ Rp 300.000) — LUNAS siap check-out',
     created_at: getRelativeIso(-2, 11, 0),
   },
   {
@@ -1343,7 +1353,7 @@ export const initialInvoices: Invoice[] = [
     pnbp_account_name: 'Pendapatan Sewa Kamar / Asrama / Wisma (PP No. 59/2020)',
     simponi_billing_code: '820261119000909',
     billing_expired_at: getRelativeIso(1, 23, 59),
-    notes: 'Kamar Standar M104 (3 Malam @ Rp 250.000) — Telah DP Rp 300.000, Kurang Rp 450.000',
+    notes: 'Kamar Standar M102 (3 Malam @ Rp 250.000) — Telah DP Rp 300.000, Kurang Rp 450.000',
     created_at: getRelativeIso(-3, 14, 0),
   },
   {
@@ -1395,7 +1405,7 @@ export const initialInvoiceItems: InvoiceItem[] = [
   {
     id: 'ii-03',
     invoice_id: 'inv-003',
-    description: 'Sewa Kamar Superior M101 Tamu VIP (3 Malam)',
+    description: 'Sewa Kamar Superior M209 Tamu VIP (3 Malam)',
     category: 'ROOM',
     quantity: 3,
     unit: 'Kamar/Malam',
@@ -1405,7 +1415,7 @@ export const initialInvoiceItems: InvoiceItem[] = [
   {
     id: 'ii-04',
     invoice_id: 'inv-004',
-    description: 'Sewa Kamar Standar M103 Tim Medis (3 Malam)',
+    description: 'Sewa Kamar Standar M101 Tim Medis (3 Malam)',
     category: 'ROOM',
     quantity: 3,
     unit: 'Kamar/Malam',
@@ -1425,7 +1435,7 @@ export const initialInvoiceItems: InvoiceItem[] = [
   {
     id: 'ii-06',
     invoice_id: 'inv-006',
-    description: 'Sewa Kamar Standar M105 Narasumber Manasik (2 Malam)',
+    description: 'Sewa Kamar Standar M103 Narasumber Manasik (2 Malam)',
     category: 'ROOM',
     quantity: 2,
     unit: 'Kamar/Malam',
@@ -1435,7 +1445,7 @@ export const initialInvoiceItems: InvoiceItem[] = [
   {
     id: 'ii-07',
     invoice_id: 'inv-007',
-    description: 'Sewa Kamar Standar M106 Tamu Keluarga (2 Malam)',
+    description: 'Sewa Kamar Standar M104 Tamu Keluarga (2 Malam)',
     category: 'ROOM',
     quantity: 2,
     unit: 'Kamar/Malam',
@@ -1445,7 +1455,7 @@ export const initialInvoiceItems: InvoiceItem[] = [
   {
     id: 'ii-08',
     invoice_id: 'inv-008',
-    description: 'Sewa Kamar Superior M102 Pejabat Kemenag Jayapura (2 Malam)',
+    description: 'Sewa Kamar Superior M211 Pejabat Kemenag Jayapura (2 Malam)',
     category: 'ROOM',
     quantity: 2,
     unit: 'Kamar/Malam',
@@ -1455,7 +1465,7 @@ export const initialInvoiceItems: InvoiceItem[] = [
   {
     id: 'ii-09',
     invoice_id: 'inv-009',
-    description: 'Sewa Kamar Standar M104 Pendamping Internal (3 Malam)',
+    description: 'Sewa Kamar Standar M102 Pendamping Internal (3 Malam)',
     category: 'ROOM',
     quantity: 3,
     unit: 'Kamar/Malam',
@@ -1518,7 +1528,7 @@ export const initialPayments: Payment[] = [
     payment_method: 'TRANSFER_BSI',
     terbilang: 'Sembilan Ratus Ribu Rupiah',
     received_from: 'Drs. H. Syamsuddin, M.Ag.',
-    for_purpose: 'Sewa Kamar Superior M101 3 Malam (RSV/AHP/2026/00003)',
+    for_purpose: 'Sewa Kamar Superior M209 3 Malam (RSV/AHP/2026/00003)',
     officer_name: 'Bendahara Keuangan',
     notes: 'Transfer Rekening BSI UPT Asrama Haji',
     created_at: getRelativeIso(-2, 14, 15),
@@ -1534,7 +1544,7 @@ export const initialPayments: Payment[] = [
     payment_method: 'SIMPONI_MPN_G3',
     terbilang: 'Tujuh Ratus Lima Puluh Ribu Rupiah',
     received_from: 'dr. Sarah Maulida, Sp.Ok',
-    for_purpose: 'Penginapan Kamar Standar M103 3 Malam (RSV/AHP/2026/00004)',
+    for_purpose: 'Penginapan Kamar Standar M101 3 Malam (RSV/AHP/2026/00004)',
     officer_name: 'Bendahara Keuangan',
     notes: 'NTPN: 8829104928172635, NTB: 99182374 Bank Persepsi BRI',
     created_at: getRelativeIso(-1, 14, 45),
@@ -1566,7 +1576,7 @@ export const initialPayments: Payment[] = [
     payment_method: 'QRIS',
     terbilang: 'Lima Ratus Ribu Rupiah',
     received_from: 'Dr. Zulkifli Harahap, M.Pd',
-    for_purpose: 'Penginapan Kamar Standar M105 2 Malam (RSV/AHP/2026/00006)',
+    for_purpose: 'Penginapan Kamar Standar M103 2 Malam (RSV/AHP/2026/00006)',
     officer_name: 'Resepsionis',
     notes: 'Pembayaran QRIS Dinamis Bank BSI',
     created_at: getRelativeIso(-1, 11, 15),
@@ -1582,7 +1592,7 @@ export const initialPayments: Payment[] = [
     payment_method: 'CASH',
     terbilang: 'Lima Ratus Ribu Rupiah',
     received_from: 'H. Muchtar Sembiring, S.E.',
-    for_purpose: 'Penginapan Kamar Standar M106 2 Malam (RSV/AHP/2026/00007)',
+    for_purpose: 'Penginapan Kamar Standar M104 2 Malam (RSV/AHP/2026/00007)',
     officer_name: 'Resepsionis',
     notes: 'Pembayaran tunai di Kasir Front Desk',
     created_at: getRelativeIso(-2, 11, 15),
@@ -1598,7 +1608,7 @@ export const initialPayments: Payment[] = [
     payment_method: 'QRIS',
     terbilang: 'Enam Ratus Ribu Rupiah',
     received_from: 'Dra. Hj. Maryam Kogoya',
-    for_purpose: 'Pelunasan Kamar Superior M102 (RSV/AHP/2026/00008) — Siap Checkout',
+    for_purpose: 'Pelunasan Kamar Superior M211 (RSV/AHP/2026/00008) — Siap Checkout',
     officer_name: 'Resepsionis',
     notes: 'Pembayaran QRIS Dinamis tervalidasi',
     created_at: getRelativeIso(-2, 14, 35),
@@ -1614,7 +1624,7 @@ export const initialPayments: Payment[] = [
     payment_method: 'CASH',
     terbilang: 'Tiga Ratus Ribu Rupiah',
     received_from: 'Karel Wenda, S.Sos.',
-    for_purpose: 'Uang Muka (DP) Kamar Standar M104 (RSV/AHP/2026/00009)',
+    for_purpose: 'Uang Muka (DP) Kamar Standar M102 (RSV/AHP/2026/00009)',
     officer_name: 'Resepsionis',
     notes: 'DP Tunai di Kasir, Sisa Rp 450.000 dilunasi saat check-out hari ini',
     created_at: getRelativeIso(-3, 14, 50),
@@ -1714,7 +1724,7 @@ export const initialNotifications: NotificationItem[] = [
   {
     id: 'notif-02',
     title: 'Jadwal Check-in Hari Ini',
-    message: 'Dr. Zulkifli Harahap, M.Pd dijadwalkan check-in di Kamar Standar M105. Kamar telah siap/bersih.',
+    message: 'Dr. Zulkifli Harahap, M.Pd dijadwalkan check-in di Kamar Standar M103. Kamar telah siap/bersih.',
     type: 'CHECKIN',
     is_read: false,
     link_page: 'checkin',
@@ -1724,7 +1734,7 @@ export const initialNotifications: NotificationItem[] = [
   {
     id: 'notif-03',
     title: 'Jadwal Check-out Hari Ini',
-    message: '2 Tamu terjadwal check-out hari ini: Kamar M102 (Lunas) & Kamar M104 (Kurang bayar Rp 450.000).',
+    message: '2 Tamu terjadwal check-out hari ini: Kamar M211 (Lunas) & Kamar M102 (Kurang bayar Rp 450.000).',
     type: 'CHECKOUT',
     is_read: false,
     link_page: 'checkout',
@@ -1734,17 +1744,17 @@ export const initialNotifications: NotificationItem[] = [
   {
     id: 'notif-04',
     title: 'Tamu Telah Checkout — Kamar Kotor',
-    message: 'Kamar M106 telah checkout. Tim Housekeeping perlu melakukan sanitasi dan penggantian linen.',
+    message: 'Kamar M104 telah checkout. Tim Housekeeping perlu melakukan sanitasi dan penggantian linen.',
     type: 'HOUSEKEEPING',
     is_read: false,
     link_page: 'housekeeping',
-    link_id: 'room-006',
+    link_id: 'room-004',
     created_at: getRelativeIso(0, 8, 30),
   },
   {
     id: 'notif-05',
-    title: 'Tiket Perbaikan Darurat AC Kamar M107',
-    message: 'Perbaikan pendingin ruangan kamar M107 sedang dikerjakan teknisi Lukas Karoba.',
+    title: 'Tiket Perbaikan Darurat AC Kamar M105',
+    message: 'Perbaikan pendingin ruangan kamar M105 sedang dikerjakan teknisi Lukas Karoba.',
     type: 'MAINTENANCE',
     is_read: true,
     link_page: 'maintenance',
@@ -1814,7 +1824,7 @@ export const initialAuditLogs: AuditLog[] = [
     action: 'CHECKOUT_GUEST',
     module: 'Check-out',
     target_id: 'RSV/AHP/2026/00007',
-    details: 'Proses checkout Kamar M106, pengembalian kunci kartu, status kamar dialihkan ke DIRTY / Housekeeping',
+    details: 'Proses checkout Kamar M104, pengembalian kunci kartu, status kamar dialihkan ke DIRTY / Housekeeping',
     ip_address: '192.168.1.30',
     timestamp: '2026-09-26T11:45:00Z',
   },

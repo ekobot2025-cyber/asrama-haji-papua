@@ -57,7 +57,7 @@ const conflictBooking = db.createReservation({
   reservation_type: 'INDIVIDUAL',
   rental_category: 'PENGINAPAN',
   room_type_id: 'rt-sup',
-  unit_count: 2, // Superior only has 2 units, 1 is booked above, so requesting 2 should fail
+  unit_count: 4, // Superior has 4 units (M209, M211, M213, M215), 1 is booked above, so requesting 4 more should fail (1+4=5 > 4)
   duration: 2,
   duration_unit: 'MALAM',
   checkin_date: '2026-11-10',
