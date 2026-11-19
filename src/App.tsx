@@ -34,6 +34,7 @@ import { AuditLogPage } from './pages/system/AuditLogPage';
 import { SettingsPage } from './pages/system/SettingsPage';
 import { FrontDeskPosPage } from './pages/operations/FrontDeskPosPage';
 import { LandingPage } from './pages/landing/LandingPage';
+import { ChatbotWidget } from './components/common/ChatbotWidget';
 import { ScrollToTopButton } from './components/common/ScrollToTopButton';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
 import { Button } from './components/common/Button';
@@ -133,7 +134,12 @@ const AppContent: React.FC = () => {
     if (authView === 'login') {
       return <LoginPage onBackToLanding={() => setAuthView('landing')} />;
     }
-    return <LandingPage onGoToLogin={() => setAuthView('login')} />;
+    return (
+      <>
+        <LandingPage onGoToLogin={() => setAuthView('login')} />
+        <ChatbotWidget />
+      </>
+    );
   }
 
   // If authenticated user navigates to 'landing', render LandingPage with quick access back to dashboard
