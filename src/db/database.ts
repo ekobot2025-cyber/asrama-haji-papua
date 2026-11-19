@@ -14,7 +14,7 @@ import {
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v6.1_live_operational_sync';
+const DB_VERSION = 'simaha_papua_v6.2_clean_live';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -98,176 +98,11 @@ class DatabaseService {
     this.auditLogs = [...initialAuditLogs];
     this.settings = { ...initialSettings };
 
-    // Initial assignments for checked-in rooms (Gedung Mina)
-    this.roomAssignments = [
-      {
-        id: 'ra-01',
-        reservation_id: 'rsv-003',
-        guest_id: 'gst-001',
-        room_id: 'room-027', // M209 (Superior - Lantai 2)
-        bed_id: 'bed-room-027-1',
-        assigned_at: getRelativeIso(-2, 14, 0),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-02',
-        reservation_id: 'rsv-008',
-        guest_id: 'gst-002',
-        room_id: 'room-029', // M211 (Superior - Lantai 2)
-        bed_id: 'bed-room-029-1',
-        assigned_at: getRelativeIso(-2, 14, 15),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-03',
-        reservation_id: 'rsv-004',
-        guest_id: 'gst-010',
-        room_id: 'room-001', // M101 (Standar - Lantai 1)
-        bed_id: 'bed-room-001-1',
-        assigned_at: getRelativeIso(-1, 14, 15),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-04',
-        reservation_id: 'rsv-009',
-        guest_id: 'gst-008',
-        room_id: 'room-002', // M102 (Standar - Lantai 1)
-        bed_id: 'bed-room-002-1',
-        assigned_at: getRelativeIso(-3, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-05',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-005',
-        room_id: 'room-019', // M201 (Standar - Lantai 2)
-        bed_id: 'bed-room-019-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-06',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-006',
-        room_id: 'room-020', // M202 (Standar - Lantai 2)
-        bed_id: 'bed-room-020-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-07',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-007',
-        room_id: 'room-021', // M203 (Standar - Lantai 2)
-        bed_id: 'bed-room-021-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-      {
-        id: 'ra-08',
-        reservation_id: 'rsv-001',
-        guest_id: 'gst-003',
-        room_id: 'room-022', // M204 (Standar - Lantai 2)
-        bed_id: 'bed-room-022-1',
-        assigned_at: getRelativeIso(-2, 14, 30),
-        assigned_by: 'Resepsionis',
-        status: 'CHECKED_IN',
-      },
-    ];
-
-    this.checkins = [
-      {
-        id: 'chk-01',
-        reservation_id: 'rsv-001',
-        checkin_no: 'CIN/2026/0001',
-        checkin_time: getRelativeIso(-2, 14, 30),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 8,
-        deposit_amount: 500000,
-        notes: 'Check-in rombongan Jamaah Haji Kloter 1 Kab. Jayapura (4 Kamar)',
-      },
-      {
-        id: 'chk-02',
-        reservation_id: 'rsv-003',
-        checkin_no: 'CIN/2026/0002',
-        checkin_time: getRelativeIso(-2, 14, 0),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Tamu VIP Kemenag RI (Kamar Superior M209)',
-      },
-      {
-        id: 'chk-03',
-        reservation_id: 'rsv-008',
-        checkin_no: 'CIN/2026/0003',
-        checkin_time: getRelativeIso(-2, 14, 15),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Dra. Hj. Maryam Kogoya (Kamar Superior M211)',
-      },
-      {
-        id: 'chk-04',
-        reservation_id: 'rsv-004',
-        checkin_no: 'CIN/2026/0004',
-        checkin_time: getRelativeIso(-1, 14, 15),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Tim Medis PPIH Embarkasi (Kamar Standar M101)',
-      },
-      {
-        id: 'chk-05',
-        reservation_id: 'rsv-009',
-        checkin_no: 'CIN/2026/0005',
-        checkin_time: getRelativeIso(-3, 14, 30),
-        checkin_by: 'Resepsionis',
-        card_keys_issued: 1,
-        deposit_amount: 100000,
-        notes: 'Pendamping Internal Keagamaan (Kamar Standar M102)',
-      },
-    ];
-
-    this.checkouts = [
-      {
-        id: 'co-01',
-        reservation_id: 'rsv-007',
-        checkout_no: 'COUT/2026/0001',
-        clearance_slip_no: 'SLIP/CLR/2026/0001',
-        checkout_time: getRelativeIso(0, 8, 30),
-        checkout_by: 'Resepsionis',
-        room_condition_notes: 'Kamar M104 rapi, kunci kartu lengkap dikembalikan',
-        deposit_returned: true,
-        deposit_amount: 100000,
-        notes: 'Selesai menginap dan telah diterbitkan surat bebas beban resmi',
-      },
-    ];
-
+    // Clean operational data (no dummy data)
+    this.roomAssignments = [];
+    this.checkins = [];
+    this.checkouts = [];
     this.facilityReservations = [];
-
-    // Update rooms and beds for initial checked in assignments
-    const occupiedRoomIds = new Set(this.roomAssignments.filter(a => a.status === 'CHECKED_IN').map(a => a.room_id));
-    this.rooms = this.rooms.map(r => {
-      if (occupiedRoomIds.has(r.id)) {
-        return { ...r, status: 'OCCUPIED' as RoomStatus, occupied_beds: r.total_beds };
-      }
-      return r;
-    });
-
-    const occupiedBedIds = new Set(this.roomAssignments.filter(a => a.status === 'CHECKED_IN').map(a => a.bed_id));
-    this.beds = this.beds.map(b => {
-      if (occupiedBedIds.has(b.id)) {
-        return { ...b, status: 'OCCUPIED' };
-      }
-      return b;
-    });
 
     this.saveAll(triggerPush);
     if (typeof localStorage !== 'undefined') {
