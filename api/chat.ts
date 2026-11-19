@@ -101,7 +101,7 @@ export default async function handler(req: any, res: any) {
   if (!last) return res.status(400).json({ reply: 'Pesan kosong.' });
 
   const token = req.headers['x-vercel-oidc-token'] || process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
-  if (!token) return res.status(200).json({ reply: fallbackAnswer(last.content), mode: 'faq' });
+  if (!token) return res.status(200).json({ reply: fallbackAnswer(last.content), mode: 'faq', why: 'no-token' });
 
   try {
     const live = await loadLiveFacts();
@@ -124,7 +124,7 @@ export default async function handler(req: any, res: any) {
     const reply = j?.choices?.[0]?.message?.content?.trim();
     if (!reply) throw new Error('empty');
     return res.status(200).json({ reply, mode: 'ai' });
-  } catch (e) {
-    return res.status(200).json({ reply: fallbackAnswer(last.content), mode: 'faq' });
+  } catch (e: any) {
+    return res.status(200).json({ reply: fallbackAnswer(last.content), mode: 'faq', why: String(e?.message || e).slice(0, 80) });
   }
 }
