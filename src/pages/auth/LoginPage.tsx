@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Compass, LogIn, Lock, User as UserIcon, Shield, CheckCircle, ArrowLeft } from 'lucide-react';
+import { LogIn, Lock, User as UserIcon, Shield, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { Button } from '../../components/common/Button';
@@ -9,33 +9,31 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
-  const { login, users } = useAuth();
+  const { login } = useAuth();
   const toast = useToast();
 
-  const [username, setUsername] = useState('superadmin');
-  const [password, setPassword] = useState('password123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username.trim() || !password) {
+      toast.error('Data Belum Lengkap', 'Silakan masukkan username dan kata sandi Anda.');
+      return;
+    }
+
     setLoading(true);
 
     setTimeout(() => {
-      const success = login(username, password);
+      const success = login(username.trim(), password);
       setLoading(false);
       if (success) {
         toast.success('Selamat Datang', 'Login berhasil. Selamat bertugas di SIMAHA PAPUA.');
       } else {
-        toast.error('Login Gagal', 'Username atau kata sandi tidak valid.');
+        toast.error('Login Gagal', 'Username atau kata sandi tidak valid. Hubungi administrator.');
       }
     }, 400);
-  };
-
-  const handleQuickLogin = (uname: string) => {
-    setUsername(uname);
-    setPassword('password123');
-    login(uname);
-    toast.success('Beralih Akun', `Login otomatis sebagai ${uname}`);
   };
 
   return (
@@ -102,7 +100,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                 <input
                   type="text"
                   required
-                  placeholder="superadmin / admin / petugas..."
+                  placeholder="Masukkan username atau email pegawai..."
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 border border-[#e8dfc8] rounded-xl focus:ring-2 focus:ring-[#c9a961] focus:outline-none bg-[#FAF9F5] text-stone-800 font-medium"
@@ -117,7 +115,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                 <input
                   type="password"
                   required
-                  placeholder="••••••••"
+                  placeholder="Masukkan kata sandi..."
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 border border-[#e8dfc8] rounded-xl focus:ring-2 focus:ring-[#c9a961] focus:outline-none bg-[#FAF9F5] text-stone-800 font-medium"
@@ -137,61 +135,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
             </Button>
           </form>
 
-          {/* Quick Demo Access Roles */}
-          <div className="mt-6 pt-5 border-t border-[#e8dfc8]">
-            <p className="text-[10px] font-bold text-[#8a6d2b] uppercase tracking-wider text-center mb-2.5">
-              Login Cepat Akun Demo (1-Click):
-            </p>
-            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('superadmin')}
-                className="px-2.5 py-1.5 rounded-lg border border-[#e8dfc8] hover:bg-[#fbf8ee] hover:border-[#c9a961] text-stone-700 text-left truncate transition-colors"
-              >
-                <span className="font-bold block text-stone-900">Super Admin</span>
-                <span className="text-[10px] text-stone-500">Akses Penuh IT</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="px-2.5 py-1.5 rounded-lg border border-[#e8dfc8] hover:bg-[#fbf8ee] hover:border-[#c9a961] text-stone-700 text-left truncate transition-colors"
-              >
-                <span className="font-bold block text-stone-900">Admin Penginapan</span>
-                <span className="text-[10px] text-stone-500">Reservasi & Kamar</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('resepsionis')}
-                className="px-2.5 py-1.5 rounded-lg border border-[#e8dfc8] hover:bg-[#fbf8ee] hover:border-[#c9a961] text-stone-700 text-left truncate transition-colors"
-              >
-                <span className="font-bold block text-stone-900">Petugas Front Office</span>
-                <span className="text-[10px] text-stone-500">Check-in / Check-out</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('keuangan')}
-                className="px-2.5 py-1.5 rounded-lg border border-[#e8dfc8] hover:bg-[#fbf8ee] hover:border-[#c9a961] text-stone-700 text-left truncate transition-colors"
-              >
-                <span className="font-bold block text-stone-900">Bendahara PNBP</span>
-                <span className="text-[10px] text-stone-500">Kwitansi & Kasir</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('housekeeping')}
-                className="px-2.5 py-1.5 rounded-lg border border-[#e8dfc8] hover:bg-[#fbf8ee] hover:border-[#c9a961] text-stone-700 text-left truncate transition-colors"
-              >
-                <span className="font-bold block text-stone-900">Housekeeping</span>
-                <span className="text-[10px] text-stone-500">Kebersihan Kamar</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('pimpinan')}
-                className="px-2.5 py-1.5 rounded-lg border border-[#e8dfc8] hover:bg-[#fbf8ee] hover:border-[#c9a961] text-stone-700 text-left truncate transition-colors"
-              >
-                <span className="font-bold block text-stone-900">Kepala UPT</span>
-                <span className="text-[10px] text-stone-500">Executive Read-only</span>
-              </button>
+          {/* Security Notice */}
+          <div className="mt-6 pt-5 border-t border-[#e8dfc8] text-center">
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-stone-600 font-semibold">
+              <Shield className="w-3.5 h-3.5 text-[#8a6d2b]" />
+              <span>Portal Terbatas Pegawai & Petugas Resmi</span>
             </div>
+            <p className="text-[10px] text-stone-400 mt-1 leading-relaxed">
+              Hanya untuk petugas berwenang UPT Asrama Haji Papua. Setiap aktivitas masuk tercatat dalam audit sistem.
+            </p>
           </div>
         </div>
 
