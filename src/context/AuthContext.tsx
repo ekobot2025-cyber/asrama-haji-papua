@@ -50,9 +50,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (username: string): boolean => {
+  const login = (username: string, password?: string): boolean => {
     const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() || u.email.toLowerCase() === username.toLowerCase());
     if (user) {
+      if (password) {
+        const validPasswords = ['AdminPapua2026!', 'superadmin123', 'password123', 'Admin#Haji2026'];
+        if (!validPasswords.includes(password.trim())) {
+          return false;
+        }
+      }
       setCurrentUser(user);
       localStorage.setItem('sipah_auth_user_id', user.id);
       db.logAudit(user.name, user.role, 'USER_LOGIN', 'Otentikasi', `Pengguna ${user.name} berhasil masuk.`);

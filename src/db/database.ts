@@ -14,7 +14,7 @@ import {
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v6.3_aula_cash';
+const DB_VERSION = 'simaha_papua_v6.4_superadmin_only';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -386,15 +386,15 @@ class DatabaseService {
         // Fallback migration to ensure all reservations have SPMA & package_type
         let needsSave = false;
 
-        // Clean any existing dummy personal names from stored user accounts
-        this.users.forEach(u => {
-          if (u.username === 'superadmin') { u.name = 'Super Admin'; u.email = 'superadmin@asramahaji.id'; }
-          else if (u.username === 'admin') { u.name = 'Admin Penginapan'; u.email = 'admin@asramahaji.id'; }
-          else if (u.username === 'resepsionis') { u.name = 'Resepsionis'; u.role = 'RESEPSIONIS'; u.email = 'resepsionis@asramahaji.id'; }
-          else if (u.username === 'keuangan') { u.name = 'Bendahara Keuangan'; u.email = 'keuangan@asramahaji.id'; }
-          else if (u.username === 'housekeeping') { u.name = 'Housekeeping'; u.email = 'housekeeping@asramahaji.id'; }
-          else if (u.username === 'pimpinan') { u.name = 'Pimpinan (Ka. UPT)'; u.email = 'pimpinan@asramahaji.id'; }
-        });
+        // Restrict to single superadmin user account only
+        this.users = this.users.filter(u => u.username === 'superadmin');
+        if (!this.users.length) {
+          this.users = [...initialUsers];
+        } else {
+          this.users[0].name = 'Super Admin';
+          this.users[0].role = 'SUPER_ADMIN';
+          this.users[0].email = 'superadmin@asramahaji.id';
+        }
         needsSave = true;
 
         // 1. RoomTypes: Superior & Standar official brochure specs

@@ -314,39 +314,42 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               </div>
 
-              {/* Role Switcher for Instant Testing */}
-              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
-                Ganti Role Pengguna (Demo):
-              </div>
-              <div className="space-y-0.5">
-                {users.map((u) => (
-                  <button
-                    key={u.id}
-                    onClick={() => {
-                      switchUser(u.id);
-                      setShowUserMenu(false);
-                      toast.info(`Beralih Peran`, `Sekarang login sebagai ${u.name} (${roleLabels[u.role]})`);
-                      
-                      // Auto-navigate to primary workspace for selected role
-                      const defaultPage = 
-                        u.role === 'HOUSEKEEPING' ? 'housekeeping' :
-                        u.role === 'RESEPSIONIS' ? 'frontdesk-pos' :
-                        u.role === 'KEUANGAN' ? 'invoices' :
-                        u.role === 'PIMPINAN' ? 'executive-dashboard' :
-                        'dashboard';
-                      onNavigate(defaultPage);
-                    }}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all ${
-                      currentUser?.id === u.id
-                        ? 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-white font-semibold shadow-xs'
-                        : 'text-stone-700 hover:bg-[#fbf8ee]'
-                    }`}
-                  >
-                    <span className="truncate">{roleLabels[u.role] || u.name}</span>
-                    {currentUser?.id === u.id && <CheckCircle className="w-3.5 h-3.5 text-white shrink-0" />}
-                  </button>
-                ))}
-              </div>
+              {/* Role Switcher (hanya jika terdapat lebih dari 1 user) */}
+              {users.length > 1 && (
+                <>
+                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                    Ganti Role Pengguna:
+                  </div>
+                  <div className="space-y-0.5">
+                    {users.map((u) => (
+                      <button
+                        key={u.id}
+                        onClick={() => {
+                          switchUser(u.id);
+                          setShowUserMenu(false);
+                          toast.info(`Beralih Peran`, `Sekarang login sebagai ${u.name} (${roleLabels[u.role]})`);
+                          
+                          const defaultPage = 
+                            u.role === 'HOUSEKEEPING' ? 'housekeeping' :
+                            u.role === 'RESEPSIONIS' ? 'frontdesk-pos' :
+                            u.role === 'KEUANGAN' ? 'invoices' :
+                            u.role === 'PIMPINAN' ? 'executive-dashboard' :
+                            'dashboard';
+                          onNavigate(defaultPage);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all ${
+                          currentUser?.id === u.id
+                            ? 'bg-gradient-to-r from-[#c9a961] to-[#b8941e] text-white font-semibold shadow-xs'
+                            : 'text-stone-700 hover:bg-[#fbf8ee]'
+                        }`}
+                      >
+                        <span className="truncate">{roleLabels[u.role] || u.name}</span>
+                        {currentUser?.id === u.id && <CheckCircle className="w-3.5 h-3.5 text-white shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
 
               <div className="my-1.5 border-t border-[#e8dfc8]/60" />
 
