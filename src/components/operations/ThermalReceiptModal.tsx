@@ -207,10 +207,15 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
                   <span className="truncate max-w-[170px]">{data.institutionName}</span>
                 </div>
               )}
-              {data.roomInfo && (
+              {data.roomInfo && data.roomInfo.roomNumber && data.roomInfo.roomNumber !== '-' ? (
                 <div className="flex justify-between text-[#8a6d2b] font-semibold bg-[#fbf8ee] px-1 py-0.5 rounded">
                   <span>Kamar Terpilih</span>
                   <span>{data.roomInfo.roomNumber} ({data.roomInfo.buildingName})</span>
+                </div>
+              ) : (
+                <div className="flex justify-between text-emerald-800 font-semibold bg-emerald-50 px-1 py-0.5 rounded">
+                  <span>Jenis Transaksi</span>
+                  <span>Sewa Gedung / Fasilitas</span>
                 </div>
               )}
             </div>

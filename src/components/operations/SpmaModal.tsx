@@ -209,20 +209,20 @@ export const SpmaModal: React.FC<SpmaModalProps> = ({
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div className="bg-white p-3 rounded-lg border border-[#e8dfc8]">
                   <span className="text-[10px] text-slate-500 block uppercase font-bold">Gedung / Zonasi</span>
-                  <span className="font-black text-slate-900 text-base">{building?.name || 'Gedung Akomodasi'}</span>
-                  <span className="text-[10px] text-slate-500 block mt-0.5">Kode: {building?.code || 'BLD'}</span>
+                  <span className="font-black text-slate-900 text-base">{building?.name || reservation.facility_name || 'Gedung Serbaguna'}</span>
+                  <span className="text-[10px] text-slate-500 block mt-0.5">{room ? `Kode: ${building?.code || 'BLD'}` : 'Sewa Gedung / Aula'}</span>
                 </div>
 
                 <div className="bg-white p-3 rounded-lg border border-[#e8dfc8]">
-                  <span className="text-[10px] text-slate-500 block uppercase font-bold">Nomor Kamar</span>
-                  <span className="font-black text-[#8a6d2b] text-2xl tracking-tight">{room?.room_number || 'A100'}</span>
-                  <span className="text-[10px] text-slate-500 block mt-0.5">Kapasitas: {room?.capacity || 4} Bed</span>
+                  <span className="text-[10px] text-slate-500 block uppercase font-bold">{room ? 'Nomor Kamar' : 'Fasilitas Disewa'}</span>
+                  <span className="font-black text-[#8a6d2b] text-xl tracking-tight">{room?.room_number || reservation.facility_name || 'Aula Utama'}</span>
+                  <span className="text-[10px] text-slate-500 block mt-0.5">{room ? `Kapasitas: ${room?.capacity || 4} Bed` : 'Tanpa Kamar Menginap'}</span>
                 </div>
 
                 <div className="bg-white p-3 rounded-lg border border-[#e8dfc8]">
-                  <span className="text-[10px] text-slate-500 block uppercase font-bold">Nomor Tempat Tidur (Bed)</span>
-                  <span className="font-black text-amber-700 text-xl font-mono">{bed?.bed_code || `${room?.room_number || 'A100'}-B01`}</span>
-                  <span className="text-[10px] text-[#8a6d2b] block font-bold mt-0.5">Satu Tamu / Bed</span>
+                  <span className="text-[10px] text-slate-500 block uppercase font-bold">{room ? 'Nomor Tempat Tidur (Bed)' : 'Durasi Pemakaian'}</span>
+                  <span className="font-black text-amber-700 text-xl font-mono">{room ? (bed?.bed_code || `${room?.room_number || 'A100'}-B01`) : `${reservation.duration || 1} Hari`}</span>
+                  <span className="text-[10px] text-[#8a6d2b] block font-bold mt-0.5">{room ? 'Satu Tamu / Bed' : 'Paket Sewa Resmi'}</span>
                 </div>
               </div>
             </div>

@@ -2193,15 +2193,18 @@ class DatabaseService {
       regencyCity: string;
       institutionName?: string;
     };
-    roomId: string;
-    bedId: string;
-    nights: number;
+    roomId?: string;
+    bedId?: string;
+    facilityId?: string;
+    facilityName?: string;
+    nights?: number;
     depositAmount: number;
     cardKeys: number;
     initialPaymentAmount: number;
     paymentMethod: Payment['payment_method'];
     notes?: string;
     user: User;
+    items?: Array<{ name: string; category: string; qty: number; unitPrice: number }>;
   }): {
     success: boolean;
     message: string;
@@ -2211,12 +2214,18 @@ class DatabaseService {
     payment?: Payment;
     checkin?: Checkin;
   } {
-    const { guest: gData, roomId, bedId, nights, depositAmount, cardKeys, initialPaymentAmount, paymentMethod, notes, user } = params;
+    const { guest: gData, roomId, bedId, nights = 1, depositAmount, cardKeys, initialPaymentAmount, paymentMethod, notes, user, items, facilityId, facilityName } = params;
 
-    const room = this.rooms.find(r => r.id === roomId);
-    const bed = this.beds.find(b => b.id === bedId);
-    if (!room || !bed) {
-      return { success: false, message: 'Kamar atau tempat tidur tidak ditemukan.' };
+    const isRoomBooking = Boolean(roomId);
+    let room: Room | undefined;
+    let bed: Bed | undefined;
+
+    if (isRoomBooking) {
+      room = this.rooms.find(r => r.id === roomId);
+      bed = this.beds.find(b => b.id === bedId);
+      if (!room || !bed) {
+        return { success: false, message: 'Kamar atau tempat tidur tidak ditemukan.' };
+      }
     }
 
     // 1. Create or find Guest
@@ -2238,7 +2247,11 @@ class DatabaseService {
     const d = String(checkoutDateObj.getDate()).padStart(2, '0');
     const checkoutDate = `${y}-${m}-${d}`;
 
-    const totalRate = room.rate_per_night * nights;
+    const totalRate = isRoomBooking && room
+      ? room.rate_per_night * nights
+      : (items && items.length > 0
+          ? items.reduce((s, it) => s + (it.unitPrice * it.qty), 0)
+          : initialPaymentAmount);
 
     // 3. Create Reservation (auto CHECKED_IN)
     const reservationNo = this.generateReservationNo();
@@ -2246,22 +2259,32 @@ class DatabaseService {
       id: `rsv-${Date.now()}`,
       reservation_no: reservationNo,
       reservation_date: new Date().toISOString(),
-      reservation_type: 'INDIVIDUAL',
+      reservation_type: gData.institutionName && gData.institutionName !== 'Pribadi / Umum' ? 'INSTANSI' : 'INDIVIDUAL',
+      rental_category: isRoomBooking ? 'PENGINAPAN' : 'RUANG_PERTEMUAN',
+      facility_id: facilityId,
+      facility_name: facilityName || (isRoomBooking ? undefined : 'Sewa Gedung / Fasilitas'),
+      unit_count: 1,
+      duration: nights,
+      duration_unit: isRoomBooking ? 'MALAM' : 'HARI',
+      snapshot_rate: totalRate,
       guest_id: newGuest.id,
+      guest_name: newGuest.full_name,
       activity_type: gData.guestType,
-      activity_name: gData.institutionName ? `Tamu Kedinasan ${gData.institutionName}` : 'Tamu Walk-In Asrama Haji',
+      activity_name: gData.institutionName && gData.institutionName !== 'Pribadi / Umum' 
+        ? `Tamu Kedinasan ${gData.institutionName}` 
+        : (isRoomBooking ? 'Tamu Walk-In Asrama Haji' : `Sewa ${facilityName || 'Gedung / Aula'}`),
       checkin_date: checkinDate,
       checkout_date: checkoutDate,
       total_guests: 1,
       male_count: gData.gender === 'L' ? 1 : 0,
       female_count: gData.gender === 'P' ? 1 : 0,
-      total_rooms_requested: 1,
+      total_rooms_requested: isRoomBooking ? 1 : 0,
       status: 'CHECKED_IN',
       payment_status: initialPaymentAmount >= totalRate ? 'PAID' : (initialPaymentAmount > 0 ? 'PARTIAL' : 'UNPAID'),
       total_amount: totalRate,
       paid_amount: Math.min(totalRate, initialPaymentAmount),
       remaining_amount: Math.max(0, totalRate - initialPaymentAmount),
-      notes: notes || 'Registrasi Langsung (Walk-In Guest)',
+      notes: notes || (isRoomBooking ? 'Registrasi Langsung (Walk-In Guest)' : 'Sewa Gedung / Fasilitas Kasir'),
       spma_no: this.generateSpmaNo(),
       package_type: 'REGULER',
       created_by: user.name,
@@ -2272,39 +2295,44 @@ class DatabaseService {
     };
     this.reservations.unshift(newRsv);
 
-    // 4. Create Room Assignment
-    const newAssignment: RoomAssignment = {
-      id: `ra-${Date.now()}`,
-      reservation_id: newRsv.id,
-      guest_id: newGuest.id,
-      room_id: roomId,
-      bed_id: bedId,
-      assigned_at: new Date().toISOString(),
-      assigned_by: user.name,
-      status: 'CHECKED_IN',
-    };
-    this.roomAssignments.push(newAssignment);
+    // 4. Create Room Assignment (only for room booking)
+    if (isRoomBooking && room && bed) {
+      const newAssignment: RoomAssignment = {
+        id: `ra-${Date.now()}`,
+        reservation_id: newRsv.id,
+        guest_id: newGuest.id,
+        room_id: room.id,
+        bed_id: bed.id,
+        assigned_at: new Date().toISOString(),
+        assigned_by: user.name,
+        status: 'CHECKED_IN',
+      };
+      this.roomAssignments.push(newAssignment);
 
-    // 5. Update Room & Bed status to OCCUPIED
-    room.status = 'OCCUPIED';
-    bed.status = 'OCCUPIED';
-    bed.current_guest_id = newGuest.id;
-    const roomBeds = this.beds.filter(b => b.room_id === room.id);
-    room.occupied_beds = roomBeds.filter(b => b.status === 'OCCUPIED').length;
+      // 5. Update Room & Bed status to OCCUPIED
+      room.status = 'OCCUPIED';
+      bed.status = 'OCCUPIED';
+      bed.current_guest_id = newGuest.id;
+      const roomBeds = this.beds.filter(b => b.room_id === room!.id);
+      room.occupied_beds = roomBeds.filter(b => b.status === 'OCCUPIED').length;
+    }
 
-    // 6. Create Checkin Record
-    const checkinNo = `CIN/${new Date().getFullYear()}/${(this.checkins.length + 1).toString().padStart(4, '0')}`;
-    const newCheckin: Checkin = {
-      id: `chk-${Date.now()}`,
-      reservation_id: newRsv.id,
-      checkin_no: checkinNo,
-      checkin_time: new Date().toISOString(),
-      checkin_by: user.name,
-      card_keys_issued: cardKeys,
-      deposit_amount: depositAmount,
-      notes: notes || 'Walk-in Registration',
-    };
-    this.checkins.unshift(newCheckin);
+    // 6. Create Checkin Record (if keys issued or room booked or deposit taken)
+    let newCheckin: Checkin | undefined;
+    if (isRoomBooking || cardKeys > 0 || depositAmount > 0) {
+      const checkinNo = `CIN/${new Date().getFullYear()}/${(this.checkins.length + 1).toString().padStart(4, '0')}`;
+      newCheckin = {
+        id: `chk-${Date.now()}`,
+        reservation_id: newRsv.id,
+        checkin_no: checkinNo,
+        checkin_time: new Date().toISOString(),
+        checkin_by: user.name,
+        card_keys_issued: cardKeys,
+        deposit_amount: depositAmount,
+        notes: notes || (isRoomBooking ? 'Walk-in Registration' : 'Walk-in Sewa Gedung'),
+      };
+      this.checkins.unshift(newCheckin);
+    }
 
     // 7. Create Invoice
     const invoiceNo = `INV/AHP/${new Date().getFullYear()}/${(this.invoices.length + 1).toString().padStart(4, '0')}`;
@@ -2324,27 +2352,55 @@ class DatabaseService {
       paid_amount: Math.min(totalRate, initialPaymentAmount),
       balance_due: Math.max(0, totalRate - initialPaymentAmount),
       status: initialPaymentAmount >= totalRate ? 'PAID' : (initialPaymentAmount > 0 ? 'PARTIAL' : 'UNPAID'),
-      pnbp_account_code: '425112',
-      pnbp_account_name: 'Pendapatan Sewa Kamar Asrama Haji / Wisma',
+      pnbp_account_code: isRoomBooking ? '425112' : '425111',
+      pnbp_account_name: isRoomBooking ? 'Pendapatan Sewa Kamar Asrama Haji / Wisma' : 'Pendapatan Sewa Gedung dan Bangunan / Aula',
       simponi_billing_code: this.generateSimponiBillingCode(),
       billing_expired_at: checkoutDate,
-      notes: `Faktur sewa kamar Walk-In ${room.room_number} (${nights} malam)`,
+      notes: isRoomBooking && room ? `Faktur sewa kamar Walk-In ${room.room_number} (${nights} malam)` : `Faktur sewa ${facilityName || 'Gedung / Aula'} (${nights} hari)`,
       created_at: new Date().toISOString(),
     };
     this.invoices.unshift(newInvoice);
 
-    // 8. Create Invoice Item
-    const newInvItem: InvoiceItem = {
-      id: `item-${Date.now()}`,
-      invoice_id: newInvoice.id,
-      description: `Sewa Kamar ${room.room_number} (${nights} malam)`,
-      category: 'ROOM',
-      quantity: nights,
-      unit: 'MALAM',
-      unit_price: room.rate_per_night,
-      total_price: totalRate,
-    };
-    this.invoiceItems.push(newInvItem);
+    // 8. Create Invoice Item(s)
+    if (isRoomBooking && room) {
+      const newInvItem: InvoiceItem = {
+        id: `item-${Date.now()}`,
+        invoice_id: newInvoice.id,
+        description: `Sewa Kamar ${room.room_number} (${nights} malam)`,
+        category: 'ROOM',
+        quantity: nights,
+        unit: 'MALAM',
+        unit_price: room.rate_per_night,
+        total_price: totalRate,
+      };
+      this.invoiceItems.push(newInvItem);
+    } else if (items && items.length > 0) {
+      items.forEach((it, idx) => {
+        const newInvItem: InvoiceItem = {
+          id: `item-${Date.now()}-${idx}`,
+          invoice_id: newInvoice.id,
+          description: it.name,
+          category: it.category === 'FACILITY' ? 'FACILITY' : 'SERVICE',
+          quantity: it.qty,
+          unit: it.category === 'FACILITY' ? 'HARI' : 'UNIT',
+          unit_price: it.unitPrice,
+          total_price: it.unitPrice * it.qty,
+        };
+        this.invoiceItems.push(newInvItem);
+      });
+    } else {
+      const newInvItem: InvoiceItem = {
+        id: `item-${Date.now()}`,
+        invoice_id: newInvoice.id,
+        description: `Sewa ${facilityName || 'Gedung / Fasilitas'} (${nights} hari)`,
+        category: 'FACILITY',
+        quantity: nights,
+        unit: 'HARI',
+        unit_price: totalRate,
+        total_price: totalRate,
+      };
+      this.invoiceItems.push(newInvItem);
+    }
 
     // 9. Process initial payment if provided
     let newPayment: Payment | undefined;
@@ -2355,9 +2411,9 @@ class DatabaseService {
         initialPaymentAmount,
         paymentMethod,
         gData.fullName,
-        `Pembayaran Sewa Kamar Walk-in ${room.room_number}`,
+        isRoomBooking && room ? `Pembayaran Sewa Kamar Walk-in ${room.room_number}` : `Pembayaran Sewa ${facilityName || 'Gedung / Fasilitas'}`,
         user,
-        'Pembayaran langsung saat check-in'
+        'Pembayaran langsung saat kasir POS'
       );
     }
 
@@ -2370,14 +2426,25 @@ class DatabaseService {
     localStorage.setItem(`${STORAGE_PREFIX}invoices`, JSON.stringify(this.invoices));
     localStorage.setItem(`${STORAGE_PREFIX}invoiceItems`, JSON.stringify(this.invoiceItems));
 
-    this.logAudit(user.name, user.role, 'WALK_IN_CHECKIN', 'Front Desk', `Check-in langsung tamu walk-in ${gData.fullName} di kamar ${room.room_number} (${nights} malam)`, newRsv.id);
-    this.addNotification('Tamu Walk-In Berhasil Check-in', `Tamu ${gData.fullName} berhasil check-in di Kamar ${room.room_number}.`, 'CHECKIN', 'checkin', newRsv.id);
+    const auditDesc = isRoomBooking && room 
+      ? `Check-in langsung tamu walk-in ${gData.fullName} di kamar ${room.room_number} (${nights} malam)`
+      : `Sewa gedung walk-in ${gData.fullName} untuk ${facilityName || 'Gedung / Fasilitas'} (${nights} hari)`;
+    this.logAudit(user.name, user.role, 'WALK_IN_CHECKIN', 'Front Desk', auditDesc, newRsv.id);
+    this.addNotification(
+      isRoomBooking ? 'Tamu Walk-In Berhasil Check-in' : 'Sewa Gedung Kasir Berhasil', 
+      isRoomBooking && room ? `Tamu ${gData.fullName} berhasil check-in di Kamar ${room.room_number}.` : `Transaksi sewa gedung ${gData.fullName} berhasil.`, 
+      'CHECKIN', 
+      'checkin', 
+      newRsv.id
+    );
     this.saveAll(true);
     this.notifySyncListeners();
 
     return {
       success: true,
-      message: `Tamu Walk-in ${gData.fullName} berhasil check-in di Kamar ${room.room_number}.`,
+      message: isRoomBooking && room 
+        ? `Tamu Walk-in ${gData.fullName} berhasil check-in di Kamar ${room.room_number}.`
+        : `Sewa gedung/fasilitas untuk ${gData.fullName} berhasil diproses.`,
       reservation: newRsv,
       guest: newGuest,
       invoice: newInvoice,

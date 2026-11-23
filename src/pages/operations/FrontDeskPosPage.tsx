@@ -3,10 +3,10 @@ import {
   Receipt, Search, BedDouble, Plus, Minus, Trash2, CheckCircle2, 
   CreditCard, Banknote, QrCode, ArrowRight, User, Phone, Building, 
   Calendar, Key, Clock, ShieldCheck, Printer, RefreshCw, Sparkles, 
-  Hotel, Utensils, Coffee, Briefcase, DollarSign, LogOut, ChevronRight
+  Hotel, Utensils, Coffee, Briefcase, DollarSign, LogOut, ChevronRight, Check
 } from 'lucide-react';
 import { db } from '../../db/database';
-import { Room, Building as BuildingType, RoomType, Guest, RateItem, Reservation, RoomAssignment, Invoice, Payment } from '../../types';
+import { Room, Bed, Building as BuildingType, RoomType, Guest, RateItem, Reservation, RoomAssignment, Invoice, Payment, Facility } from '../../types';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { ThermalReceiptModal, PosReceiptData } from '../../components/operations/ThermalReceiptModal';
@@ -40,6 +40,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
   const [rooms, setRooms] = useState<Room[]>([]);
   const [buildings, setBuildings] = useState<BuildingType[]>([]);
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [rates, setRates] = useState<RateItem[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -91,6 +92,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
     setRooms(db.getRooms());
     setBuildings(db.getBuildings());
     setRoomTypes(db.getRoomTypes());
+    setFacilities(db.getFacilities());
     setGuests(db.getGuests());
     setRates(db.getRates());
     setReservations(db.getReservations());
@@ -119,7 +121,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
 
   // Preset Extra POS Catalog Items (F&B, Services, Facilities)
   const presetCatalogItems: CartItem[] = useMemo(() => {
-    return [
+    const standardServices: CartItem[] = [
       {
         id: 'svc-extrabed',
         type: 'SERVICE',
@@ -183,26 +185,24 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
         unitPrice: 150000,
         qty: 1,
       },
-      {
-        id: 'fac-aula',
-        type: 'SERVICE',
-        name: 'Sewa Aula Cenderawasih (Harian)',
-        subtitle: 'Kapasitas 800 orang + AC & Sound',
-        category: 'FACILITY',
-        unitPrice: 3500000,
-        qty: 1,
-      },
-      {
-        id: 'fac-rapat-vip',
-        type: 'SERVICE',
-        name: 'Sewa Ruang Rapat VIP Sentani',
-        subtitle: 'Kapasitas 40 orang + Smart TV 75"',
-        category: 'FACILITY',
-        unitPrice: 1500000,
-        qty: 1,
-      },
     ];
-  }, []);
+
+    const activeFacilities = (facilities.length > 0 ? facilities : db.getFacilities()).filter(
+      (f) => f.status !== 'INACTIVE'
+    );
+
+    const facilityItems: CartItem[] = activeFacilities.map((f) => ({
+      id: `fac-${f.id}`,
+      type: 'SERVICE',
+      name: `Sewa ${f.name}`,
+      subtitle: `${f.location || 'Kompleks Asrama'} • Kapasitas ${f.capacity} Orang`,
+      category: 'FACILITY',
+      unitPrice: f.daily_rate,
+      qty: 1,
+    }));
+
+    return [...standardServices, ...facilityItems];
+  }, [facilities]);
 
   // Today's Cash Drawer & Shift Stats
   const shiftStats = useMemo(() => {
@@ -256,12 +256,27 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
       const withoutRoom = prev.filter((item) => item.type !== 'ROOM');
       return [newItem, ...withoutRoom];
     });
+    setHasDeposit(true);
+    setCardKeys(1);
     toast.success('Kamar Ditambahkan', `Kamar ${room.room_number} berhasil dimasukkan ke keranjang kasir.`);
   };
 
   // Selected room currently in cart
   const selectedRoomInCart = useMemo(() => {
     return cart.find((i) => i.type === 'ROOM');
+  }, [cart]);
+
+  // Check if any facility/gedung is in cart
+  const hasFacilityInCart = useMemo(() => {
+    return cart.some(
+      (i) =>
+        i.category === 'FACILITY' ||
+        i.id.startsWith('fac-') ||
+        i.name.toLowerCase().includes('aula') ||
+        i.name.toLowerCase().includes('gedung') ||
+        i.name.toLowerCase().includes('ruang') ||
+        i.name.toLowerCase().includes('lapangan')
+    );
   }, [cart]);
 
   // Direct selection from cashier dropdown
@@ -280,10 +295,15 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
     setCart((prev) => {
       const existing = prev.find((i) => i.id === service.id);
       if (existing) {
-        return prev.map((i) => i.id === service.id ? { ...i, qty: i.qty + 1 } : i);
+        return prev.map((i) => (i.id === service.id ? { ...i, qty: i.qty + 1 } : i));
       }
       return [...prev, { ...service, qty: 1 }];
     });
+    // If adding a facility and there is no room in cart, turn off room key deposit and zero keys
+    if (service.category === 'FACILITY' && !cart.some((i) => i.type === 'ROOM')) {
+      setHasDeposit(false);
+      setCardKeys(0);
+    }
     toast.success('Layanan Ditambahkan', `${service.name} dimasukkan ke transaksi kasir.`);
   };
 
@@ -371,21 +391,37 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
     }
 
     const roomItem = cart.find((i) => i.type === 'ROOM');
-    if (!roomItem || !roomItem.roomId) {
-      toast.warning('Pilih Kamar Menginap', 'Silakan pilih kamar pada menu dropdown "Alokasi Kamar Menginap" atau klik salah satu kamar pada rak di sebelah kiri.');
+    const facilityItems = cart.filter(
+      (i) =>
+        i.category === 'FACILITY' ||
+        i.id.startsWith('fac-') ||
+        i.name.toLowerCase().includes('aula') ||
+        i.name.toLowerCase().includes('gedung') ||
+        i.name.toLowerCase().includes('ruang') ||
+        i.name.toLowerCase().includes('lapangan')
+    );
+    const isFacilityOnlyRental = !roomItem && facilityItems.length > 0;
+
+    if (!roomItem && !isFacilityOnlyRental) {
+      toast.warning('Pilih Kamar atau Gedung', 'Silakan pilih kamar untuk tamu menginap atau pilih gedung/layanan pada katalog.');
       return;
     }
 
-    const targetRoom = rooms.find((r) => r.id === roomItem.roomId);
-    if (!targetRoom) {
-      toast.error('Error', 'Data kamar tidak ditemukan.');
-      return;
-    }
+    let targetRoom: Room | undefined;
+    let targetBed: Bed | undefined;
 
-    const targetBed = db.getBeds().find((b) => b.room_id === targetRoom.id && b.status === 'AVAILABLE') || db.getBeds().find((b) => b.room_id === targetRoom.id);
-    if (!targetBed) {
-      toast.error('Error', 'Tidak ada tempat tidur tersedia di kamar tersebut.');
-      return;
+    if (roomItem && roomItem.roomId) {
+      targetRoom = rooms.find((r) => r.id === roomItem.roomId);
+      if (!targetRoom) {
+        toast.error('Error', 'Data kamar tidak ditemukan.');
+        return;
+      }
+
+      targetBed = db.getBeds().find((b) => b.room_id === targetRoom!.id && b.status === 'AVAILABLE') || db.getBeds().find((b) => b.room_id === targetRoom!.id);
+      if (!targetBed) {
+        toast.error('Error', 'Tidak ada tempat tidur tersedia di kamar tersebut.');
+        return;
+      }
     }
 
     const mappedPaymentMethod = 
@@ -403,6 +439,9 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
       created_at: new Date().toISOString(),
     };
 
+    const mainFacility = facilityItems[0];
+    const cleanFacilityId = mainFacility ? mainFacility.id.replace(/^fac-/, '') : undefined;
+
     // Call Walk-in Checkin in database
     const result = db.createWalkInCheckin({
       guest: {
@@ -414,33 +453,43 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
         regencyCity: 'Kota Jayapura',
         institutionName: guestInstitution,
       },
-      roomId: targetRoom.id,
-      bedId: targetBed.id,
+      roomId: targetRoom?.id,
+      bedId: targetBed?.id,
+      facilityId: cleanFacilityId,
+      facilityName: mainFacility?.name,
       nights: stayNights,
       depositAmount: activeDeposit,
-      cardKeys,
+      cardKeys: targetRoom ? cardKeys : 0,
       initialPaymentAmount: grandTotal,
       paymentMethod: mappedPaymentMethod,
       notes: posNotes,
       user: currentUserObj,
+      items: isFacilityOnlyRental ? cart.map((c) => ({
+        name: c.name,
+        category: c.category || c.type,
+        qty: c.qty,
+        unitPrice: c.unitPrice,
+      })) : undefined,
     });
 
     if (result.success && result.reservation && result.invoice) {
-      // If there are extra services in cart, add them as extra charges to the invoice
-      const extraItems = cart.filter((i) => i.type === 'SERVICE');
-      for (const extra of extraItems) {
-        db.addExtraChargeToInvoice(
-          result.invoice.id,
-          `${extra.name} (${extra.qty}x)`,
-          'SERVICE',
-          extra.qty,
-          extra.unitPrice,
-          currentUserObj
-        );
+      // If there are extra services in cart and it's a room booking, add them as extra charges to the invoice
+      if (targetRoom) {
+        const extraItems = cart.filter((i) => i.type === 'SERVICE');
+        for (const extra of extraItems) {
+          db.addExtraChargeToInvoice(
+            result.invoice.id,
+            `${extra.name} (${extra.qty}x)`,
+            'SERVICE',
+            extra.qty,
+            extra.unitPrice,
+            currentUserObj
+          );
+        }
       }
 
       // Generate POS Receipt Data
-      const bld = buildings.find((b) => b.id === targetRoom.building_id);
+      const bld = targetRoom ? buildings.find((b) => b.id === targetRoom!.building_id) : undefined;
       const receiptNo = `POS/${new Date().getFullYear()}/${String(Date.now()).slice(-6)}`;
 
       const receiptData: PosReceiptData = {
@@ -450,14 +499,14 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
         guestName: guestName,
         institutionName: guestInstitution,
         phone: guestPhone,
-        roomInfo: {
+        roomInfo: targetRoom ? {
           roomNumber: targetRoom.room_number,
           buildingName: bld?.name || 'Gedung Asrama',
-          bedName: targetBed.bed_code,
+          bedName: targetBed?.bed_code,
           checkinDate,
           checkoutDate,
           nights: stayNights,
-        },
+        } : undefined,
         items: cart.map((item) => ({
           name: item.name,
           qty: item.qty,
@@ -472,13 +521,16 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
         changeAmount,
         paymentMethod,
         simponiBillingCode: result.invoice.simponi_billing_code,
-        cardKeysIssued: cardKeys,
+        cardKeysIssued: targetRoom ? cardKeys : 0,
       };
 
       setPosReceiptData(receiptData);
       setCreatedRsv(result.reservation);
       setReceiptModalOpen(true);
-      toast.success('Transaksi Berhasil!', `Kamar ${targetRoom.room_number} telah check-in dan struk kasir diterbitkan.`);
+      const successMsg = targetRoom 
+        ? `Kamar ${targetRoom.room_number} telah check-in dan struk kasir diterbitkan.`
+        : `Sewa gedung/fasilitas atas nama ${guestName} berhasil diproses dan struk kasir diterbitkan.`;
+      toast.success('Transaksi Berhasil!', successMsg);
 
       // Refresh master state
       loadData();
@@ -973,21 +1025,26 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                 </div>
               </div>
 
-              {/* FITUR PILIH KAMAR: Alokasi Kamar Menginap Langsung di Terminal Kasir */}
+              {/* FITUR PILIH KAMAR: Alokasi Kamar Menginap */}
               <div className="pt-2.5 border-t border-slate-200/70 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
                     <BedDouble className="w-3.5 h-3.5 text-[#8a6d2b]" />
-                    <span>Pilih Kamar Menginap (Siap Huni) *</span>
+                    <span>Pilih Kamar Menginap (Siap Huni)</span>
                   </label>
                   {selectedRoomInCart ? (
                     <span className="text-[10px] font-bold bg-[#f4ebd0] text-[#8a6d2b] px-2 py-0.5 rounded-full flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3 text-[#8a6d2b]" />
                       Kamar Terpilih
                     </span>
+                  ) : hasFacilityInCart ? (
+                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      Opsional (Sewa Gedung Saja)
+                    </span>
                   ) : (
                     <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-                      Wajib Dipilih
+                      Wajib untuk Menginap
                     </span>
                   )}
                 </div>
@@ -999,10 +1056,16 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   className={`w-full px-2.5 py-2 border rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     selectedRoomInCart
                       ? 'border-[#c9a961] bg-[#fbf8ee] text-[#1A1410] ring-1 ring-[#c9a961] font-bold'
+                      : hasFacilityInCart
+                      ? 'border-emerald-300 bg-white text-slate-700 hover:border-emerald-400'
                       : 'border-amber-400 bg-amber-50/70 text-slate-800 focus:ring-2 focus:ring-[#c9a961] shadow-xs'
                   }`}
                 >
-                  <option value="">-- Klik untuk Pilih Kamar Siap Huni ({availableRooms.length} Kamar) --</option>
+                  <option value="">
+                    {hasFacilityInCart
+                      ? `-- Tidak Memilih Kamar (Hanya Sewa Gedung / Fasilitas) --`
+                      : `-- Klik untuk Pilih Kamar Siap Huni (${availableRooms.length} Kamar) --`}
+                  </option>
                   {availableRooms.map((rm) => {
                     const bld = buildings.find((b) => b.id === rm.building_id)?.name || 'Gedung';
                     const rType = roomTypes.find((t) => t.id === rm.room_type_id)?.name || 'Kamar';
@@ -1014,7 +1077,7 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                   })}
                 </select>
 
-                {/* Info Status Kamar Terpilih atau Ajakan Pintasan ke Rak Kamar */}
+                {/* Info Status Kamar Terpilih atau Info Opsional */}
                 {selectedRoomInCart ? (
                   <div className="flex items-center justify-between text-[11px] bg-[#fbf8ee] border border-[#e8dfc8] text-[#8a6d2b] px-2.5 py-1.5 rounded-lg">
                     <div className="truncate">
@@ -1030,6 +1093,11 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     >
                       Ganti / Hapus
                     </button>
+                  </div>
+                ) : hasFacilityInCart ? (
+                  <div className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+                    <span className="text-sm">ℹ️</span>
+                    <span>Tamu menyewa gedung/fasilitas. Pemilihan kamar <strong>tidak wajib</strong> jika tidak menginap.</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-between text-[11px] text-amber-900 bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg">
@@ -1118,16 +1186,51 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
             </div>
 
             {/* Deposit & Keycard Control */}
-            <div className="bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs space-y-2 text-amber-950">
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 font-semibold cursor-pointer">
+            {selectedRoomInCart ? (
+              <div className="bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs space-y-2 text-amber-950">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 font-semibold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={hasDeposit}
+                      onChange={(e) => setHasDeposit(e.target.checked)}
+                      className="w-4 h-4 text-[#8a6d2b] rounded border-slate-300 focus:ring-[#c9a961]"
+                    />
+                    <span>Ambil Deposit Jaminan Kunci</span>
+                  </label>
+                  {hasDeposit && (
+                    <input
+                      type="number"
+                      step="50000"
+                      value={depositAmount}
+                      onChange={(e) => setDepositAmount(Number(e.target.value) || 0)}
+                      className="w-24 px-2 py-1 border border-amber-300 rounded-lg text-xs font-mono font-bold text-right bg-white"
+                    />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-amber-800">Jumlah Kunci Kartu Diberikan:</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={cardKeys}
+                    onChange={(e) => setCardKeys(parseInt(e.target.value) || 1)}
+                    className="w-14 px-2 py-0.5 border border-amber-300 rounded text-center font-bold bg-white"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer font-medium">
                   <input
                     type="checkbox"
                     checked={hasDeposit}
                     onChange={(e) => setHasDeposit(e.target.checked)}
                     className="w-4 h-4 text-[#8a6d2b] rounded border-slate-300 focus:ring-[#c9a961]"
                   />
-                  <span>Ambil Deposit Jaminan Kunci</span>
+                  <span>Deposit Jaminan Tambahan (Opsional)</span>
                 </label>
                 {hasDeposit && (
                   <input
@@ -1135,23 +1238,11 @@ export const FrontDeskPosPage: React.FC<FrontDeskPosPageProps> = ({ onNavigate }
                     step="50000"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(Number(e.target.value) || 0)}
-                    className="w-24 px-2 py-1 border border-amber-300 rounded-lg text-xs font-mono font-bold text-right bg-white"
+                    className="w-24 px-2 py-1 border border-slate-300 rounded-lg text-xs font-mono font-bold text-right bg-white"
                   />
                 )}
               </div>
-
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-amber-800">Jumlah Kunci Kartu Diberikan:</span>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  value={cardKeys}
-                  onChange={(e) => setCardKeys(parseInt(e.target.value) || 1)}
-                  className="w-14 px-2 py-0.5 border border-amber-300 rounded text-center font-bold bg-white"
-                />
-              </div>
-            </div>
+            )}
 
             {/* Financial Settlement Breakdown */}
             <div className="space-y-1.5 pt-2 border-t border-slate-200 text-xs">
