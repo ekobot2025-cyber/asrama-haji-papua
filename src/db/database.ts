@@ -14,7 +14,7 @@ import {
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v6.4_superadmin_only';
+const DB_VERSION = 'simaha_papua_v6.5_facilities_update';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -162,9 +162,20 @@ class DatabaseService {
     if (Array.isArray(payload.roomAssignments)) this.roomAssignments = payload.roomAssignments;
     if (Array.isArray(payload.checkins)) this.checkins = payload.checkins;
     if (Array.isArray(payload.checkouts)) this.checkouts = payload.checkouts;
-    if (Array.isArray(payload.facilities)) this.facilities = payload.facilities;
+    if (Array.isArray(payload.facilities)) {
+      const prunedFacilityIds = ['fac-02', 'fac-03', 'fac-06'];
+      this.facilities = payload.facilities
+        .filter(f => !prunedFacilityIds.includes(f.id) && !f.name.toLowerCase().includes('asmat') && !f.name.toLowerCase().includes('sentani') && !f.name.toLowerCase().includes('ruang makan'))
+        .map(f => {
+          if (f.id === 'fac-01') return { ...f, image_url: '/images/aula-1.png' };
+          if (f.id === 'fac-01-wedding') return { ...f, image_url: '/images/aula-2.png' };
+          return f;
+        });
+    }
     if (Array.isArray(payload.facilityReservations)) this.facilityReservations = payload.facilityReservations;
-    if (Array.isArray(payload.rates)) this.rates = payload.rates;
+    if (Array.isArray(payload.rates)) {
+      this.rates = payload.rates.filter(r => r.id !== 'rate-04' && r.target_id !== 'fac-02' && !r.name.toLowerCase().includes('asmat'));
+    }
     if (Array.isArray(payload.rateHistories)) this.rateHistories = payload.rateHistories;
     if (Array.isArray(payload.invoices)) this.invoices = payload.invoices;
     if (Array.isArray(payload.invoiceItems)) this.invoiceItems = payload.invoiceItems;
@@ -425,6 +436,14 @@ class DatabaseService {
         });
 
         // 2. Facilities: Aula Kegiatan Umum (Rp3.900.000), Aula Pernikahan (Rp5.000.000) & Ruang Kelas (Rp650.000)
+        // Remove pruned facilities: Ruang Pertemuan Asmat (fac-02), Ruang Rapat VIP Sentani (fac-03), Ruang Makan Serbaguna (fac-06)
+        const prunedFacilityIds = ['fac-02', 'fac-03', 'fac-06'];
+        const prevFacCount = this.facilities.length;
+        this.facilities = this.facilities.filter(f => !prunedFacilityIds.includes(f.id) && !f.name.toLowerCase().includes('asmat') && !f.name.toLowerCase().includes('sentani') && !f.name.toLowerCase().includes('ruang makan'));
+        if (this.facilities.length !== prevFacCount) {
+          needsSave = true;
+        }
+
         const aulaFac = this.facilities.find(f => f.id === 'fac-01' || (f.name.toLowerCase().includes('aula') && !f.name.toLowerCase().includes('pernikahan')));
         if (aulaFac) {
           aulaFac.name = 'Aula (Kegiatan Umum)';
@@ -434,7 +453,7 @@ class DatabaseService {
           aulaFac.rate_unit = 'PER_DAY';
           aulaFac.description = 'Aula pertemuan serbaguna untuk pemakaian kegiatan umum, seminar, rapat dinas, diklat, wisuda, dan manasik berkapasitas maksimal 300 orang.';
           aulaFac.amenities = ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi'];
-          if (!aulaFac.image_url) aulaFac.image_url = 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600';
+          aulaFac.image_url = '/images/aula-1.png';
           needsSave = true;
         }
 
@@ -447,7 +466,7 @@ class DatabaseService {
           weddingFac.rate_unit = 'PER_DAY';
           weddingFac.description = 'Sewa Aula representatif untuk resepsi dan akad acara pernikahan (wedding) berkapasitas maksimal 300–500 tamu.';
           weddingFac.amenities = ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi', 'Area Pelaminan & Resepsi'];
-          if (!weddingFac.image_url) weddingFac.image_url = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600';
+          weddingFac.image_url = '/images/aula-2.png';
           needsSave = true;
         } else {
           this.facilities.push({
@@ -463,8 +482,15 @@ class DatabaseService {
             status: 'AVAILABLE',
             description: 'Sewa Aula representatif untuk resepsi dan akad acara pernikahan (wedding) berkapasitas maksimal 300–500 tamu.',
             amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi', 'Area Pelaminan & Resepsi'],
-            image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600',
+            image_url: '/images/aula-2.png',
           });
+          needsSave = true;
+        }
+
+        // Remove pruned rate: rate-04 (Tarif Ruang Pertemuan Asmat)
+        const prevRateCount = this.rates.length;
+        this.rates = this.rates.filter(r => r.id !== 'rate-04' && r.target_id !== 'fac-02' && !r.name.toLowerCase().includes('asmat'));
+        if (this.rates.length !== prevRateCount) {
           needsSave = true;
         }
 

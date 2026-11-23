@@ -182,7 +182,7 @@ export const FacilitiesPage: React.FC = () => {
             Fasilitas Umum & Ruang Pertemuan (Aula)
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Aula Utama Cenderawasih, Ruang Pertemuan Asmat, Masjid Baiturrahim, Lapangan Manasik Haji, dan Dapur Umum.
+            Aula (Kegiatan Umum & Pernikahan), Ruang Kelas Diklat, Masjid Baiturrahim, dan Lapangan Manasik Haji.
           </p>
         </div>
 
@@ -225,6 +225,18 @@ export const FacilitiesPage: React.FC = () => {
             className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow group"
           >
             <div>
+              {fac.image_url && (
+                <div className="w-full h-40 mb-3 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                  <img
+                    src={fac.image_url}
+                    alt={fac.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#8a6d2b] bg-[#fbf8ee] px-2.5 py-0.5 rounded-full border border-[#e8dfc8]">
                   {fac.type.replace(/_/g, ' ')}

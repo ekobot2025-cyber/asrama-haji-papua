@@ -95,7 +95,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     rate_unit: 'PER_DAY' as const,
     status: 'AVAILABLE' as const,
     description: 'Aula pertemuan serbaguna untuk pemakaian kegiatan umum kapasitas s.d 300 orang',
-    amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi']
+    amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi'],
+    image_url: '/images/aula-1.png'
   };
 
   const aulaWeddingFacility = facilities.find(f => f.id === 'fac-01-wedding' || f.name.toLowerCase().includes('pernikahan')) || {
@@ -109,7 +110,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     rate_unit: 'PER_DAY' as const,
     status: 'AVAILABLE' as const,
     description: 'Sewa Aula lengkap untuk resepsi & akad acara pernikahan (wedding) kapasitas s.d 300–500 tamu',
-    amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi', 'Area Pelaminan & Resepsi']
+    amenities: ['Sound System', 'Infocus / Proyektor', 'AC', 'Kursi', 'Area Pelaminan & Resepsi'],
+    image_url: '/images/aula-2.png'
   };
 
   const ruangKelasFacility = facilities.find(f => f.id === 'fac-class' || f.name.toLowerCase().includes('kelas')) || {
@@ -732,16 +734,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Card 3: Aula */}
           <div className="bg-white rounded-3xl border border-[#e8dfc8] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
-            <div className="h-44 bg-gradient-to-tr from-[#1A1410] via-[#2A2018] to-[#1A1410] relative p-6 flex flex-col justify-between text-white">
-              <div className="flex justify-between items-start">
-                <span className="bg-[#c9a961]/20 text-[#c9a961] border border-[#c9a961]/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+            <div className="h-48 relative overflow-hidden flex flex-col justify-between text-white">
+              <img
+                src="/images/aula-1.png"
+                alt="Foto Aula 1 - Ruang Serbaguna UPT Asrama Haji Jayapura"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
+              <div className="relative p-5 flex justify-between items-start z-10">
+                <span className="bg-[#c9a961] text-[#1A1410] font-black uppercase text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
                   Gedung Serbaguna
                 </span>
-                <span className="text-[11px] font-bold text-stone-300">PP No. 59/2020</span>
+                <span className="text-[11px] font-bold text-amber-200 bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-xs">PP No. 59/2020</span>
               </div>
-              <div>
-                <h3 className="text-xl font-black text-white">Aula Utama Serbaguna</h3>
-                <p className="text-xs text-stone-300">Kapasitas Maksimal 300–500 Orang &bull; Tarif Harian</p>
+              <div className="relative p-5 z-10">
+                <h3 className="text-xl font-black text-white drop-shadow-sm">Aula Utama Serbaguna</h3>
+                <p className="text-xs text-stone-200">Kapasitas Maksimal 300–500 Orang &bull; Tarif Harian</p>
               </div>
             </div>
             <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
