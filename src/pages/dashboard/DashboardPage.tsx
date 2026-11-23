@@ -128,7 +128,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <KpiCard
             title="Total Kamar"
             value={totalRooms}
-            subtitle="Suite, VIP, Deluxe, Superior"
+            subtitle="Superior & Standar"
             icon={BedDouble}
             colorScheme="gold"
             onClick={() => onNavigate('rooms')}
@@ -181,7 +181,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             subtitle="Rasio keterisian saat ini"
             icon={Percent}
             colorScheme="amber"
-            trend={{ value: '8.4%', isPositive: true }}
             onClick={() => onNavigate('room-status-board')}
           />
           <KpiCard
@@ -229,7 +228,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       />
 
       {/* Visual Analytics & Occupancy Charts */}
-      <OccupancyCharts rooms={rooms} />
+      <OccupancyCharts rooms={rooms} beds={beds} reservations={reservations} />
     </div>
   );
 };

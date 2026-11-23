@@ -3,14 +3,20 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, Legend, BarChart, Bar, CartesianGrid 
 } from 'recharts';
-import { Room } from '../../types';
+import { Room, Bed, Reservation } from '../../types';
 
 interface OccupancyChartsProps {
   rooms: Room[];
+  beds?: Bed[];
+  reservations?: Reservation[];
 }
 
-export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
-  // 1. Calculate Room Status breakdown from database
+export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ 
+  rooms, 
+  beds = [], 
+  reservations = [] 
+}) => {
+  // 1. Calculate Room Status breakdown from actual rooms in database
   const statusCounts = rooms.reduce((acc, r) => {
     acc[r.status] = (acc[r.status] || 0) + 1;
     return acc;
@@ -22,36 +28,117 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
     { name: 'Reserved', value: statusCounts['RESERVED'] || 0, color: '#d4af37' },
     { name: 'Cleaning', value: statusCounts['CLEANING'] || 0, color: '#ea580c' },
     { name: 'Maintenance', value: statusCounts['MAINTENANCE'] || 0, color: '#e11d48' },
-  ];
+    { name: 'Inactive', value: statusCounts['INACTIVE'] || 0, color: '#94a3b8' },
+  ].filter(item => item.value > 0);
 
-  // 2. Trend 7 Days Occupancy (Realistic trend matching current week)
-  const sevenDaysData = [
-    { day: 'Sen, 20/9', occupancy: 42, beds: 42 },
-    { day: 'Sel, 21/9', occupancy: 48, beds: 48 },
-    { day: 'Rab, 22/9', occupancy: 55, beds: 55 },
-    { day: 'Kam, 23/9', occupancy: 62, beds: 62 },
-    { day: 'Jum, 24/9', occupancy: 68, beds: 68 },
-    { day: 'Sab, 25/9', occupancy: 78, beds: 78 },
-    { day: 'Min, 26/9', occupancy: 82, beds: 82 },
-  ];
+  // 2. Trend 7 Days Occupancy calculated dynamically from real reservations & beds
+  const totalBedsCount = beds.length > 0 ? beds.length : (rooms.length * 2);
+  const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+  const sevenDaysData = [];
+  const now = new Date();
 
-  // 3. Monthly Occupancy Trend 2026
-  const monthlyData = [
-    { month: 'Apr', tamu: 210, okupansi: 52 },
-    { month: 'Mei', tamu: 340, okupansi: 68 },
-    { month: 'Jun', tamu: 480, okupansi: 85 }, // Musim Haji
-    { month: 'Jul', tamu: 390, okupansi: 74 },
-    { month: 'Agu', tamu: 280, okupansi: 60 },
-    { month: 'Sep', tamu: 365, okupansi: 79 },
-  ];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const dayLabel = `${dayNames[d.getDay()]}, ${d.getDate()}/${d.getMonth() + 1}`;
 
-  // 4. Breakdown by Activity/Guest Type
+    let occupiedBedsCount = 0;
+    reservations.forEach(r => {
+      if (
+        (r.status === 'CHECKED_IN' || r.status === 'CONFIRMED') &&
+        r.checkin_date <= dateStr &&
+        r.checkout_date >= dateStr
+      ) {
+        occupiedBedsCount += r.total_guests || r.total_rooms_requested || 1;
+      }
+    });
+
+    const occRate = totalBedsCount > 0 
+      ? Math.min(100, Math.round((occupiedBedsCount / totalBedsCount) * 100)) 
+      : 0;
+
+    sevenDaysData.push({
+      day: dayLabel,
+      occupancy: occRate,
+      beds: occupiedBedsCount
+    });
+  }
+
+  const avgOccupancy = sevenDaysData.length > 0
+    ? (sevenDaysData.reduce((sum, d) => sum + d.occupancy, 0) / sevenDaysData.length).toFixed(1)
+    : '0.0';
+
+  // 3. Monthly Occupancy Trend 2026 based on real reservations
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const currentMonthIdx = now.getMonth();
+  const startIdx = Math.max(0, currentMonthIdx - 5);
+  const windowMonths = months.slice(startIdx, Math.max(startIdx + 6, currentMonthIdx + 1));
+
+  const monthlyData = windowMonths.map(month => {
+    const mIdx = months.indexOf(month);
+    const mStr = String(mIdx + 1).padStart(2, '0');
+    const yearMonth = `2026-${mStr}`;
+
+    let tamuCount = 0;
+    reservations.forEach(r => {
+      if (
+        r.status !== 'CANCELLED' && 
+        r.status !== 'REJECTED' &&
+        r.checkin_date && 
+        r.checkin_date.startsWith(yearMonth)
+      ) {
+        tamuCount += r.total_guests || 1;
+      }
+    });
+
+    const monthlyCapacity = totalBedsCount * 30;
+    const okupansi = monthlyCapacity > 0 
+      ? Math.min(100, Math.round((tamuCount / monthlyCapacity) * 100)) 
+      : 0;
+
+    return {
+      month,
+      tamu: tamuCount,
+      okupansi,
+    };
+  });
+
+  // 4. Breakdown by Activity/Guest Type from real reservations
+  const categoryCounts: Record<string, number> = {
+    'Jamaah Haji': 0,
+    'Kedinasan': 0,
+    'Manasik': 0,
+    'Pelatihan': 0,
+    'Umum': 0,
+  };
+
+  reservations.forEach(r => {
+    if (r.status === 'CANCELLED' || r.status === 'REJECTED') return;
+    const guests = r.total_guests || 1;
+    const act = (r.activity_name || '').toLowerCase();
+    const pkg = (r.package_type || '').toLowerCase();
+    const type = (r.reservation_type || '').toLowerCase();
+
+    if (act.includes('haji') || pkg.includes('haji') || act.includes('kloter')) {
+      categoryCounts['Jamaah Haji'] += guests;
+    } else if (act.includes('manasik') || pkg.includes('manasik')) {
+      categoryCounts['Manasik'] += guests;
+    } else if (act.includes('diklat') || pkg.includes('diklat') || act.includes('bimtek') || act.includes('pelatihan')) {
+      categoryCounts['Pelatihan'] += guests;
+    } else if (type === 'instansi' || act.includes('dinas') || act.includes('kemenag') || act.includes('rapat')) {
+      categoryCounts['Kedinasan'] += guests;
+    } else {
+      categoryCounts['Umum'] += guests;
+    }
+  });
+
   const guestTypeData = [
-    { name: 'Jamaah Haji', count: 185, fill: '#c9a961' },
-    { name: 'Kedinasan', count: 95, fill: '#1d4ed8' },
-    { name: 'Manasik', count: 68, fill: '#d4af37' },
-    { name: 'Pelatihan', count: 52, fill: '#7c3aed' },
-    { name: 'Umum', count: 28, fill: '#8a6d2b' },
+    { name: 'Jamaah Haji', count: categoryCounts['Jamaah Haji'], fill: '#c9a961' },
+    { name: 'Kedinasan', count: categoryCounts['Kedinasan'], fill: '#1d4ed8' },
+    { name: 'Manasik', count: categoryCounts['Manasik'], fill: '#d4af37' },
+    { name: 'Pelatihan', count: categoryCounts['Pelatihan'], fill: '#7c3aed' },
+    { name: 'Umum', count: categoryCounts['Umum'], fill: '#8a6d2b' },
   ];
 
   return (
@@ -64,7 +151,7 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
             <p className="text-xs text-slate-500">Persentase tingkat hunian asrama haji Jayapura</p>
           </div>
           <span className="text-xs font-bold text-[#8a6d2b] bg-[#fbf8ee] px-3 py-1 rounded-full border border-[#e8dfc8] shadow-2xs">
-            Rata-rata 62.1%
+            Rata-rata {avgOccupancy}%
           </span>
         </div>
         <div className="h-64 w-full">
@@ -94,7 +181,7 @@ export const OccupancyCharts: React.FC<OccupancyChartsProps> = ({ rooms }) => {
         <div className="flex items-center justify-between mb-2">
           <div>
             <h4 className="text-sm font-bold text-slate-900">Komposisi Status Kamar Real-time</h4>
-            <p className="text-xs text-slate-500">Total {rooms.length} kamar terdistribusi di 3 gedung</p>
+            <p className="text-xs text-slate-500">Total {rooms.length} kamar (Gedung Madinah Lt. 1 & 2)</p>
           </div>
         </div>
         <div className="h-64 w-full flex items-center justify-center">
