@@ -22,33 +22,112 @@ export const ExecutiveDashboardPage: React.FC = () => {
 
   const reservations = db.getReservations();
   const rooms = db.getRooms();
+  const beds = db.getBeds();
   const payments = db.getPayments();
+  const invoices = db.getInvoices();
   const groups = db.getGroups();
   const guests = db.getGuests();
+  const roomAssignments = db.getRoomAssignments();
+  const buildings = db.getBuildings();
+
+  // Helper date filter
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  
+  const isWithinFilter = (dateStr?: string): boolean => {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    if (timeFilter === 'today') {
+      return dateStr.startsWith(todayStr);
+    } else if (timeFilter === 'week') {
+      const weekAgo = new Date(now);
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      return d >= weekAgo && d <= now;
+    } else if (timeFilter === 'month') {
+      const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      return dateStr.startsWith(currentYearMonth);
+    } else if (timeFilter === 'year') {
+      return dateStr.startsWith(String(now.getFullYear()));
+    }
+    return true;
+  };
+
+  const filteredPayments = payments.filter(p => isWithinFilter(p.payment_date));
+  const filteredReservations = reservations.filter(r => 
+    isWithinFilter(r.checkin_date) || isWithinFilter(r.reservation_date)
+  );
 
   // Aggregate executive metrics
-  const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
-  const totalGuestsServed = guests.length + 85; // include rombongan
-  const totalGroupsServed = groups.length;
-  const totalActivities = reservations.length;
-  const currentOccupancy = 78; // %
+  const totalRevenue = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
+  const totalGuestsServed = filteredReservations.reduce((sum, r) => sum + (r.total_guests || 1), 0);
+  const totalGroupsServed = groups.filter(g => isWithinFilter(g.created_at)).length;
+  const totalActivities = filteredReservations.length;
 
-  // Revenue by Category
+  const totalActiveBeds = beds.filter(b => b.status !== 'MAINTENANCE').length || (rooms.length * 2);
+  const occupiedBeds = beds.filter(b => b.status === 'OCCUPIED').length;
+  const currentOccupancy = totalActiveBeds > 0 ? Math.round((occupiedBeds / totalActiveBeds) * 100) : 0;
+
+  // Revenue by Category calculated from actual transactions
+  let sewaKamarAmount = 0;
+  let sewaAulaAmount = 0;
+  let lapanganManasikAmount = 0;
+  let layananAmount = 0;
+
+  filteredPayments.forEach(pay => {
+    const inv = invoices.find(i => i.id === pay.invoice_id);
+    const rsv = inv ? reservations.find(r => r.id === inv.reservation_id) : undefined;
+    
+    if (rsv) {
+      if (
+        rsv.rental_category === 'RUANG_PERTEMUAN' || 
+        rsv.facility_id?.startsWith('fac-01') || 
+        rsv.facility_id?.startsWith('fac-07')
+      ) {
+        sewaAulaAmount += pay.amount;
+      } else if (rsv.facility_id === 'fac-05') {
+        lapanganManasikAmount += pay.amount;
+      } else {
+        sewaKamarAmount += pay.amount;
+      }
+    } else {
+      sewaKamarAmount += pay.amount;
+    }
+  });
+
   const revenueByCategory = [
-    { name: 'Sewa Kamar', amount: 38500000, color: '#c9a961' },
-    { name: 'Sewa Aula & Ruang Rapat', amount: 12500000, color: '#C59B27' },
-    { name: 'Lapangan Manasik', amount: 4000000, color: '#2563eb' },
-    { name: 'Layanan & Kebersihan', amount: 2400000, color: '#7c3aed' },
+    { name: 'Sewa Kamar', amount: sewaKamarAmount, color: '#c9a961' },
+    { name: 'Sewa Aula & Ruang Rapat', amount: sewaAulaAmount, color: '#C59B27' },
+    { name: 'Lapangan Manasik', amount: lapanganManasikAmount, color: '#2563eb' },
+    { name: 'Layanan & Kebersihan', amount: layananAmount, color: '#7c3aed' },
   ];
 
-  // Most Occupied Rooms
-  const topRooms = [
-    { room: 'Kamar M101 (Superior)', bld: 'Gedung Mina', daysOccupied: 27, occupancy: 90 },
-    { room: 'Kamar M102 (Superior)', bld: 'Gedung Mina', daysOccupied: 26, occupancy: 87 },
-    { room: 'Kamar M103 (Standar)', bld: 'Gedung Mina', daysOccupied: 25, occupancy: 83 },
-    { room: 'Kamar M104 (Standar)', bld: 'Gedung Mina', daysOccupied: 24, occupancy: 80 },
-    { room: 'Kamar M201 (Standar)', bld: 'Gedung Mina', daysOccupied: 22, occupancy: 73 },
-  ];
+  // Most Occupied Rooms from real roomAssignments / reservations
+  const roomUsageMap: Record<string, number> = {};
+  roomAssignments.forEach(asg => {
+    const rsv = reservations.find(r => r.id === asg.reservation_id);
+    if (rsv && isWithinFilter(rsv.checkin_date)) {
+      const nights = rsv.duration || 1;
+      roomUsageMap[asg.room_id] = (roomUsageMap[asg.room_id] || 0) + nights;
+    }
+  });
+
+  const maxDaysInPeriod = timeFilter === 'today' ? 1 : timeFilter === 'week' ? 7 : timeFilter === 'month' ? 30 : 365;
+  const activeRooms = rooms.filter(r => r.status !== 'INACTIVE');
+  const topRooms = [...activeRooms]
+    .map(room => {
+      const daysOccupied = roomUsageMap[room.id] || 0;
+      const occupancy = Math.min(100, Math.round((daysOccupied / maxDaysInPeriod) * 100));
+      const roomTypeName = room.room_type_id === 'rt-spr' ? 'Superior' : 'Standar';
+      const buildingName = buildings.find(b => b.id === room.building_id)?.name || 'Gedung Madinah';
+      return {
+        room: `Kamar ${room.room_number} (${roomTypeName})`,
+        bld: buildingName,
+        daysOccupied,
+        occupancy,
+      };
+    })
+    .sort((a, b) => b.daysOccupied - a.daysOccupied)
+    .slice(0, 5);
 
   const handleDirectPrint = () => {
     if (!dashboardRef.current) return;
@@ -155,7 +234,7 @@ export const ExecutiveDashboardPage: React.FC = () => {
           </div>
           <div className="text-3xl font-black text-slate-900">{currentOccupancy}%</div>
           <p className="text-[11px] text-[#8a6d2b] font-semibold mt-1.5 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#fbf8ee]0" /> +6.2% vs target bulanan
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c9a961]" /> {occupiedBeds} dari {totalActiveBeds} bed terisi
           </p>
         </div>
 
@@ -209,29 +288,38 @@ export const ExecutiveDashboardPage: React.FC = () => {
           <h4 className="text-sm font-bold text-slate-900 mb-1">Komposisi Penerimaan PNBP</h4>
           <p className="text-xs text-slate-500 mb-4">Berdasarkan unit layanan Asrama Haji Papua</p>
 
-          <div className="h-56 w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={revenueByCategory}
-                  dataKey="amount"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={75}
-                  innerRadius={45}
-                  paddingAngle={3}
-                >
-                  {revenueByCategory.map((entry, idx) => (
-                    <Cell key={idx} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(val: number) => [formatCurrency(val), 'Penerimaan']} 
-                  contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', fontSize: '12px' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          {totalRevenue === 0 ? (
+            <div className="h-56 w-full flex flex-col items-center justify-center text-slate-400 text-xs gap-3">
+              <div className="w-12 h-12 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-400">
+                <DollarSign className="w-6 h-6 text-slate-300" />
+              </div>
+              <span>Belum ada penerimaan PNBP pada periode ini.</span>
+            </div>
+          ) : (
+            <div className="h-56 w-full flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={revenueByCategory.filter(i => i.amount > 0)}
+                    dataKey="amount"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={75}
+                    innerRadius={45}
+                    paddingAngle={3}
+                  >
+                    {revenueByCategory.filter(i => i.amount > 0).map((entry, idx) => (
+                      <Cell key={idx} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(val: number) => [formatCurrency(val), 'Penerimaan']} 
+                    contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', fontSize: '12px' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
 
           <div className="space-y-2 mt-2 pt-2 border-t border-slate-100 text-xs">
             {revenueByCategory.map((item, idx) => (
@@ -269,24 +357,32 @@ export const ExecutiveDashboardPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {topRooms.map((r, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-3 px-3 font-bold text-slate-900">{r.room}</td>
-                    <td className="py-3 px-3 text-slate-600">{r.bld}</td>
-                    <td className="py-3 px-3 text-center font-semibold text-slate-800">{r.daysOccupied} Hari</td>
-                    <td className="py-3 px-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-[#c9a961] h-full rounded-full"
-                            style={{ width: `${r.occupancy}%` }}
-                          />
-                        </div>
-                        <span className="font-bold text-slate-800 w-9 text-right">{r.occupancy}%</span>
-                      </div>
+                {topRooms.length === 0 || topRooms.every(r => r.daysOccupied === 0) ? (
+                  <tr>
+                    <td colSpan={4} className="py-10 text-center text-xs text-slate-400">
+                      Belum ada pemakaian kamar pada periode ini.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  topRooms.map((r, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-3 px-3 font-bold text-slate-900">{r.room}</td>
+                      <td className="py-3 px-3 text-slate-600">{r.bld}</td>
+                      <td className="py-3 px-3 text-center font-semibold text-slate-800">{r.daysOccupied} Hari</td>
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div
+                              className="bg-[#c9a961] h-full rounded-full"
+                              style={{ width: `${r.occupancy}%` }}
+                            />
+                          </div>
+                          <span className="font-bold text-slate-800 w-9 text-right">{r.occupancy}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
