@@ -14,7 +14,7 @@ import {
 } from './seedData.ts';
 import { terbilang } from '../utils/terbilang.ts';
 
-const DB_VERSION = 'simaha_papua_v6.5_facilities_update';
+const DB_VERSION = 'simaha_papua_v7.0_official_clean';
 const STORAGE_PREFIX = 'sipah_';
 
 class DatabaseService {
@@ -407,6 +407,42 @@ class DatabaseService {
           this.users[0].email = 'superadmin@asramahaji.id';
         }
         needsSave = true;
+
+        // Ensure all leftover dummy transactions are wiped clean for official production launch
+        if (this.reservations.some(r => r.guest_name === 'ERNA' || r.guest_name?.toLowerCase().includes('demo') || (r.notes && r.notes.includes('Counter Kasir Front Desk')))) {
+          this.reservations = [];
+          this.guests = [];
+          this.groups = [];
+          this.roomAssignments = [];
+          this.checkins = [];
+          this.checkouts = [];
+          this.invoices = [];
+          this.invoiceItems = [];
+          this.payments = [];
+          this.housekeepingTasks = [];
+          this.maintenanceRequests = [];
+          this.notifications = [];
+          this.auditLogs = [];
+
+          const inactiveNumbers = ['M117', 'M217', 'M218'];
+          this.rooms.forEach(r => {
+            if (inactiveNumbers.includes(r.room_number)) {
+              r.status = 'INACTIVE';
+              r.housekeeping_status = 'INSPECTED';
+              r.occupied_beds = 0;
+            } else {
+              r.status = 'AVAILABLE';
+              r.housekeeping_status = 'READY';
+              r.occupied_beds = 0;
+            }
+          });
+          this.beds.forEach(b => {
+            const isInactive = inactiveNumbers.some(num => b.bed_code?.startsWith(num));
+            b.status = isInactive ? 'MAINTENANCE' : 'AVAILABLE';
+            b.current_guest_id = undefined;
+          });
+          needsSave = true;
+        }
 
         // 1. RoomTypes: Superior & Standar official brochure specs
         this.roomTypes.forEach(rt => {
