@@ -180,49 +180,50 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Manajemen Data Demo Siap Pakai */}
-        <div className="bg-gradient-to-br from-amber-50/80 via-white to-amber-50/50 p-6 rounded-2xl border border-amber-200/80 shadow-xs space-y-4 text-xs">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-amber-100">
+        {/* Reset Database ke Kondisi Bersih Produksi */}
+        <div className="bg-gradient-to-br from-[#fbf8ee] via-white to-[#FAF9F5] p-6 rounded-2xl border border-[#e8dfc8] shadow-xs space-y-4 text-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-[#e8dfc8]">
             <div>
-              <h3 className="text-sm font-bold text-amber-950 flex items-center gap-2">
+              <h3 className="text-sm font-bold text-stone-900 flex items-center gap-2">
                 <Database className="w-4 h-4 text-[#8a6d2b]" />
-                Manajemen Data Demo Operasional Siap Pakai
+                Pemeliharaan Database Resmi (Reset Bersih)
               </h3>
-              <p className="text-xs text-amber-800/80 mt-1">
-                Gunakan fitur ini untuk memuat ulang seluruh data simulasi: reservasi aktif kamar Gedung Mina (Superior & Standar), jadwal check-out hari ini (lunas & kurang bayar), sewa Aula dan Ruang Kelas, tugas housekeeping, serta 8 laporan akuntansi SAP PP 71/2010.
+              <p className="text-xs text-stone-600 mt-1">
+                Gunakan fungsi ini jika perlu mengosongkan seluruh data operasional kembali ke kondisi awal resmi: 33 kamar aktif siap huni, 0 tamu dummy, 0 reservasi dummy, dan tersinkronkan ke Cloud.
               </p>
             </div>
             <Button
               variant="outline"
               type="button"
               size="sm"
-              icon={<RotateCcw className="w-3.5 h-3.5 text-amber-700" />}
-              onClick={() => {
-                if (confirm('Muat ulang data demo SIMAHA Papua?\n\nSemua perubahan data lokal akan disegarkan kembali ke preset operasional lengkap.')) {
+              icon={<RotateCcw className="w-3.5 h-3.5 text-[#8a6d2b]" />}
+              onClick={async () => {
+                if (confirm('Kosongkan data operasional (Mulai dari Kondisi Bersih / Standar)?\n\nSistem akan:\n• Menghapus seluruh data reservasi, check-in, check-out, dan invoice\n• Menyetel seluruh 33 kamar aktif siap huni (AVAILABLE / READY)\n• Menyinkronkan kondisi bersih ini ke Cloud Real-time')) {
                   db.resetDemoData();
-                  toast.success('Data Demo Berhasil Dimuat Ulang', 'Seluruh data kamar, reservasi, jadwal hari ini, dan laporan keuangan telah disegarkan.');
+                  await db.pushToCloud();
+                  toast.success('Database Bersih', 'Seluruh data operasional telah dikosongkan dan tersinkronkan ke Cloud.');
                   setTimeout(() => {
                     window.location.reload();
                   }, 400);
                 }
               }}
-              className="bg-white border-amber-300 text-amber-900 hover:bg-amber-100/60 font-bold shrink-0"
+              className="bg-white border-[#c9a961] text-[#8a6d2b] hover:bg-[#fbf8ee] font-bold shrink-0"
             >
-              Muat Ulang Data Demo
+              Reset Bersih Database
             </Button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-amber-900/90 font-medium pt-1">
-            <div className="flex items-center gap-2 bg-white/80 p-2.5 rounded-xl border border-amber-200/50">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-stone-700 font-medium pt-1">
+            <div className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-[#e8dfc8]">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>5 Kamar In-House Terisi (M101 - M104, M201-M202)</span>
+              <span>33 Kamar Siap Huni (Available / Ready)</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/80 p-2.5 rounded-xl border border-amber-200/50">
+            <div className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-[#e8dfc8]">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Jadwal Check-out Hari Ini (1 Lunas, 1 Kurang Bayar)</span>
+              <span>5 Fasilitas & Tarif Resmi Sesuai Brosur</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/80 p-2.5 rounded-xl border border-amber-200/50">
+            <div className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-[#e8dfc8]">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Sewa Aula & Ruang Kelas Aktif + SIMPONI MPN-G3</span>
+              <span>Tersinkronisasi Real-Time Multi-Perangkat</span>
             </div>
           </div>
         </div>

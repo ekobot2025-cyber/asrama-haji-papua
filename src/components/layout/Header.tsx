@@ -358,10 +358,10 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowUserMenu(false);
                   handleResetData();
                 }}
-                className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-amber-800 hover:bg-amber-50 flex items-center gap-2 transition-colors cursor-pointer"
+                className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-stone-700 hover:bg-stone-50 flex items-center gap-2 transition-colors cursor-pointer"
               >
-                <RotateCcw className="w-4 h-4 text-amber-700" />
-                <span>Muat Ulang / Reset Data Demo</span>
+                <RotateCcw className="w-4 h-4 text-stone-600" />
+                <span>Reset Bersih Database (Kondisi Awal)</span>
               </button>
 
               <button

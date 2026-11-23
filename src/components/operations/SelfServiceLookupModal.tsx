@@ -102,40 +102,7 @@ export const SelfServiceLookupModal: React.FC<SelfServiceLookupModalProps> = ({
             </Button>
           </form>
 
-          {/* Quick sample chips */}
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
-            <span className="font-semibold">Contoh Cepat:</span>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('Sulaiman');
-                handleSearch('Sulaiman');
-              }}
-              className="bg-slate-100 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] px-2 py-0.5 rounded-lg border border-slate-200 transition-colors"
-            >
-              H. Sulaiman
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('Fatimah');
-                handleSearch('Fatimah');
-              }}
-              className="bg-slate-100 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] px-2 py-0.5 rounded-lg border border-slate-200 transition-colors"
-            >
-              Hj. Siti Fatimah
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('RSV/AHP/2026/00001');
-                handleSearch('RSV/AHP/2026/00001');
-              }}
-              className="bg-slate-100 hover:bg-[#fbf8ee] hover:text-[#8a6d2b] px-2 py-0.5 rounded-lg border border-slate-200 transition-colors font-mono"
-            >
-              RSV-00001
-            </button>
-          </div>
+
 
           {/* Results Area */}
           {hasSearched && searchResult && (
